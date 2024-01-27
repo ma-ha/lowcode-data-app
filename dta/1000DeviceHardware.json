@@ -1,0 +1,10 @@
+{
+  "Raspi5": {
+    "id": "Raspi5",
+    "Manufacturer": "RaspBerry",
+    "Name": "RaspBerry Pi 5",
+    "Revision": "5",
+    "LinkType": "LAN",
+    "scopeId": "1000/DE"
+  }
+}

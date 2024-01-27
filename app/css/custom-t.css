@@ -1,0 +1,156 @@
+/* LOCODE-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
+
+
+#welcome-img1 {
+  display: none;
+}
+#welcome-img2 {
+  display: unset;
+  float: right;
+  width: 50%;
+}
+
+.welcomediv {
+  width: 94%;
+  padding-left: 3%;
+  padding-right: 3%;
+  clear: both;
+  height: auto;
+  overflow: auto;
+  padding-bottom: 10px;
+}
+
+.welcome2Abox {
+  width: 100%;
+  height: auto;
+  min-height: unset;
+  margin-bottom: 10px;
+  padding-bottom: 16px;
+}
+.welcome2Abox img {
+  float: right;
+}
+#welcome2 {
+  width:94%;
+}
+#welcome2txt {
+  width: 99%;
+  padding: 2%;
+  font-size: 1.1em;
+}
+#welcome2boxes, #welcome3boxes, #planboxes {
+  width: 100%;
+  height: auto;
+}
+.welcome2box {
+  width: 100%;
+  min-height: unset;
+  height: auto;
+  background-color: #2ca7ee15;
+  float: left;
+  margin-right: 0;
+  margin-top: 15px;
+}
+#dasboard1img {
+  width: 70%; 
+  margin-left: 15%;
+} 
+#welcome2box1 {
+  width: 100%;
+}
+
+.welcome2boxtxt, .planboxtxt {
+  margin: 3%;
+}
+
+.welcome1box {
+  width: 24%;
+  min-height: 325px;
+  height: auto;
+  background-color: #2ca7ee15;
+  float: left;
+  margin-right: 1%;
+}
+
+#welcome2boxes, #welcome3boxes, #planboxes {
+  width: 100%;
+  height: auto;
+}
+.welcome2box {
+  width: 100%;
+  min-height: unset;
+  height: auto;
+  background-color: #2ca7ee15;
+  float: left;
+  margin-right: 0;
+  margin-top: 15px;
+}
+#welcome2box1 {
+  width: 98%;
+  background-color: transparent;
+}
+
+#welcome2Abox3 {
+  width: 100%;
+  margin-right: 0px;
+}
+
+.welcome2boxtxt, .planboxtxt {
+  margin: 2%;
+  height: auto;
+}
+#welcome3security {
+  clear: left;
+  width: 80%;
+  font-size: 1.1em;
+}
+
+#planboxes {
+  width: 100%;
+  padding: 0px;
+}
+.planbox {
+  width: 48%;
+  min-height: unset;
+  background-color: #2ca7ee15;
+  float: left;
+  margin: 10px 0 10px 0;
+  height: auto;
+}
+#planbox1,
+#planbox3 {
+  margin-right: 3%;
+}
+.planboxprice {
+  bottom: unset;
+  position: unset;
+}
+#planfooter {
+  clear: both;
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+.orderdiv {
+  width: 100%;
+  height: 45px;
+  color: white;
+  /* background-color:  #45a7d8; */
+  text-align:center;
+  padding-top:25px;
+}
+.previewdiv .pre-h1 {
+  font-size: 1em;
+  color: #e4f1f8;
+}
+.previewdiv h3 {
+  color: white;
+  font-size: 1.2em;
+}
+.previewdiv {
+  padding-top:5px;
+  height: 55px;
+}
+#planbox3,
+#planbox4 {
+  min-height: 270px;
+}

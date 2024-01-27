@@ -1,0 +1,303 @@
+/* LOCODE-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
+
+#Sec2 {
+  top: 0px;
+  right: 0px;
+}
+#header {
+  margin: 0px;
+  width: 98%;
+}
+.header-logo h1 {
+  padding: 0px 0 0 10px;
+}
+#SecResetPwdURL {
+  top: 35px;
+}
+.pong-security2 {
+  right: -16px;
+}
+#MainNav {
+  min-width: unset;
+  width: 100%;
+}
+.header-logo h1 {
+  min-width: unset;
+  font-size: 2em;
+}
+.header-logo {
+  height: 75px;
+  width: 67%;
+  padding:0;
+}
+#footer {
+  height: 80px;
+}
+#footer .copyright-div {
+  top: 50px;
+  left: 5%;
+}
+#footer .footer-links {
+  position: absolute;
+  left: 5%;
+}
+
+img {
+  max-width: 100%;
+}
+
+#docuContent {
+  padding-left: 4%;
+  padding-right: 4%;
+}
+.sourcecode {
+  width: 96%;
+  margin-left: 0;
+}
+
+.pongNavBarPullDownMenu {
+  padding: 5px 5px 5px 5px;
+  width: 195px;
+}
+.pongNavBarPullDownItem {
+  margin-top: 20px;
+  margin-bottom: 18px;
+  padding-left: 5%;
+  width: 90%;
+}
+#navItem1 {
+  width: 100%;
+}
+.pongNavBarItem {
+  width: 31%;
+}
+#SecResetPwdURL {
+  top: 40px;
+}
+#SecurityHeaderUser {
+  max-width: 100px;
+}
+/* ===== Welcome Page ===============================*/
+
+#welcomeTitle {
+  display: none;
+}
+#welcome {
+  overflow: auto;
+}
+
+.welcomediv {
+  width: 94%;
+  padding-left: 3%;
+  padding-right: 3%;
+  clear: both;
+  height: auto;
+  overflow: auto;
+  padding-bottom: 0px;
+}
+
+.htmldiv .pre-h1{
+  color: #4ca5d0;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+.htmldiv h1, .htmldiv h2, .htmldiv h3 {
+  margin-top: 5px;
+  color:  var(--theme-color);
+}
+.htmldiv h1 {
+  font-size: 2.0em;
+}
+.htmldiv h2 {
+  font-size: 1.2em;
+}
+.htmldiv h3 {
+  font-size: 1.6em;
+}
+#welcome1 {
+  padding-top: 30px;
+  padding-bottom: 10px;
+  height: 150px;
+  background-color: #4ca5d0;
+}
+.linkbtn {
+  border: 1px solid #fff;
+  padding: 10px;
+  text-decoration: none;
+}
+#welcome1 a:link, .orderdiv a:link {
+  color: white;
+  font-weight: bold;
+}
+#welcome1 a:visited, .orderdiv a:visited  {
+  color: white;
+  font-weight: bold;
+}
+#welcome1 a:hover, .orderdiv a:hover  {
+  color: rgb(214, 229, 233);
+  font-weight: bold;
+}
+#welcome1 h1, #welcome1 .pre-h1 {
+  color: white;
+}
+#welcome-img1 {
+  display: none;
+}
+#welcome-img2 {
+  display: inline;
+  width: 96%; 
+  max-width: 400px;
+}
+
+.welcome1box {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+.img-shaddow {
+  margin: 10px 10px 10px 0px;
+  box-shadow: 3px 3px 5px #666;
+  -moz-box-shadow: 3px 3px 5px #666;
+  -webkit-box-shadow: 3px 3px 5px #666;
+  -khtml-box-shadow: 3px 3px 5px #666;
+}
+
+#welcome2 {
+  width:94%;
+}
+#welcome2txt {
+  width: 99%;
+  padding: 2%;
+  font-size: 1.1em;
+}
+#welcome2boxes, #welcome3boxes, #planboxes {
+  width: 100%;
+  height: auto;
+}
+.welcome2box {
+  width: 100%;
+  min-height: unset;
+  height: auto;
+  background-color: #2ca7ee15;
+  float: left;
+  margin-right: 0;
+  margin-top: 15px;
+}
+#welcome2box1 {
+  width: 98%;
+  background-color: transparent;
+}
+
+#welcome2Abox3 {
+  width: 100%;
+  margin-right: 0px;
+}
+
+.welcome2boxtxt, .planboxtxt {
+  margin: 2%;
+  height: auto;
+}
+#welcome3security {
+  clear: left;
+  width: 80%;
+  font-size: 1.1em;
+}
+
+.planbox {
+  width: 94%;
+  min-height: unset;
+  background-color: #2ca7ee15;
+  float: left;
+  margin-right: 0;
+  margin-top: 10px;
+  height: auto;
+}
+.planboxprice {
+  bottom: unset;
+  position: unset;
+}
+#planfooter {
+  clear: both;
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+.orderdiv {
+  width: 100%;
+  height: 45px;
+  color: white;
+  /* background-color:  #45a7d8; */
+  text-align:center;
+  padding-top:25px;
+}
+.previewdiv .pre-h1 {
+  font-size: 1em;
+  color: #e4f1f8;
+}
+.previewdiv h3 {
+  color: white;
+  font-size: 1.2em;
+}
+.previewdiv {
+  padding-top:5px;
+  height: 55px;
+}
+
+/* Alarm Config */
+#AlarmCfg {
+  width: 100%;
+}
+#AlarmCfgContentPongFormFrm .pongFormInputCol {
+  padding: 0px;
+  width: auto;
+}
+[id^="AlarmCfgContentWCURL"] input {
+  width: 95%;
+}
+[id^="AlarmCfgContentWCHLZ"] input {
+  width: 90%;
+}
+[id^="AlarmCfgContentWCMS"] select {
+  width: 90%;
+}
+
+#AlarmCfg [class$="Col3"] {
+  width: 22%;
+}
+
+/* Trial Order Page*/
+#welcome1 {
+  height: auto;
+  padding-bottom: 16px;
+}
+
+#trialinfo,
+#FrialCfgMainRow {
+  padding-left: 0px;
+}
+
+#FrialCfgContentgtcDiv label {
+  float: right;
+  width: 85%;
+}
+#FrialCfgContentgtcDiv input {
+  width: 25px;
+}
+
+.welcome2Abox {
+  width: 100%;
+  height: auto;
+  min-height: unset;
+  margin-bottom: 10px;
+}
+
+.pongFormInputCol {
+  padding-right: 0px;
+}
+
+#FrialCfgContentPongFormFrm select,
+#FrialCfgContentPongFormFrm input {
+  width: 290px;
+}
+#FrialCfgContentgtcDiv input {
+  width: 25px;
+}

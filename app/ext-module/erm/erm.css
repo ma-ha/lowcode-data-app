@@ -1,0 +1,607 @@
+/* LOCODE-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
+
+.lc-erm-main-div {
+  width: 100%;
+  height: 100%;;
+  background-color: white;
+}
+
+.lc-erm-appname {
+  font-size: 0.85em;
+}
+
+.lc-erm-ns {
+  position: absolute;
+  z-index: 200;
+  border-radius:10px;
+	-webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  /* text */
+  vertical-align: top;  
+  text-align: left;
+  padding: 5px;
+  overflow:hidden;
+}
+.lc-erm-ns-lbl {
+  padding-left: 20px;
+}
+
+.lc-erm-features-div {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 360px;
+  height: 200px;
+  z-index: 300;
+  padding: 10px;
+  /* background-color: wheat; */
+  background-color: lightblue;
+}
+.lc-erm-features-div h2 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+}
+.lc-erm-ms {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  z-index: 300;
+  border-radius:6px;
+	-webkit-border-radius:6px;
+  -moz-border-radius:6px;
+  /* text */
+  vertical-align: top;  
+  text-align: center;
+  padding: 2px;
+}
+
+.lc-erm-logbox-div {
+  background-color: #3b493d; 
+  z-index: 500;
+}
+.lc-erm-move-logs,
+.lc-erm-rez-logs {
+  background-color: #cde9d263; 
+}
+
+.lc-erm-logbox-resize {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 10000;
+}
+
+
+.lc-erm-logbox-name {
+  color: white;
+  background-color: #3b493d;
+  font-size: 0.8em;
+  position: absolute;
+  height:20px;
+  top: -20px;
+  padding-left: 5px;
+  padding-right: 5px;
+  right:0px;
+}
+.lc-erm-logbox-logs {
+  color: lightgreen;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top:0px;
+  left:0px;
+  font-size: 0.70em;
+  padding-left: 3px;
+  font-family: monospace;
+  overflow: auto;
+}
+
+/* Access Stats ================== */
+.lc-erm-stats-nameico {
+  width:20px;
+  float: right;
+}
+.lc-erm-stats-namelb {
+  width:140px;
+  float: left;
+}
+
+.lc-erm-stats-e {
+  position: absolute;
+  bottom: 20px;
+  left: 4px;
+}
+
+.lc-erm-accstat-ico {
+  position: absolute;
+  bottom: 20px;
+  left: 35px;
+}
+.lc-erm-urlstat-ico {
+  position: absolute;
+  bottom: 20px;
+  left: 50px;  
+}
+.lc-erm-cltstat-ico {
+  position: absolute;
+  bottom: 20px;
+  left: 65px;  
+}
+.lc-erm-cpustat-ico {
+  position: absolute;
+  bottom: 20px;
+  left: 5px;
+}
+.lc-erm-memstat-ico {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;  
+}
+.lc-erm-stats-div {
+  background-color: #061b1e; 
+  z-index: 500;
+  width: 180px;
+  height: 70px;
+}
+.lc-erm-stats-name {
+  color: white;
+  background-color: #0f363b;
+  font-size: 0.8em;
+  position: absolute;
+  height:18px;
+  top: -18px;
+  padding-left: 3%;
+  padding-right: 3%;
+  right:0px;
+  width: 94%;
+  padding-top: 3px;
+  overflow: hidden;
+}
+.lc-erm-move-accstats {
+  background-color: #62aabb;
+}
+.lc-erm-stats-tot {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width:  170px;
+  height: 60px;
+  background-color: #061b1e;
+}
+/* .lc-erm-stats-tot-t {
+  position: absolute;
+  top: 0px;
+  width:  170px;
+  height: 16px;
+  text-align: right;
+  font-size: 0.8em;
+  color: white;
+} */
+.lc-erm-stats-tot-g {
+  position: absolute;
+  top: 0px;
+  width:  170px;
+  height: 60px;
+}
+.lc-erm-stats-tot-bar {
+  position: absolute;
+  bottom: 0px;
+  background-color: rgb(133, 247, 177);
+  background: linear-gradient(0deg, rgba(42,187,52,1) 78%, rgba(57,255,70,1) 100%);   position: absolute; 
+}
+.lc-erm-stats-tot-bar-err {
+  position: absolute;
+  bottom: 0px;
+  background-color: red;
+  background: linear-gradient(0deg, rgba(187,42,42,1) 78%, rgba(255,159,57,1) 100%);   bottom: 0px;
+}
+.lc-erm-stats-tot-x1 {
+  position: absolute;
+  top: 0px;
+  width: 170px;
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-color: gray;
+}
+.lc-erm-stats-tot-x2 {
+  position: absolute;
+  top: 30px;
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-color: gray;
+  width: 170px;
+}
+.lc-erm-stats-tot-x1l {
+  position: absolute;
+  top: 0px;
+  width: 170px;
+  color: white;
+  font-size: 0.6em;
+}
+.lc-erm-stats-tot-x2l {
+  position: absolute;
+  top: 30px;
+  width: 170px;
+  color: white;
+  font-size: 0.6em;
+}
+
+.lc-erm-stats-bars-g {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+.lc-erm-cltstats,
+.lc-erm-urlstats {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  color: white;
+}
+.lc-erm-urlbar {
+  position: absolute;
+  left: 0px;
+  height: 12px;
+  background-color: rgba(9,121,103,1);
+  background: linear-gradient(90deg, rgba(69,90,248,1) 63%, rgba(101,236,231,1) 100%); 
+  /* background: linear-gradient(90deg,   rgba(66,86,121,1) 63%, rgba(0,212,255,1) 100%);  */
+}
+.lc-erm-cltbar {
+  position: absolute;
+  left: 0px;
+  height: 12px;
+  background-color: rgba(9,121,103,1);
+  background: linear-gradient(90deg, rgb(15, 102, 105) 63%, rgb(32, 179, 147) 100%); 
+  /* background: linear-gradient(90deg,   rgba(66,86,121,1) 63%, rgba(0,212,255,1) 100%);  */
+}
+.lc-erm-bartxt {
+  position: absolute;
+  left: 0px;
+  height: 13px;
+  width: 100%;
+  font-size: 0.6em;
+  overflow: hidden;
+}
+
+/* ================================= */
+
+.lc-erm-ms-lbl {
+  display: table-cell;
+  width: 100px;
+  height: 80px;
+  vertical-align: middle;
+}
+
+.lc-erm-ms-status {
+  position: absolute;
+  width: 104px;
+  height: auto;
+  min-height: 20px;
+  left: 0px;
+  top: 84px;
+  background-color: black;
+  color:white;
+  border-radius:6px;
+	-webkit-border-radius:6px;
+  -moz-border-radius:6px;
+  display:block;
+}
+
+.lc-erm-ms-status-light {
+  position: absolute;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius:5px; 
+	-webkit-border-radius:5px;
+  -moz-border-radius:5px;
+  border:1px solid gray;
+  /* display:block;
+  float: left; */
+}
+
+.lc-erm-ms-status-ava {
+  position: absolute;
+  top: 4px;
+  width: 13px;
+  height: 12px;
+  border-radius:5px; 
+	-webkit-border-radius:5px;
+  -moz-border-radius:5px;
+  border:1px solid gray;
+}
+
+.lc-erm-ms-pod-status {
+  position: relative;
+  float: left;
+  display:block;
+  height: 18px;
+}
+
+.lc-erm-ms-ss-status {
+  position: absolute;
+  width: 100px;
+  height: 20px; columns: #4e9b4e;
+  left:1px;  
+  background-color: GRAY;
+  border:1px solid black;
+  border-radius:6px;
+	-webkit-border-radius:6px;
+  -moz-border-radius:6px;
+}
+
+.lc-erm-conn {
+  position: absolute;
+  z-index: 250;
+}
+.lc-erm-conn-ns2ns {
+  position: absolute;
+  z-index: 150;
+}
+
+.k8s-bg-lblue {
+  color: #363699;
+  background-color: #a1c4d6;
+  background-image: linear-gradient(325deg, #a1c4d6 0%, #dbe9e7 100%);
+}
+
+.k8s-bg-lblue2 {
+  color: #363699;
+  background-color: #84bad5;
+  background-image: linear-gradient(325deg, #32a4dd 0%, #53c0b0 100%);
+}
+
+.k8s-bg-lblue3 {
+  color: #363699;
+  background-color: #6794aa;
+  background-image: linear-gradient(325deg, #32c1dd 0%, #2e9081 100%);
+}
+
+.k8s-bg-gray {
+  background: rgb(224,222,222);
+  background: linear-gradient(350deg, rgba(224,222,222,1) 0%, rgba(246,246,246,1) 35%, rgba(210,212,213,1) 100%); 
+  border: 1px solid white;
+  /*   
+  background-color: #dbdbdb;
+  background-image: linear-gradient(135deg, #f2f2f2 0%, #ddd 100%); */
+}
+
+.k8s-bg-blue {
+  background-color: #0093E9;
+  background-image: linear-gradient(351deg, rgb(110, 183, 224) 0%, #cff3ef 100%);
+}
+
+.k8s-bg-tk {
+  color: white;
+  background-color: #8EC5FC;
+  background-image:  linear-gradient(135deg, rgb(20, 103, 186) 0%, #E0C3FC 100%);
+}
+
+.k8s-bg-redgr {
+  color: #dbdbdb;
+  background-color: #64577a;
+  background-image: linear-gradient(161deg, #64577a 0%, #b1b1b3 100%);  
+}
+
+
+.k8s-bg-lblue-nos {
+  background-color: #a1c4d6;
+}
+
+.k8s-bg-gray-nos {
+  background-color: #dbdbdb;
+}
+
+.k8s-bg-blue-nos {
+  background-color: rgb(102, 216, 236);
+}
+
+.k8s-bg-tk-nos {
+  background-color: rgb(4, 20, 255);
+}
+
+.k8s-bg-redgr-nos {
+  background-color: #64577a;
+}
+
+.k8s-bg-red-nos {
+  background-color: #640000;
+}
+
+.ingress-ava {
+  left: -2.5px;
+  top: -3.5px;
+}
+
+.lc-erm-vol {
+  padding-top: 2px;
+  text-align: right;
+  width: 95px
+}
+
+/* ------ EDIT MODE ------ */
+
+.lc-erm_ns_select {
+  z-index: 500;
+  position: absolute;
+  top: 50px; 
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+.k8s-ns-sel-bt {  
+  z-index: 400;
+  position: absolute;
+  top: 0px; 
+  right: 0px;
+  width: 16px;
+  height: 16px;
+  margin: 0px;
+  padding: 0px;
+}
+.k8s-ns-sel-lst {
+  widows: 100%;
+  height: 100%;
+  overflow: auto;
+  font-size: 0.8em;
+}
+
+.lc-erm-ms-sel {
+  z-index: 600;
+  position: absolute;
+  top: 3px; 
+  right: 3px;
+  width: 24px;
+  height: 24px;
+  background-color: lightsteelblue;
+}
+
+.lc-erm-logs-e {
+  position: absolute;
+  bottom: 21px;
+  right: 5px;
+}
+
+.k8s-ms-sel-bt {
+  z-index: 500;
+  position: absolute;
+  top: 0px; 
+  right: 0px;
+  width: 16px;
+  height: 16px;
+  margin: 0px;
+  padding: 0px;
+}
+.lc-erm-ms-sel-lst {
+  widows: 100%;
+  height: 100%;
+  overflow: auto;
+  font-size: 0.8em;
+}
+
+.lc-erm-move-sel {
+  z-index: 500;
+  position: absolute;
+  top: 0px; 
+  left: 0px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+.lc-erm-resize-sel {
+  z-index: 500;
+  position: absolute;
+  bottom: 0px; 
+  right: 0px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+.lc-erm-from-sel {
+  z-index: 500;
+  position: absolute;
+  top: 95px; 
+  left: 40px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+.lc-erm-to-sel {
+  z-index: 500;
+  position: absolute;
+  top: -12px; 
+  left: 40px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+
+#lc-erm-nodes-div { 
+  width: 100%;
+  height: auto;
+  position: absolute;
+  bottom: 0px;
+}
+
+.lc-erm-node { 
+  width: 100px;
+  height: 150px;
+  position: relative;
+  float: left;
+  display:block;
+  margin: 5px;
+}
+
+.lc-erm-nodename{
+  width: 100%;
+  overflow: hidden;
+  height: 30px;
+  font-size: 0.8em;
+  color: black;
+}
+
+.bg-grey {
+  color: black;
+  background-color: #dbdbdb;
+}
+
+.bg-red {
+  color: rgb(216, 14, 14);
+  background-color: #a06363;
+}
+
+.bg-outdated {
+  color: #aaa;
+  background-color: #eee;
+}
+.lc-erm-node-pods {
+  width: 100%;
+  height: 75px;
+  overflow-y: auto;
+}
+.lc-erm-node-pod {
+  width: 10px;
+  height: 10px;
+  margin-bottom: 1px;
+  margin-right: 1px;
+  position: relative;
+  float: left;
+  display:block;
+}
+
+.lc-erm-usage {
+  width: 100%;
+  height: 45px;
+  /* background-color:#555; */
+}
+
+.lc-erm-usage-pie {
+  width: 50px;
+  height: auto;
+  position: relative;
+  float: left;
+  display:block;
+}
+.k8s-pie-label {
+  width: 100%;
+  text-align: center;
+  font-size: 0.80em;
+}
+.undefined-nos {
+  background-color: rgb(94, 168, 104);
+}
+
+.succeded-nos {
+  background-color: #7a708b;
+}

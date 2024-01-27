@@ -1,0 +1,33 @@
+{
+  "demo": {
+    "name": "Demo",
+    "role": {
+      "dev": [
+        "1000"
+      ],
+      "admin": [
+        "1000"
+      ],
+      "appUser": [
+        "1000"
+      ],
+      "api": []
+    },
+    "password": "demo",
+    "expires": 2234567890000,
+    "lastLogin": 1706344467273
+  },
+  "5a095719-cfbe-49d3-8927-a55da94221ed": {
+    "name": "Markus Super App",
+    "role": {
+      "dev": [],
+      "admin": [],
+      "appUser": [],
+      "api": [
+        "1000"
+      ]
+    },
+    "password": "5a095719-cfbe-49d3-8927-a55da94221ed",
+    "expires": 1234567890
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "1000": {
+    "name": "Test Tenant",
+    "tag": []
+  },
+  "2000": {
+    "name": "Other Root Tenant",
+    "tag": []
+  },
+  "1000/DE": {
+    "name": "Region Germany",
+    "tag": [
+      "region"
+    ]
+  },
+  "1000/DE/Berlin": {
+    "name": "City: Berlin",
+    "tag": [
+      "city",
+      "capital",
+      "huge"
+    ]
+  },
+  "1000/DE/Hamburg": {
+    "name": "City: Hamburg",
+    "tag": [
+      "city",
+      "huge"
+    ]
+  },
+  "1000/DE/Munich": {
+    "name": "City: Munich",
+    "tag": [
+      "city",
+      "huge"
+    ]
+  },
+  "1000/DE/Essen": {
+    "name": "City: Essen",
+    "tag": [
+      "city",
+      "huge"
+    ]
+  },
+  "1000/DE/Bochum": {
+    "name": "City: Bochum",
+    "tag": [
+      "city",
+      "mid"
+    ]
+  },
+  "1000/DE/Hattingen": {
+    "name": "City: Hattingen",
+    "tag": [
+      "city",
+      "small"
+    ]
+  },
+  "1000/UK": {
+    "name": "UK",
+    "tag": [
+      "region"
+    ]
+  },
+  "1000/DE/Bonn": {
+    "name": "City: Bonn",
+    "tag": [
+      "city",
+      "mid"
+    ]
+  }
+}

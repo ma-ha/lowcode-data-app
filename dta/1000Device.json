@@ -1,0 +1,47 @@
+{
+  "1234": {
+    "id": "1234",
+    "DeviceNo": "1234",
+    "Status": "Planned",
+    "Hardware": "",
+    "Description": "test",
+    "ConnType": "COAP (TMA SIM)",
+    "Tags": "",
+    "scopeId": "1000/DE"
+  },
+  "x1": {
+    "id": "x1",
+    "DeviceNo": "x1",
+    "scopeId": "1000"
+  },
+  "x2": {
+    "id": "x2",
+    "DeviceNo": "x2",
+    "scopeId": "1000"
+  },
+  "a1": {
+    "id": "a1",
+    "DeviceNo": "a1",
+    "scopeId": "1000"
+  },
+  "bo1": {
+    "id": "bo1",
+    "DeviceNo": "bo1",
+    "Status": "Ordered",
+    "Hardware": "test",
+    "Description": "",
+    "ConnType": "LW-M2M (DT SIM)",
+    "Tags": "b",
+    "scopeId": "1000/DE/Bochum"
+  },
+  "abc": {
+    "id": "abc",
+    "DeviceNo": "abc",
+    "Status": "Inventory",
+    "Hardware": "Raspi5",
+    "Description": "abc",
+    "ConnType": "LW-M2M (DT SIM)",
+    "Tags": "EH-DEV",
+    "scopeId": "1000/DE"
+  }
+}

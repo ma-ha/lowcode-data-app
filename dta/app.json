@@ -1,0 +1,592 @@
+{
+  "dev/locode-entity-editor/0.1.0": {
+    "scopeId": "dev",
+    "title": "Entity Editor",
+    "entity": {
+      "app": {
+        "title": "App",
+        "scope": "inherit",
+        "maintainer": [
+          "dev"
+        ],
+        "properties": {
+          "title": {
+            "type": "String",
+            "label": "App Name"
+          },
+          "entity": {
+            "docMap": "appEntity",
+            "label": "Entities"
+          },
+          "page": {
+            "docMap": "appPage",
+            "label": "App Page"
+          }
+        }
+      },
+      "appEntity": {
+        "title": "Entity",
+        "scope": "inherit",
+        "maintainer": [
+          "dev"
+        ],
+        "properties": {
+          "name": {
+            "type": "String"
+          },
+          "scope": {
+            "select": [
+              "inherit",
+              "inherit-readonly",
+              "no-inherit"
+            ]
+          },
+          "maintainer": {
+            "select": [
+              "appUser",
+              "admin"
+            ]
+          },
+          "masterData": {
+            "type": "Boolean"
+          },
+          "property": {
+            "docMap": "appEntityProperty"
+          }
+        }
+      },
+      "appTabView": {
+        "title": "Tab View",
+        "scope": "inherit",
+        "maintainer": [
+          "dev"
+        ],
+        "properties": {
+          "title": {
+            "type": "String",
+            "label": "Page"
+          },
+          "views": {
+            "docMap": "appView"
+          }
+        }
+      },
+      "appView": {
+        "title": "View",
+        "scope": "inherit",
+        "maintainer": [
+          "dev"
+        ],
+        "properties": {
+          "title": {
+            "type": "String"
+          },
+          "type": {
+            "type": "Select",
+            "options": [
+              "table",
+              "form"
+            ]
+          },
+          "entity": {
+            "selectRef": "appEntity"
+          },
+          "search": {
+            "type": "Boolean"
+          },
+          "edit": {
+            "type": "Boolean"
+          },
+          "add": {
+            "type": "Boolean"
+          }
+        }
+      },
+      "appEntityProperty": {
+        "title": "Property",
+        "scope": "inherit",
+        "maintainer": [
+          "dev"
+        ],
+        "properties": {
+          "Name": {
+            "type": "String"
+          },
+          "Type": {
+            "type": "Select",
+            "options": []
+          },
+          "Can_be_null": {
+            "type": "Boolean"
+          },
+          "Short": {
+            "type": "Boolean"
+          },
+          "Filter": {
+            "type": "Boolean"
+          },
+          "Options": {
+            "selectRef": "appSelectValues"
+          }
+        }
+      },
+      "appSelectValues": {
+        "title": "Select Values",
+        "scope": "inherit",
+        "maintainer": [
+          "dev"
+        ],
+        "properties": {
+          "Key": {
+            "type": "String"
+          },
+          "Value": {
+            "type": "String"
+          }
+        }
+      }
+    },
+    "startPage": "app",
+    "view": {
+      "Apps": {
+        "title": "Apps",
+        "type": "table",
+        "entity": "app",
+        "edit": true,
+        "add": true
+      },
+      "Selects": {
+        "title": "Selects",
+        "type": "table",
+        "entity": "appSelectValues",
+        "add": true,
+        "edit": true
+      }
+    },
+    "scope": {
+      "dev": {
+        "role": [
+          "dev"
+        ],
+        "srcURL": ""
+      }
+    }
+  },
+  "1000/device-inventory-app/1.0.0": {
+    "type": "dev/locode-entity-editor/0.1.0",
+    "scopeId": "1000",
+    "title": "Order Device",
+    "require": {},
+    "entity": {
+      "DeviceOrder": {
+        "title": "IoT Device Order",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "OderNo": {
+            "type": "String"
+          },
+          "OrderDate": {
+            "type": "Date"
+          },
+          "OderStatus": {
+            "select": [
+              "open",
+              "in progress",
+              "shipped",
+              "delivered"
+            ]
+          },
+          "ItemPrice": {
+            "type": "String"
+          },
+          "Taxes": {
+            "type": "String"
+          },
+          "TotalPrice": {
+            "type": "String"
+          },
+          "Shipping": {
+            "type": "String"
+          },
+          "ShipmentTracking": {
+            "type": "String"
+          },
+          "Reorder": {
+            "type": "Action"
+          },
+          "Invoice": {
+            "ref": "Invoice"
+          },
+          "Devices": {
+            "selectRef": "1000/device-mgr-app/1.0.0/DeviceHardware"
+          },
+          "Invoice": {
+            "selectRef": "1000/device-inventory-app/1.0.0/Invoice"
+          }
+        },
+        "divs": [
+          {
+            "id": "O1",
+            "divs": [
+              {
+                "prop": "OrderNo"
+              },
+              {
+                "prop": "OrderDate"
+              },
+              {
+                "prop": "OderStatus"
+              }
+            ]
+          },
+          {
+            "id": "O1",
+            "divs": [
+              {
+                "prop": "Devices"
+              },
+              {
+                "prop": "ItemPrice"
+              },
+              {
+                "prop": "Taxes"
+              },
+              {
+                "prop": "TotalPrice"
+              }
+            ]
+          },
+          {
+            "id": "O1",
+            "divs": [
+              {
+                "prop": "Shipping"
+              },
+              {
+                "prop": "ShipmentTracking"
+              }
+            ]
+          },
+          {
+            "id": "O1",
+            "divs": [
+              {
+                "prop": "Reorder"
+              },
+              {
+                "prop": "Invoice"
+              }
+            ]
+          }
+        ]
+      },
+      "Invoice": {
+        "title": "Invoice",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "InvoiceNo": {
+            "type": "String"
+          },
+          "SapNo": {
+            "label": "SAP-No",
+            "type": "String"
+          }
+        }
+      }
+    },
+    "startPage": [
+      "DeviceOrder",
+      "Invoice"
+    ],
+    "role": [],
+    "scope": {
+      "#region": {
+        "role": [
+          "appUser"
+        ],
+        "srcURL": ""
+      },
+      "#city": {
+        "role": [
+          "appUser"
+        ],
+        "srcURL": ""
+      }
+    }
+  },
+  "1000/device-mgr-app/1.0.0": {
+    "type": "dev/locode-entity-editor/0.1.0",
+    "scopeId": "1000",
+    "title": "Device Manager",
+    "require": {},
+    "entity": {
+      "Device": {
+        "title": "IoT Device",
+        "scope": "no-inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "DeviceNo": {
+            "type": "String"
+          },
+          "Status": {
+            "select": [
+              "Ordered",
+              "Inventory",
+              "Planned",
+              "Active",
+              "Defect",
+              "Decommissioned"
+            ]
+          },
+          "Hardware": {
+            "selectRef": "1000/device-mgr-app/1.0.0/DeviceHardware"
+          },
+          "Description": {
+            "type": "String"
+          },
+          "ConnType": {
+            "select": [
+              "COAP (TMA SIM)",
+              "COAP (1NCE SIM)",
+              "LW-M2M (DT SIM)",
+              "LORA",
+              "MQTT (DT SIM)",
+              "MQTT (TMA SIM)",
+              "UDP (TMA SIM)",
+              "UDP (1NCE SIM)"
+            ]
+          },
+          "Tags": {
+            "multiSelectRef": "1000/device-mgr-app/1.0.0/DeviceTags"
+          }
+        }
+      },
+      "DeviceHardware": {
+        "title": "IoT Hardware",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "Manufacturer": {
+            "type": "String"
+          },
+          "Name": {
+            "type": "String"
+          },
+          "Revision": {
+            "type": "String"
+          },
+          "LinkType": {
+            "select": [
+              "BT-LE",
+              "LAN",
+              "LTE",
+              "LTE-M",
+              "LORA",
+              "NB-IoT",
+              "MODBUS",
+              "...other"
+            ]
+          }
+        }
+      },
+      "DataLink": {
+        "title": "IoT Data Link",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "LinkType": {
+            "select": [
+              "WebHook",
+              "Azure Event Hub",
+              "AWS IoT Central",
+              "CoT"
+            ]
+          },
+          "Comment": {
+            "type": "String"
+          },
+          "ConnectionString": {
+            "type": "String"
+          },
+          "TrafficStats": {
+            "type": "Metrics"
+          },
+          "DeviceStats": {
+            "type": "Metrics"
+          },
+          "DeviceTags": {
+            "multiSelectRef": "1000/device-mgr-app/1.0.0/DeviceTags"
+          }
+        }
+      },
+      "DeviceTags": {
+        "title": "Device Tags",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "Tag": {
+            "type": "String"
+          },
+          "Description": {
+            "type": "String"
+          }
+        }
+      }
+    },
+    "startPage": [
+      "Device",
+      "DataLink",
+      "DeviceHardware",
+      "DeviceTags"
+    ],
+    "role": [],
+    "scope": {
+      "#region": {
+        "role": [
+          "appUser"
+        ],
+        "srcURL": ""
+      },
+      "#city": {
+        "role": [
+          "appUser"
+        ],
+        "srcURL": ""
+      }
+    }
+  },
+  "1000/city-mgr-app/1.0.0": {
+    "type": "dev/locode-entity-editor/0.1.0",
+    "scopeId": "1000",
+    "title": "City Manager",
+    "require": {
+      "region-mgr/1.0.0": {
+        "srcURL": ""
+      }
+    },
+    "entity": {
+      "city": {
+        "title": "City",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "Name": {
+            "type": "String"
+          },
+          "ZIP": {
+            "type": "String"
+          },
+          "Region": {
+            "selectRef": "1000/region-mgr/1.0.0/region"
+          }
+        }
+      }
+    },
+    "startPage": "city",
+    "role": [],
+    "scope": {
+      "#region": {
+        "role": [
+          "appUser"
+        ],
+        "srcURL": ""
+      }
+    }
+  },
+  "1000/region-mgr/1.0.0": {
+    "type": "dev/locode-entity-editor/0.1.0",
+    "scopeId": "1000",
+    "title": "Region Manager",
+    "require": {},
+    "entity": {
+      "region": {
+        "title": "Region",
+        "scope": "inherit",
+        "maintainer": [
+          "region-manager"
+        ],
+        "properties": {
+          "Name": {
+            "type": "String"
+          },
+          "Short": {
+            "type": "String"
+          },
+          "Size": {
+            "select": [
+              "S",
+              "M",
+              "L"
+            ]
+          },
+          "CitiesInRegion": {
+            "sub": "1000/city-mgr-app/1.0.0/city",
+            "prop": "Region",
+            "label": "Cities"
+          }
+        }
+      }
+    },
+    "startPage": "region",
+    "role": [
+      "region-manager"
+    ],
+    "scope": {
+      "1000": {
+        "role": [
+          "admin"
+        ],
+        "srcURL": ""
+      }
+    }
+  },
+  "1000/city-light-mgr/1.0.0": {
+    "type": "dev/locode-entity-editor/0.1.0",
+    "scopeId": "1000",
+    "title": "City Light Manager",
+    "require": {
+      "city-mgr/1.0.0": {
+        "srcURL": ""
+      }
+    },
+    "entity": {
+      "gateway": {
+        "title": "MgrGW",
+        "scope": "inherit",
+        "maintainer": [
+          "region-manager"
+        ],
+        "properties": {
+          "Name": {
+            "type": "String"
+          }
+        }
+      }
+    },
+    "startPage": "gateway",
+    "scope": {
+      "#city": {
+        "role": [
+          "user"
+        ],
+        "srcURL": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "PRD-EH": {
+    "id": "PRD-EH",
+    "LinkType": "Azure Event Hub",
+    "Comment": "Smart Building EH",
+    "ConnectionString": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "scopeId": "1000/DE"
+  },
+  "DEV-EH1": {
+    "id": "DEV-EH1",
+    "LinkType": "Azure Event Hub",
+    "Comment": "for firmware testing",
+    "ConnectionString": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "scopeId": "1000/DE"
+  },
+  "PRD-ServiceNow": {
+    "id": "PRD-ServiceNow",
+    "LinkType": "WebHook",
+    "Comment": "Smart Building Alarms",
+    "ConnectionString": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "scopeId": "1000/DE"
+  }
+}

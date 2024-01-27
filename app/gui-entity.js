@@ -1,0 +1,302 @@
+/* LOCODE-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
+
+const gui     = require( 'easy-web-app' )
+
+const log     = require( './log' ).logger
+const dta     = require( './app-dta' )
+const userDta  = require( './app-dta-user' )
+
+exports: module.exports = {
+  init
+}
+
+function init(  ) {
+  
+  // --------------------------------------------------------------------------
+  let appEntityPage = gui.addPage( 'AppEntity-nonav' ) 
+  appEntityPage.title = "App"
+  appEntityPage.setPageWidth( "90%")
+  appEntityPage.dynamicRow( renderDynEntityRows )
+
+  // --------------------------------------------------------------------------
+  let appEntityPropPage = gui.addPage( 'AppEntityProperty-nonav' ) 
+  appEntityPropPage.title = "App"
+  appEntityPropPage.setPageWidth( "90%")
+  appEntityPropPage.dynamicRow( renderDynEntityPrpRows )
+
+}
+
+// ==========================================================================++
+
+async function renderDynEntityRows( staticRows, req, pageName )  {
+  if ( ! req.query.id  ) { log.warn('require param: id'); return [] }
+  let params =  req.query.id.split(',')
+  let appId = params[0]
+  let app   = await dta.getAppById( appId )
+  if ( ! app ) { log.warn( 'appEntityPage.dynamicRow app not found', appId ); return [] }
+  let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
+
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  let rowArr = []
+  if ( ! params[1] ) { // log.warn( 'appEntityPage.dynamicRow entityId not set', req.query.id  ); return [] }
+
+    if ( typeof app.startPage === 'string' || app.startPage instanceof String ) {
+      // render simple entity page
+      let entityId  =app.startPage
+      rowArr = renderEntityRows( app, appId, entityId, null )
+    
+    } else if ( typeof app.startPage === 'array' || app.startPage instanceof Array ) {
+    
+      // multiple tabs per entity in array
+      let tabRow = {
+        rowId  : 'Tabs' + appIdX,
+        height : "780px",
+        tabs   : [] 
+      }
+      for ( let entityId of app.startPage ) {
+        let entity = app.entity[ entityId ]
+        let tabSpec = {
+          tabId  : 'Tab' + entityId, 
+          title  : entity.title, 
+          rows: await renderEntityRows( app, appId, entityId, null, user )  
+        }
+        tabRow.tabs.push( tabSpec )
+      }
+      rowArr = [ tabRow ]
+    }
+
+  } else {   // render simple entity page
+    let entityId  = params[1]
+    let filter    = ( params.length == 3 ? params[2] : null)
+    rowArr = await renderEntityRows( app, appId, entityId, filter, user )  
+  } 
+
+  // log.info( JSON.stringify( rowArr, null, ' ' ) )
+  return rowArr
+}
+
+async function renderEntityRows( app, appId, entityId, filterParam, user ) {
+  // log.info( 'renderEntityRows', app, appId, entityId )
+  let rows = []
+  let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
+  let entity = app.entity[ entityId ]
+  let filter = null
+  if ( filterParam ) {
+    filter = {
+      field: filterParam.split('=')[0],
+      value: filterParam.split('=')[1]
+    }
+    // TODO render short info
+    rows.push({ 
+      title  : filter.field,
+      rowId : 'EntityInfo' + entityId, type : 'pong-form', 
+      resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
+      height : '60px', decor : "decor",
+      moduleConfig : {
+        id: 'EntityTableInfoForm',
+        fieldGroups:[{ columns: [
+          { formFields: [{ id: "title",   type: "text", defaultVal: filter.value }] },
+          { formFields: [{ id: "backLnk", linkText:"Back", type: "link", defaultVal: 'javascript:history.back()' }] }
+        ] }]
+      }
+    })
+  }
+
+  if ( entity.divs ) {
+    rows.push({ 
+      rowId  : 'EntityList' + entityId,
+      title  : entity.title,
+      decor  : "decor",
+      type   : 'pong-list',
+      height : '500px',
+      resourceURL : 'guiapp/'+appId+'/entity/'+entityId
+    })  
+  } else {
+    rows.push({ 
+      rowId : 'EntityList' + entityId,
+      title  : entity.title,
+      decor  : "decor",
+      type   : 'pong-table',
+      height      : '500px',
+      resourceURL : 'guiapp/'+appId+'/entity/'+entityId
+    })  
+  }
+
+  rows.push( 
+    await genAddDataForm( 
+      appId,
+      entityId, 
+      entity,
+      [{ resId: 'EntityList'+ entityId }],
+      filter,
+      user
+    )
+  )
+  
+  return rows
+}
+
+// ==========================================================================++
+ 
+
+async function genAddDataForm( appId, entityId, entity, updateResArr, filter, user ) {
+
+  let cols = []
+  cols.push({ formFields: [{ id: "id",   label: "Id", type: "text" } ]})
+
+  for ( let propId in entity.properties ) {
+    let prop = entity.properties[ propId ]
+    let lbl  = ( prop.label ? prop.label : propId )
+    // console.log( 'LBL', lbl)
+
+    let fld = null
+    if ( prop.type == 'String' ) {
+      fld = { id: propId, label: lbl, type: 'text' }
+    } else if ( prop.type == 'Boolean' ) {
+      fld = { id: propId, label: lbl, type: 'checkbox' }
+    } else if ( prop.type == 'Number' ) {
+      fld = { id: propId, label: lbl, type: 'text' }
+    } else if ( prop.type == 'Date' ) {
+      fld = { id: propId, label: lbl, type: 'date' }
+    } else if ( prop.select ) {
+      fld = { id: propId, label: lbl, type: 'select', options: [] }
+      for ( let val of prop.select ) { fld.options.push({ option: val }) }
+    } else if ( prop.docMap ) {
+      fld = { id: propId, label: lbl, type: 'text' }
+
+    } else if ( prop.selectRef ) {
+      
+      fld = { id: propId, label: lbl, type: 'select', options: [] }
+      try {
+        let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
+        for ( let recId in opdTbl ) { 
+          fld.options.push({ option: recId }) 
+        }
+      } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
+
+    } else if ( prop.multiSelectRef ) {
+
+      fld = { id: propId, label: lbl, type: 'select', options: [] }
+      try {
+        let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
+        for ( let recId in opdTbl ) { 
+          fld.options.push({ option: recId }) 
+        }
+      } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
+      
+    // } else if ( prop.refArray ) {
+    //   fld = { id: propId, label: l)bl, type: 'text' }
+    // } else if ( prop.ref ) {
+    //   fld = { id: propId, label: lbl, type: 'text' }
+
+    } else  {
+      fld = { id: propId, label: lbl, type: 'text' }
+    }
+    if ( filter && filter.field == propId ) {
+      fld.defaultVal = filter.value
+      fld.readonly   = "true" 
+    }
+    
+    if ( fld ) {
+      cols.push({ formFields: [ fld ] })
+    }
+  }
+
+  let addFormView = { 
+    id: 'Add' + entityId, rowId: 'Add' + entityId, type : 'pong-form',
+    title: 'Add/edit'+ entity.title,  
+    height: 'auto',  decor  : "decor",
+    resourceURL: 'guiapp/'+appId+'/entity/'+entityId, 
+
+    moduleConfig : {
+      // label:'Add '+viewId,
+      // description: "Add",
+      id: 'AddForm',
+      fieldGroups:[{ columns: cols }],
+      actions : [ 
+        { id: "AddEntityBtn", actionName: "Add/update",
+          actionURL: 'guiapp/'+appId+'/entity/'+entityId,
+          update: updateResArr, target: "modal" }
+      ]
+    }
+  }
+  return addFormView
+}
+// ==========================================================================++
+
+async function renderDynEntityPrpRows( staticRows, req, pageName ) {
+  if ( ! req.query.id  ) { log.warn('require param: id'); return [] }
+  let appId     = req.query.id.split(',')[0]
+  let entityId  = req.query.id.split(',')[1]
+  if ( ! entityId ) { log.warn( 'appEntityPage.dynamicRow entityId not set', req.query.id  ); return [] }
+  let app    = await dta.getAppById( appId )
+  if ( ! app ) { log.warn( 'appEntityPage.dynamicRow app not found', appId ); return [] }
+  let type  = await dta.getAppById( app.type )
+  // if ( ! type ) { log.warn( 'appEntityPage.dynamicRow app.type not found', app.type ); return [] }
+  // if ( ! type[ entityId ] ) { log.warn( 'appEntityPage.dynamicRow app.type.entity not found', app.type, entityId ); return [] }
+  let rowArr = renderEntityPrpRows( app, appId, entityId )
+  // log.info( JSON.stringify( rowArr, null, ' ' ) )
+  return rowArr
+}
+
+function renderEntityPrpRows( app, appId, entityId ) {
+  // log.info( 'renderEntityRows', app, appId, entityId )
+  let rows = []
+  let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
+  let entity = app.entity[ entityId ]
+  rows.push({ rowId : 'PropertyTable',
+    title  : 'Properties of "'+entityId+'" ("'+appId+'")',
+    decor  : "decor",
+    type   : 'pong-table',
+    height : '300px',
+    resourceURL : 'guiapp/'+appId+'/entity/'+entityId+'/property',
+    moduleConfig : {
+      dataURL: "",
+      rowId: "id",
+      cols: [
+        { id: "id",    label: "Id",    width: "20%", cellType: "text" },
+        { id: "type", label: "Title", width: "20%", cellType: "text" },
+        { id: "label", label: "Scope",    width: "20%", cellType: "text" }
+      ]
+    }
+  })
+
+  rows.push({ rowId : 'PropertyAddForm',
+    title  : 'Add Property',
+    decor  : "decor",
+    type   : 'pong-form',
+    resourceURL : 'guiapp/dev/'+appId+'/entity/'+entityId+'/properties',
+    moduleConfig : {
+      label:'Add Property',
+      description: "Edit Entity Property",
+      id: 'EntityAddPropertyForm',
+      fieldGroups:[{ columns: [{ formFields: [     
+        { id: "id",    label: "Id", type: "text" },
+        { id: "label", label: "Label", type: "text" },
+        { id: "type", label: "Type", type: "select",
+          options: addOptions([ 'String', 'Boolean', 'Select', 'selectRef', 'docMap' ]) 
+        }
+      ] }] }],
+      actions : [ 
+        { id: "PropertyAddBtn", actionName: "Add",
+          actionURL: 'guiapp/'+appId+'/entity/'+entityId+'/property', target: "_parent" }
+      ]
+    }
+  })
+
+  return rows
+}
+
+// ==========================================================================++
+// helper 
+
+function addOptions( optArr, selected ) {
+  let opts = []
+  for ( let opt of optArr ) {
+    let option = { option : opt }
+    if ( selected == opt ) { option.selected = true } else
+    if ( selected instanceof Array && selected.indexOf( opt ) >= 0 ) { option.selected = true }
+    opts.push( option )
+  }
+  return opts
+}

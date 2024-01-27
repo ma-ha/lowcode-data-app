@@ -1,0 +1,10 @@
+{
+  "EH-PRD": {
+    "id": "EH-PRD",
+    "scopeId": "1000/DE"
+  },
+  "EH-DEV": {
+    "id": "EH-DEV",
+    "scopeId": "1000/DE"
+  }
+}
