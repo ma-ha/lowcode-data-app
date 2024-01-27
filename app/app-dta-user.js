@@ -1,8 +1,8 @@
 /* LOCODE-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-const log       = require( './log' ).logger
 const cfg       = require( 'config' )
-const helper    = require( './helper' )
+const log       = require( './helper/log' ).logger
+const helper    = require( './helper/helper' )
 const fs        = require( 'fs' )
 const { mkdir, writeFile, readFile, rename, rm, stat } = require( 'node:fs/promises' )
 

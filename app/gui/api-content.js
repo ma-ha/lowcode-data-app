@@ -1,6 +1,6 @@
 /* LOCODE-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-const log   = require( './log' ).logger
+const log   = require( '../helper/log' ).logger
 const cfg   = require( 'config' )
 const fs    = require( 'fs' )
 
@@ -11,7 +11,9 @@ exports: module.exports = {
 let dbCache = {
 }
 
+
 async function init( svc ) {
+
 
   svc.get( '/get-free-trial', async (req, res) => {
     res.redirect( cfg.GUI_URL + 'index.html?layout=trial-nonav' ) 

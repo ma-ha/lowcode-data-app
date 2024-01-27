@@ -1,9 +1,9 @@
 /* LOCODE-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-const log  = require( './log' ).logger
 const cfg  = require( 'config' )
+const log  = require( '../helper/log' ).logger
 const express = require( 'express' )
-const userDta = require( './app-dta-user' )
+const userDta = require( '../app-dta-user' )
 
 exports: module.exports = {
   init

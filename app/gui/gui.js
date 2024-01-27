@@ -2,10 +2,10 @@
 
 const gui     = require( 'easy-web-app' )
 const express = require( 'express' )
-const log     = require( './log' ).logger
 const cfg     = require( 'config' )
-const pjson   = require( './package.json' )
-const weblog  = require( './app-weblog' ) 
+const log     = require( '../helper/log' ).logger
+const pjson   = require( '../package.json' )
+const weblog  = require( '../app-weblog' ) 
 
 const content = require( './api-content' ) 
 
@@ -15,8 +15,8 @@ const appGUI         = require( './gui-app' )
 const docuGUI        = require( './gui-docu' ) 
 const userGUI        = require( './gui-user' ) 
 
-const dta     = require( './app-dta' )
-const userDta = require( './app-dta-user' )
+const dta     = require( '../app-dta' )
+const userDta = require( '../app-dta-user' )
 
 exports: module.exports = {
   init,
@@ -171,7 +171,6 @@ async function genPageHeader ( pgHeader, req, page ) {
       }
     
       let scopeTbl = await userDta.getScopeList( user.userId )
-      log.debug ( 'scopeTbl', scopeTbl )
       let menuItems = []
       for ( let scope in scopeTbl ) {
         let ident = ''

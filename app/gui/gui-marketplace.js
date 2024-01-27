@@ -1,11 +1,11 @@
 /* LOCODE-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
 const gui     = require( 'easy-web-app' )
-const log     = require( './log' ).logger
+const log     = require( '../helper/log' ).logger
 const cfg     = require( 'config' )
-const pjson   = require( './package.json' )
+const pjson   = require( '../package.json' )
 
-const dta     = require( './app-dta' )
+const dta     = require( '../app-dta' )
 
 exports: module.exports = {
   init

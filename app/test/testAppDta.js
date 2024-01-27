@@ -10,7 +10,7 @@ describe( 'Test AppDta', () => {
 
 
     it( 'Alarm Check Run', async () => {
-      let scopes = await userDta.getScopeList( "demo" )
+      let scopes = await userDta.getScopeList( "mh@t.de" )
       console.log( scopes )
     })
 

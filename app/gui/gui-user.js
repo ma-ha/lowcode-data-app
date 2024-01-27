@@ -2,10 +2,10 @@
 
 const gui     = require( 'easy-web-app' )
 const express = require( 'express' )
-const log     = require( './log' ).logger
+const log     = require( '../helper/log' ).logger
 const cfg     = require( 'config' )
-const pjson   = require( './package.json' )
-const weblog  = require( './app-weblog' ) 
+const pjson   = require( '../package.json' )
+const weblog  = require( '../app-weblog' ) 
 
 exports: module.exports = {
   init

@@ -2,9 +2,9 @@
 
 const gui     = require( 'easy-web-app' )
 
-const log     = require( './log' ).logger
-const dta     = require( './app-dta' )
-const userDta  = require( './app-dta-user' )
+const log     = require( '../helper/log' ).logger
+const dta     = require( '../app-dta' )
+const userDta  = require( '../app-dta-user' )
 
 exports: module.exports = {
   init
