@@ -150,48 +150,53 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
     // console.log( 'LBL', lbl)
 
     let fld = null
-    if ( prop.type == 'String' ) {
-      fld = { id: propId, label: lbl, type: 'text' }
-    } else if ( prop.type == 'Boolean' ) {
-      fld = { id: propId, label: lbl, type: 'checkbox' }
-    } else if ( prop.type == 'Number' ) {
-      fld = { id: propId, label: lbl, type: 'text' }
-    } else if ( prop.type == 'Date' ) {
-      fld = { id: propId, label: lbl, type: 'date' }
-    } else if ( prop.select ) {
-      fld = { id: propId, label: lbl, type: 'select', options: [] }
-      for ( let val of prop.select ) { fld.options.push({ option: val }) }
-    } else if ( prop.docMap ) {
-      fld = { id: propId, label: lbl, type: 'text' }
 
-    } else if ( prop.selectRef ) {
-      
-      fld = { id: propId, label: lbl, type: 'select', options: [] }
-      try {
-        let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
-        for ( let recId in opdTbl ) { 
-          fld.options.push({ option: recId }) 
-        }
-      } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
-
-    } else if ( prop.multiSelectRef ) {
-
-      fld = { id: propId, label: lbl, type: 'select', options: [] }
-      try {
-        let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
-        for ( let recId in opdTbl ) { 
-          fld.options.push({ option: recId }) 
-        }
-      } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
-      
-    // } else if ( prop.refArray ) {
-    //   fld = { id: propId, label: l)bl, type: 'text' }
-    // } else if ( prop.ref ) {
-    //   fld = { id: propId, label: lbl, type: 'text' }
-
-    } else  {
-      fld = { id: propId, label: lbl, type: 'text' }
+    switch ( prop.type ) {
+      case 'Boolean':
+        fld = { id: propId, label: lbl, type: 'checkbox' }
+        break 
+      case 'Date':
+        fld = { id: propId, label: lbl, type: 'date' }
+        break 
+      case 'Select':
+        fld = { id: propId, label: lbl, type: 'select', options: [] }
+        for ( let val of prop.options ) { fld.options.push({ option: val }) }
+        break 
+      case 'SelectRef':
+        fld = { id: propId, label: lbl, type: 'select', options: [] }
+        try {
+          let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
+          for ( let recId in opdTbl ) { 
+            fld.options.push({ option: recId }) 
+          }
+        } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
+        break 
+      case 'MultiSelectRef':
+        fld = { id: propId, label: lbl, type: 'select', options: [] }
+        try {
+          let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
+          for ( let recId in opdTbl ) { 
+            fld.options.push({ option: recId }) 
+          }
+        } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
+        break 
+      case 'Ref': 
+        // TODO
+        break 
+      case 'RefArray':
+        // TODO
+        break 
+      case 'Link': 
+        // do nothing
+        break 
+      case 'Sub':
+        // do nothing
+        break 
+      default:   // String, Number, Select, DocMap
+        fld = { id: propId, label: lbl, type: 'text' }
+        break 
     }
+
     if ( filter && filter.field == propId ) {
       fld.defaultVal = filter.value
       fld.readonly   = "true" 

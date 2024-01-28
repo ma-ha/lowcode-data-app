@@ -217,9 +217,11 @@ async function init( ) {
       type : 'pong-table', resourceURL: 'app/entity/property', decor: 'decor', 
       moduleConfig : {
         dataURL: "",
-        rowId: "id",
+        rowId: [ 'appId', 'entityId', 'propId' ],
         cols: [
-          { id: "id",      label: "Id",       width: "20%", cellType: "text" },
+          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+            method: "GET", setData: [ { resId : 'AppEntityPropAdd' } ] },
+          { id: "propId",      label: "Id",       width: "20%", cellType: "text" },
           { id: "label",   label: "Label",    width: "20%", cellType: "text" },
           { id: "type",    label: "Type",     width: "20%", cellType: "text" }
         ]
@@ -233,7 +235,7 @@ async function init( ) {
     }
 
     rows.push({ 
-      id: 'AppEntityPropAdd', rowId: 'AppEntityPropAdd', title: 'Add Property',  height: '150px', 
+      id: 'AppEntityPropAdd', rowId: 'AppEntityPropAdd', title: 'Add / Update Property',  height: '150px', 
       type : 'pong-form', resourceURL: 'app/entity/property', decor: 'decor', 
       moduleConfig : {
         description: "Add",
@@ -244,11 +246,12 @@ async function init( ) {
           { formFields: [ { id: "propId",  label: "Id", type: "text" },
                           { id: "label",   label: "Label", type: "text" } ]},
           { formFields: [{ id: "type",     label: "Type", type: "select",
-            options: addOptions([ 'String', 'Boolean', 'Number', 'Date', 'Select', 'docMap', 'selectRef', 'ref' , 'refArray' ]) },
+            options: addOptions([ 'String', 'Boolean', 'Number', 'Date', 'Select', 'DocMap', 
+              'SelectRef', 'Ref', 'RefArray', 'Metric', 'Link', 'JSON' ]) },
           { id: "ref", label: "Ref", type: "text", options: refOptions } ]}
         ] }],
         actions : [ 
-          { id: "AddFormBtn", actionName: "Add", actionURL: 'app/entity/property', 
+          { id: "AddFormBtn", actionName: "Add / Update", actionURL: 'app/entity/property', 
             update: [{ resId:'AppEntityProp' }], target: "modal" }
         ]
       }

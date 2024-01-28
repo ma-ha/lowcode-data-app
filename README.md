@@ -43,11 +43,13 @@ Data types (and their Web GUI mapping)
 - `Number` (simple input fields)
 - `Boolean`  (checkboxes)
 - `Date` (date picker)
-- `select` with an option array (pull down of values)
-- `docMap` master-detail reference (link to  filtered docs)
-- `selectRef` to other entity  (pull down of ids)
-- `multiSelectRef` to other entity  (pull down of ids)
+- `Select` with an option array (pull down of values)
+- `DocMap` master-detail reference (link to  filtered docs)
+- `SelectRef` to other entity  (pull down of ids)
+- `MultiSelectRef` to other entity  (pull down of ids)
 - `Metrics` link to a metrics (time series data) for this entity id
+- `JSON` (Multi Line Edit)
+- `Link`(simple input fields, will take placeholders)
 
 So relations are
 - **1:n** = `docMap`

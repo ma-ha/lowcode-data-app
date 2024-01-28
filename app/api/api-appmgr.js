@@ -337,7 +337,7 @@ async function addEntity( req, res ) {
 // --------------------------------------------------------------------------
 
 async function getProperty( req, res ) {
-  log.info( 'GET /app/entity/property' )
+  log.info( 'GET /app/entity/property', req.query )
   let appId = ( req.query.appId ? req.query.appId : req.query.id.split(',')[0] )
   if ( ! appId ) { return res.status(400).send([]) }
   let entityId = ( req.query.entityId ? req.query.entityId : req.query.id.split(',')[1] )
@@ -346,27 +346,74 @@ async function getProperty( req, res ) {
   if ( ! app ) { log.warn('GET entity: /app/entity/property not found'); return res.status(400).send([]) }
   if ( ! app.entity ) { app.entity = {} }
   if ( ! app.entity[ entityId ] ) {  log.warn('GET /app/entity/property: app entity not found'); return res.status(400).send([]) }
+  if ( req.query.propId && ! req.query.id ) { // property by id
+    let dbProp = app.entity[ entityId ].properties[ req.query.propId ]
+    if ( ! dbProp ) { return res.send( null ) }
+    let prop = {
+      appId    : appId,
+      entityId : entityId,
+      propId   : req.query.propId,
+      type     :  dbProp.type,
+      label    : ( dbProp.label ? dbProp.label : '' ),
+    }
+    switch ( dbProp.type ) {
+      case 'Select':
+        prop.ref = dbProp.options.join()
+        break 
+      case 'SelectRef':
+        prop.ref  = dbProp.selectRef
+        break 
+      case 'DocMap':
+        prop.ref  = dbProp.docMap
+        break 
+      case 'Ref':
+        prop.ref  = dbProp.ref
+        break 
+      case 'RefArray':
+        prop.ref  = dbProp.refArray
+        break 
+      case 'Link':
+        prop.ref  = dbProp.link
+        break 
+      default: break 
+    }
+
+    return res.send( prop )
+  } 
+  
+  // else ... property array
+
   let propArr = []
   for ( let propId in app.entity[ entityId ].properties ) {
     let prop = app.entity[ entityId ].properties[ propId ]
-    let pType = "?"
-    if ( prop.type ) {
-      pType =  prop.type
-    } else if ( prop.docMap ) {
-      pType = "docMap."+prop.docMap
-    } else if ( prop.selectRef ) {
-      pType = "selectRef."+prop.selectRef
-    } else if ( prop.select ) {
-      pType = "select ["+prop.select.join()+']'
-    } else if ( prop.refArray ) {
-      pType = "refArray."+prop.refArray
-    } else if ( prop.ref ) {
-      pType = "ref."+prop.ref
-    } 
+    let pType = ( prop.type ? prop.type : "?" )
+    switch ( pType ) {
+      case 'Select':
+        pType = "Select: ["+prop.options.join()+']'
+        break 
+      case 'SelectRef':
+        pType = "SelectRef: "+prop.selectRef
+        break 
+      case 'DocMap':
+        pType = "DocMap: "+prop.docMap
+        break 
+      case 'Ref':
+        pType = "Ref: "+prop.ref
+        break 
+      case 'RefArray':
+        pType = "RefArray: "+prop.refArray
+        break 
+      case 'Link':
+        pType = "Link: "+prop.link
+        break 
+      default: break 
+    }
     propArr.push({
-      id    : propId,
-      label : prop.label,
-      type  : pType
+      appId    : appId,
+      entityId : entityId,
+      propId   : propId,
+      label    : prop.label,
+      type     : pType
     })
   }
   res.send( propArr )
@@ -384,16 +431,11 @@ async function addProperty ( req, res ) {
   if ( ! app ) { log.warn('POST /entity/property: entity not found'); return res.status(400).send("Entity Id not found") }
   entity.properties[ id ] = { }
   if ( req.body.label ) { entity.properties[ id ].label = req.body.label }
-  if ( req.body.type == 'String' ) {
-    entity.properties[ id ].type = 'String'
-  } else if ( req.body.type == 'Boolean' ) {
-    entity.properties[ id ].type = 'Boolean'
-  } else if ( req.body.type == 'Date' ) {
-    entity.properties[ id ].type = 'Date'
-  } else if ( req.body.type == 'Number' ) {
-    entity.properties[ id ].type = 'Number'
-  } else if ( req.body.type == 'Select' ) {
-    entity.properties[ id ].select = req.body.ref.split(',')
+  entity.properties[ id ].type = req.body.type 
+
+  // special types need additional info
+  if ( req.body.type == 'Select' ) {
+    entity.properties[ id ].Select = req.body.ref.split(',')
   } else {
     if ( ! isValidId( req.body.ref ) ) {
       return res.status(400).send("Ref not vot a valid ID") 

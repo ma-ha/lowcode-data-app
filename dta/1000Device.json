@@ -19,11 +19,6 @@
     "DeviceNo": "x2",
     "scopeId": "1000"
   },
-  "a1": {
-    "id": "a1",
-    "DeviceNo": "a1",
-    "scopeId": "1000"
-  },
   "bo1": {
     "id": "bo1",
     "DeviceNo": "bo1",
@@ -42,6 +37,31 @@
     "Description": "abc",
     "ConnType": "LW-M2M (DT SIM)",
     "Tags": "EH-DEV",
-    "scopeId": "1000/DE"
+    "scopeId": "1000/DE",
+    "_upd": 1706465075631
+  },
+  "a1": {
+    "id": "a1",
+    "DeviceNo": "a1",
+    "Status": "Inventory",
+    "Hardware": "Raspi5",
+    "Description": "abc",
+    "ConnType": "LW-M2M (DT SIM)",
+    "Tags": "EH-DEV",
+    "scopeId": "1000/DE",
+    "_cre": 1706465357198,
+    "_upd": 1706465357198
+  },
+  "a2": {
+    "id": "a2",
+    "DeviceNo": "a2",
+    "Status": "Inventory",
+    "Hardware": "Raspi5",
+    "Description": "abc",
+    "ConnType": "LW-M2M (DT SIM)",
+    "Tags": "EH-DEV",
+    "scopeId": "1000/DE",
+    "_cre": 1706465346153,
+    "_upd": 1706465699879
   }
 }

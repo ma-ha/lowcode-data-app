@@ -176,10 +176,11 @@ async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeI
   await syncTbl( tbl )
   let inherit = await scopeInherited( rootScopeId, appId, appVersion, entityId )
   let result = null
-  if ( id &&  data[ tbl ][ id ] ) { 
+  if ( id  ) { 
     // single rec by id
     let rec = data[ tbl ][ id ] 
-    if ( scopeOK( userScopeId, rec.scopeId  , inherit ) ) {
+    log.debug( 'getDataObjX rec', rec )
+    if ( rec && scopeOK( userScopeId, rec.scopeId  , inherit ) ) {
       result = rec
     }
   
@@ -197,6 +198,7 @@ async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeI
 }
 
 function scopeOK( userScope, recScope, inherit ) {
+  log.debug( 'scopeOK',userScope, recScope, inherit )
   let ok = false
   if ( inherit ) { 
     if ( userScope.startsWith( recScope ) ) {
@@ -210,10 +212,18 @@ function scopeOK( userScope, recScope, inherit ) {
 
 
 async function addDataObj( tbl, id, obj ) {
-  log.info( 'addDataObj', tbl, id, obj)
+  log.debug( 'addDataObj', tbl, id, obj)
   await syncTbl( tbl )
-  data[ tbl ][ id ] = obj
-
+  let cre = null
+  if ( data[ tbl ][ id.trim() ] ) { cre = data[ tbl ][ id.trim() ]._cre }
+  data[ tbl ][ id.trim() ] = obj
+  data[ tbl ][ id.trim() ].id  = id.trim()
+  if ( cre ) {
+    data[ tbl ][ id.trim() ]._cre = cre
+  } else {
+    data[ tbl ][ id.trim() ]._cre = Date.now()
+  }
+  data[ tbl ][ id.trim() ]._upd = Date.now()
   let dbFile = DB_DIR + tbl + '.json'
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
   
@@ -222,7 +232,7 @@ async function addDataObj( tbl, id, obj ) {
 }
 
 async function syncTbl( tbl ) {
-  log.info( 'syncTbl', tbl )
+  log.debug( 'syncTbl', tbl )
   let dbFile = DB_DIR + tbl + '.json'
   if ( ! fs.existsSync( dbFile ) ) {
     await writeFile( dbFile, '{}' )
@@ -235,362 +245,5 @@ async function syncTbl( tbl ) {
 
 
 let data = {
-  app : {
-    "dev/locode-entity-editor/0.1.0" : {
-      scopeId: 'dev',
-      title: "Entity Editor",
-      entity : {
-        app: {
-          title: "App",
-          scope: "inherit",
-          maintainer: ["dev"],
-          properties : {
-            title    : { type: "String", label: 'App Name'  },
-            entity   : { docMap: "appEntity", label: 'Entities' },
-            page     : { docMap: "appPage", label: 'App Page' }
-          }
-        },
-        appEntity: {
-          title: "Entity",
-          scope: "inherit",
-          maintainer: ["dev"],
-          properties : {
-            name       : { type: "String" },
-            scope      : { select: ["inherit", "inherit-readonly", 'no-inherit' ] },
-            maintainer : { select: ["appUser","admin"] },
-            masterData : { type: "Boolean" },
-            property   : { docMap: "appEntityProperty" }
-          }
-        },
-        // appPage: {
-        //   title: "App Page",
-        //   scope: "inherit",
-        //   maintainer: ["dev"],
-        //   properties : {
-        //     title : { type: "String", label: 'Page'  },
-        //     view  : { docMap: "appView" },
-        //     tab   : { docMap: "appTabView" }
-        //   }
-        // }, 
-        appTabView: {
-          title: "Tab View",
-          scope: "inherit",
-          maintainer: ["dev"],
-          properties : {
-            title : { type: "String", label: 'Page'  },
-            views : { docMap: "appView" }
-          }
-        },
-        appView: {
-          title: "View",
-          scope: "inherit",
-          maintainer: ["dev"],
-          properties : {
-            title   : { type: "String" },
-            type    : { type: "Select", options: ["table","form"] },
-            entity  : { selectRef: "appEntity" },
-            search  : { type: "Boolean" },
-            edit    : { type: "Boolean" },
-            add     : { type: "Boolean" }
-          }
-        },
-        appEntityProperty: {
-          title: "Property",
-          scope: "inherit",
-          maintainer: ["dev"],
-          properties : {
-            Name        : { type: "String" },
-            Type        : { type: "Select", options: [],  },
-            Can_be_null : { type: "Boolean" } ,
-            Short       : { type: "Boolean" } ,
-            Filter      : { type: "Boolean" } ,
-            Options     : { selectRef: "appSelectValues" }
-          }
-        },
-        appSelectValues: {
-          title: "Select Values",
-          scope: "inherit",
-          maintainer: ["dev"],
-          properties : {
-            Key   : { type: "String" },
-            Value : { type: "String" }
-          }
-        }
-      },
-      startPage: 'app', 
-      // page: {
-      //   start: {
-      //     title: 'Customize',
-      //     tab: {
-      //       Apps: {
-      //         title: 'Apps',
-      //         views: {
-      //           AppTable: {
-      //             title: "Apps",
-      //             type: "table",
-      //             entity: "app",
-      //             search: false,
-      //             edit: true,
-      //             add : false
-      //           } 
-      //         }
-      //       }
-      //     }
-      //   }
-      // },
-      view : {
-        Apps: {
-          title: "Apps",
-          type: "table",
-          entity: "app",
-          edit: true,
-          add : true
-        },
-        Selects: {
-          title: "Selects",
-          type: "table",
-          entity: "appSelectValues",
-          add : true,
-          edit: true
-        }
-      },
-      scope: {
-        "dev": { role: ["dev"], srcURL: "" }
-      }
-    },
-
-    "1000/device-inventory-app/1.0.0": {
-      type : 'dev/locode-entity-editor/0.1.0',
-      scopeId: '1000',
-      title: "Order Device",
-      require: {
-        // "region-mgr/1.0.0": { srcURL: "" }
-      },
-      entity : {
-        DeviceOrder : {
-          title: "Device Order",
-          scope: "inherit",
-          maintainer: ["appUser"],
-          properties : {
-            OderNo : { type: "String" },
-            OrderDate  : { type: "Date" },
-            OderStatus : { select: ["open","in progress","shipped","delivered"] },
-            ItemPrice  : { type: "String" },
-            Taxes      : { type: "String" },
-            TotalPrice : { type: "String" },
-            Shipping   : { type: "String" },
-            ShipmentTracking : { type: "String" },
-            Reorder    : { type: "Action" },
-            Invoice    : { ref: "Invoice" },
-            Devices    : { selectRef : "1000/device-mgr-app/1.0.0/DeviceHardware" },
-          },
-          divs : [
-            { id: "O1",
-              divs: [ {prop:'OrderNo'}, {prop:'OrderDate'}, {prop:'OderStatus'} ] 
-            }, 
-            { id: "O1",
-              divs: [ {prop:'Devices'},{prop:'ItemPrice'}, {prop:'Taxes'}, {prop:'TotalPrice'} ] 
-            }, 
-            { id: "O1",
-              divs: [ {prop:'Shipping'}, {prop:'ShipmentTracking'}  ] 
-            }, 
-            { id: "O1",
-              divs: [ {prop:'Reorder'}, {prop:'Invoice'}  ] 
-            }, 
-          ]
-        },
-        Invoice : {
-          title: "Invoice",
-          scope: "inherit",
-          maintainer: ["appUser"],
-          properties : {
-            InvoiceNo : { type: "String" },
-          }
-        }
-      },
-      startPage: ['DeviceOrder', 'Invoice'], 
-      role: [],
-      scope: {
-        "#region": { role: ["appUser"], srcURL: "" },
-        "#city": { role: ["appUser"], srcURL: "" }
-      }
-    },
-
-
-    "1000/device-mgr-app/1.0.0": {
-      type : 'dev/locode-entity-editor/0.1.0',
-      scopeId: '1000',
-      title: "Device Manager",
-      require: {
-        // "region-mgr/1.0.0": { srcURL: "" }
-      },
-      entity : {
-        Device : {
-          title: "Device",
-          scope: "no-inherit",
-          maintainer: ["appUser"],
-          properties : {
-            DeviceNo    : { type: "String" },
-            Status      : { select: ["Ordered","Inventory","Planned","Active","Defect","Decommissioned"] },
-            Hardware    : { selectRef : "1000/device-mgr-app/1.0.0/DeviceHardware" },
-            Description : { type: "String" },
-            ConnType    : { select: ["COAP (TMA SIM)","COAP (1NCE SIM)","LW-M2M (DT SIM)","LORA","MQTT (DT SIM)","MQTT (TMA SIM)","UDP (TMA SIM)","UDP (1NCE SIM)"] },
-            Tags        : { multiSelectRef : "1000/device-mgr-app/1.0.0/DeviceTags" }
-          }
-        },
-        DeviceHardware : {
-          title: "Hardware",
-          scope: "inherit",
-          maintainer: ["appUser"],
-          properties : {
-            Manufacturer : { type: "String" },
-            Name         : { type: "String" },
-            Revision     : { type: "String" },
-            LinkType     : { select: ["BT-LE","LAN","LTE","LTE-M","LORA","NB-IoT","MODBUS","...other"] }
-          }
-        },
-        DataLink : { 
-          title: "Data Link",
-          scope: "inherit",
-          maintainer: ["appUser"],
-          properties : {
-            LinkType : { select: ["WebHook","Azure Event Hub","AWS IoT Central","CoT"] },
-            Comment : { type: "String" },
-            ConnectionString : { type: "String" },
-            TrafficStats  : { type: "Metrics" },
-            DeviceStats  : { type: "Metrics" },
-            DeviceTags   : { multiSelectRef : "1000/device-mgr-app/1.0.0/DeviceTags" }
-          }
-        },
-        DeviceTags : {
-          title: "Tags",
-          scope: "inherit",
-          maintainer: ["appUser"],
-          properties : {
-            Tag         : { type: "String" },
-            Description : { type: "String" }
-          }
-        }
-      },
-      startPage: [ 'Device', 'DataLink', 'DeviceHardware', 'DeviceTags' ], 
-      role: [],
-      scope: {
-        "#region": { role: ["appUser"], srcURL: "" },
-        "#city": { role: ["appUser"], srcURL: "" }
-      }
-    },
-
-
-    "1000/city-mgr-app/1.0.0": {
-      type : 'dev/locode-entity-editor/0.1.0',
-      scopeId: '1000',
-      title: "City Manager",
-      require: {
-        "region-mgr/1.0.0": { srcURL: "" }
-      },
-      entity : {
-        city : {
-          title: "City",
-          scope: "inherit",
-          maintainer: ["appUser"],
-          properties : {
-            Name   : { type: "String" },
-            ZIP    : { type: "String" },
-            Region : { selectRef : "1000/region-mgr/1.0.0/region" }
-          }
-        }
-      },
-      startPage: 'city', 
-      // page: {
-      //   start: {
-      //     title: 'Customize',
-      //     tab: {
-      //       Apps: {
-      //         title: 'Apps',
-      //         views: {
-      //           main: {
-      //             type: "table",
-      //             entity: "city",
-      //             edit: true,
-      //             add : true
-      //           }
-      //         }
-      //       }
-      //     }
-      //   }  
-        
-      // },
-      role: [],
-      scope: {
-        "#region": { role: ["appUser"], srcURL: "" }
-      }
-    },
-
-    "1000/region-mgr/1.0.0": {
-      type : 'dev/locode-entity-editor/0.1.0',
-      scopeId: '1000',
-      title: "Region Manager",
-      require: {},
-      entity : {
-        region : {
-          title: "Region",
-          scope: "inherit",
-          maintainer: ["region-manager"],
-          properties : {
-            Name : { type: "String" },
-            Short: { type: "String" },
-            Size : { select: ['S','M','L'] },
-            CitiesInRegion : { sub: '1000/city-mgr-app/1.0.0/city', prop: 'Region', label: 'Cities' }
-          }
-        }
-      },
-      startPage: 'region', 
-      // page: {
-      //   start: {
-      //     title: 'Customize',
-      //     tab: {
-      //       Apps: {
-      //         title: 'Apps',
-      //         views: {
-      //           main: {
-      //             title: "Region List",
-      //             type: "table",
-      //             entity: "region",
-      //             edit: true,
-      //             add : true
-      //           }
-      //         }
-      //       }
-      //     }
-      //   }
-      // },
-      role: ["region-manager"],
-      scope: {
-        "1000": { "role": ["admin"], "srcURL":"" }
-      }
-    },
-
-    "1000/city-light-mgr/1.0.0": {
-      type : 'dev/locode-entity-editor/0.1.0',
-      scopeId: '1000',
-      title: "City Light Manager",
-      require: {
-        "city-mgr/1.0.0": { "srcURL":"" }
-      },
-      entity : {
-        gateway : {
-          title: "MgrGW",
-          scope: "inherit",
-          maintainer: ["region-manager"],
-          properties : {
-            Name : { type: "String" }
-          }
-        }
-      },
-      startPage: 'gateway',
-      scope: {
-        "#city": { "role": ["user"], "srcURL" :"" }
-      }
-    }
-  }
+ 
 }

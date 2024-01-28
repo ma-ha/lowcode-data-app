@@ -15,10 +15,12 @@
             "label": "App Name"
           },
           "entity": {
+            "type": "DocMap",
             "docMap": "appEntity",
             "label": "Entities"
           },
           "page": {
+            "type": "DocMap",
             "docMap": "appPage",
             "label": "App Page"
           }
@@ -35,14 +37,16 @@
             "type": "String"
           },
           "scope": {
-            "select": [
+            "type": "Select",
+            "options": [
               "inherit",
               "inherit-readonly",
               "no-inherit"
             ]
           },
           "maintainer": {
-            "select": [
+            "type": "Select",
+            "options": [
               "appUser",
               "admin"
             ]
@@ -51,6 +55,7 @@
             "type": "Boolean"
           },
           "property": {
+            "type": "DocMap",
             "docMap": "appEntityProperty"
           }
         }
@@ -67,6 +72,7 @@
             "label": "Page"
           },
           "views": {
+            "type": "DocMap",
             "docMap": "appView"
           }
         }
@@ -89,6 +95,7 @@
             ]
           },
           "entity": {
+            "type": "SelectRef",
             "selectRef": "appEntity"
           },
           "search": {
@@ -126,6 +133,7 @@
             "type": "Boolean"
           },
           "Options": {
+            "type": "SelectRef",
             "selectRef": "appSelectValues"
           }
         }
@@ -192,7 +200,8 @@
             "type": "Date"
           },
           "OderStatus": {
-            "select": [
+            "type": "Select",
+            "options": [
               "open",
               "in progress",
               "shipped",
@@ -209,7 +218,13 @@
             "type": "String"
           },
           "Shipping": {
-            "type": "String"
+            "type": "Select",
+            "label": "Shipping Method",
+            "options": [
+              "Standard",
+              " Express",
+              " Collect"
+            ]
           },
           "ShipmentTracking": {
             "type": "String"
@@ -218,9 +233,11 @@
             "type": "Action"
           },
           "Invoice": {
+            "type": "SelectRef",
             "selectRef": "1000/device-inventory-app/1.0.0/Invoice"
           },
           "Devices": {
+            "type": "SelectRef",
             "selectRef": "1000/device-mgr-app/1.0.0/DeviceHardware"
           }
         },
@@ -281,7 +298,7 @@
         ]
       },
       "Invoice": {
-        "title": "Invoice XZYAB",
+        "title": "Invoice",
         "scope": "inherit",
         "maintainer": [
           "appUser"
@@ -326,7 +343,8 @@
             "type": "String"
           },
           "Status": {
-            "select": [
+            "type": "Select",
+            "options": [
               "Ordered",
               "Inventory",
               "Planned",
@@ -336,13 +354,15 @@
             ]
           },
           "Hardware": {
+            "type": "SelectRef",
             "selectRef": "1000/device-mgr-app/1.0.0/DeviceHardware"
           },
           "Description": {
             "type": "String"
           },
           "ConnType": {
-            "select": [
+            "type": "Select",
+            "options": [
               "COAP (TMA SIM)",
               "COAP (1NCE SIM)",
               "LW-M2M (DT SIM)",
@@ -375,7 +395,8 @@
             "type": "String"
           },
           "LinkType": {
-            "select": [
+            "type": "Select",
+            "options": [
               "BT-LE",
               "LAN",
               "LTE",
@@ -396,7 +417,8 @@
         ],
         "properties": {
           "LinkType": {
-            "select": [
+            "type": "Select",
+            "options": [
               "WebHook",
               "Azure Event Hub",
               "AWS IoT Central",
@@ -416,6 +438,7 @@
             "type": "Metrics"
           },
           "DeviceTags": {
+            "type": "MultiSelectRef",
             "multiSelectRef": "1000/device-mgr-app/1.0.0/DeviceTags"
           }
         }
@@ -482,6 +505,7 @@
             "type": "String"
           },
           "Region": {
+            "type": "SelectRef",
             "selectRef": "1000/region-mgr/1.0.0/region"
           }
         }
@@ -518,13 +542,15 @@
             "type": "String"
           },
           "Size": {
-            "select": [
+            "type": "Select",
+            "options": [
               "S",
               "M",
               "L"
             ]
           },
           "CitiesInRegion": {
+            "type": "Sub",
             "sub": "1000/city-mgr-app/1.0.0/city",
             "prop": "Region",
             "label": "Cities"

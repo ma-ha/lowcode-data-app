@@ -43,31 +43,30 @@ async function setupAPI( app ) {
   svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, addDoc )
   
   svc.get( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/property', guiAuthz, async ( req, res ) => {
-    log.info( 'GET entity/property', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
-    let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
-    let app = await dta.getAppById( appId )
-    let propArr = []
-    if ( app  &&  app.entity[ req.params.entityId ] ) {
-      for ( let propId in app.entity[ req.params.entityId ].properties ) {
-        let prop = app.entity[ req.params.entityId ].properties[ propId ]
-        log.info( prop )
-        let rec = { 
-          id    : propId,
-          label : ( prop.label ? prop.label : propId )
-        }
-        if ( prop.type ) {
-          rec.type = prop.type
-        } else 
-        if ( prop.selectRef ) {
-          rec.type = 'Select of "'+prop.selectRef+'"'
-        } else 
-        if ( prop.docMap ) {
-          rec.type = 'Map of "'+ prop.docMap+'"'
-        }
-        propArr.push( rec )
-      }
-    }
-    res.send( propArr )
+    log.error( 'GET entity/property', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
+    // let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
+    // let app = await dta.getAppById( appId )
+    // let propArr = []
+    // if ( app  &&  app.entity[ req.params.entityId ] ) {
+    //   for ( let propId in app.entity[ req.params.entityId ].properties ) {
+    //     let prop = app.entity[ req.params.entityId ].properties[ propId ]
+    //     log.info( prop )
+    //     let rec = { 
+    //       id    : propId,
+    //       type  : prop.type,
+    //       label : ( prop.label ? prop.label : propId )
+    //     }
+
+    //     if ( prop.selectRef ) {
+    //       rec.type = 'Select of "'+prop.selectRef+'"'
+    //     } else 
+    //     if ( prop.docMap ) {
+    //       rec.type = 'Map of "'+ prop.docMap+'"'
+    //     }
+    //     propArr.push( rec )
+    //   }
+    // }
+    res.send(  )
   })
 
   svc.get( '/guiapp/:tenantId/:appId/:appVersion/:entity/pong-form', guiAuthz, async ( req, res ) => {
@@ -206,7 +205,7 @@ async function getDocTblDef ( req, res ) {
   let cols = [
     { id: 'Edit', label: "&nbsp;", cellType: "button", method: "GET", width :'5%', icon: 'ui-icon-pencil', 
       setData: [ { resId : 'Add' + req.params.entityId } ] } ,
-    { id: 'id', label: "Id",  cellType: "text", width:'10%' }
+    { id: 'recId', label: "Id",  cellType: "text", width:'10%' }
   ]
 
   if ( app && app.entity[ req.params.entityId ] ) {
@@ -219,27 +218,37 @@ async function getDocTblDef ( req, res ) {
     for ( let propId in appEntityProps ) {
       let prop =  appEntityProps[ propId ]
       let label = propId 
-      if ( prop.label ) { label =  prop.label }
-      if ( prop.type == 'String' ) {
-        cols.push({ id: propId, label : label, cellType: 'text', width:width })
-      } else if ( prop.type == 'Boolean' ) {
-        cols.push({ id: propId, label : label, cellType: 'checkbox', width:width })
-      } else if ( prop.type == 'Select' ) {
-        cols.push({ id: propId, label : label, cellType: '', width:width })
-      } else if ( prop.docMap  ) {
-        cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
-      } else if ( prop.selectRef  ) {
-        cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
-      } else if ( prop.sub ) {
-        cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
-      } else {
-        cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
+      switch ( prop.type ) {
+        case 'Boolean':
+          cols.push({ id: propId, label : label, cellType: 'checkbox', width:width })
+          break 
+        case 'Date':
+          cols.push({ id: propId, label : label, cellType: 'date', width:width }) 
+          break 
+        // case 'SelectRef':
+        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
+        //   break 
+        // case 'DocMap':
+        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
+        //   break 
+        // case 'Ref':
+        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
+        //   break 
+        // case 'RefArray':
+        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
+        //   break 
+        // case 'Link':
+        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
+        //   break 
+        default:  // String, Number, Select
+          cols.push({ id: propId, label : label, cellType: 'text', width:width }) 
+          break 
       }
     }
   }
   // log.info( 'colArr',  req.params.entityId , cols )
   res.send({ 
-    rowId   : [ 'id'], 
+    rowId   : [ 'recId' ], 
     dataURL : '',
     cols    : cols
   })
@@ -252,48 +261,66 @@ async function getDoc( req, res ) {
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
   let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
-  let app = await dta.getAppById( appId )
-  if ( ! app ) { log.warn('GET data: app not found'); return res.status(400).send([]) }
-  if ( ! app.entity[ req.params.entityId ] ) { log.warn('GET data: app entity not found'); return res.status(400).send([]) }
-  let entity = app.entity[ req.params.entityId ]
   // log.info( 'entity', entity )
 
-  if ( req.query.id ) { // single doc by id
-    log.info( 'GET entity q/id', req.query.id )
+  if ( req.query.recId ) { // single doc by id
+    log.info( 'GET entity q/id', req.query.recId )
     let doc = await dta.getDataObjX( 
       user.rootScopeId,  
       req.params.appId, 
       req.params.appVersion,
       req.params.entityId,
       user.scopeId, 
-      req.query.id
+      req.query.recId
     )
-    return  res.send( doc )
+    log.debug( 'GET entity doc', doc )
+    let result = JSON.parse( JSON.stringify( doc ) ) 
+    result.recId =  req.query.recId
+    log.debug( 'GET entity q/id', result )
+    return  res.send( result )
   }
 
+  let app = await dta.getAppById( appId )
+  if ( ! app ) { log.warn('GET data: app not found'); return res.status(400).send([]) }
+  if ( ! app.entity[ req.params.entityId ] ) { log.warn('GET data: app entity not found'); return res.status(400).send([]) }
+  let entity = app.entity[ req.params.entityId ]
   // else doc array
   let dataArr = await dta.getDataObjX( user.rootScopeId,  req.params.appId, req.params.appVersion, req.params.entityId, user.scopeId )
 
   let result = []
   for ( let rec of dataArr ) {
-    let tblRec = { id: rec.id }
+    let tblRec = { recId: rec.id }
+    log.debug( 'getDoc rec', rec )
     for ( let propId in entity.properties ) {
       let prop = entity.properties[ propId ]
       let label = ( prop.label ? prop.label : propId )
-      if ( prop.type  ) {
-        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
-      } else if ( prop.selectRef  ) {
-        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
-      } else if ( prop.docMap ) {
-        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
-      } else if ( prop.sub ) {
-        let params = prop.sub.split('/')
-        let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ prop.prop +'='+ rec.id
-        tblRec[ propId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
-      } else {
-        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
-      }
+      log.debug( 'getDoc', propId, prop.type )
 
+      switch ( prop.type ) {
+        case 'SelectRef':
+          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+          break 
+        case 'DocMap':
+          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+          break 
+        case 'Ref':
+          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+          break 
+        case 'RefArray':
+          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+          break 
+        case 'Link': 
+          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+          break 
+        case 'Sub':
+          let params = prop.sub.split('/')
+          let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ prop.prop +'='+ rec.id
+          tblRec[ propId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
+          break 
+        default:   // String, Number, Select
+          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
+          break 
+      }
     }
     result.push( tblRec )
   }
@@ -314,11 +341,11 @@ async function addDoc( req, res )  {
 
   if ( ! app ) { return res.status(401).send( 'ERROR: Login required') }
   let dtaColl = user.rootScopeId + req.params.entityId
-  let existRec = await dta.idExists( dtaColl, req.body.id )
   
-  if ( existRec && existRec.scopeId != user.scopeId ) {
-    return  res.send( 'ID '+  req.body.id +' already used in scope'+  existRec.scopeId )
-  }
+  // let existRec = await dta.idExists( dtaColl, req.body.id )  
+  // if ( existRec && existRec.scopeId != user.scopeId ) {
+  //   return  res.send( 'ID '+  req.body.id +' already used in scope'+  existRec.scopeId )
+  // }
   let obj = req.body
   obj.scopeId = user.scopeId 
   let result = await dta.addDataObj( dtaColl, req.body.id, req.body )

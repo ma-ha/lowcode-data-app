@@ -83,20 +83,20 @@ async function publishDataChgEvt( dtaOp, dtaId, dtaType, data ) {
     seqNo: ( seqNo++ ),
     dt   : Date.now()
   }
-  log.info( 'evt', evt )
+  log.debug( 'evt', evt )
   for ( let scope in subscriptions ) {
-    log.info( 'evt scope', scope )
+    log.debug( 'evt scope', scope )
     if ( dtaId.indexOf( scope) == 0 ) {
       for ( let app in subscriptions[ scope ] ) {
-        log.info( 'evt app', scope, app )
+        log.debug( 'evt app', scope, app )
         try {
           let sub = subscriptions[ scope ][ app ]
           if ( sub.filter ) {
             // TODO
           }
-          log.info( 'evt post', sub.webHook )
+          log.debug( 'evt post', sub.webHook )
           let result = await axios.post( sub.webHook, evt )
-          log.info( 'evt post', sub.webHook ,result.status )
+          log.debug( 'evt post', sub.webHook ,result.status )
         } catch ( exc ) { log.warn( 'event err', app ) }
       }  
     }
