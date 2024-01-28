@@ -1,4 +1,4 @@
-# Prototype of a "Low Code App".
+# Prototype of a "Low Code Data App".
 
 ## General Idea
 
@@ -94,9 +94,11 @@ Simple color scheme changes can be done easily, just focus on the 1st 15 lines i
 # TODOs
 
 - [ ] Ext Data API
+- [ ] Edit admin objects
 - [ ] API for scopes
 - [ ] Event filter
 - [ ] Document delete function
 - [ ] Entity JSON field type
 - [ ] Scope meta data
+- [ ] Link field type
 
