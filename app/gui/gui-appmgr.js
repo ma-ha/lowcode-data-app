@@ -21,15 +21,15 @@ async function init( ) {
   scopePg.navLabel = 'Scopes'
   scopePg.setPageWidth( '90%' )
   scopePg.addView({ id: 'Scopes', 
-    rowId: 'Scopes', title: 'Scopes',  height: '650px', 
+    rowId: 'Scopes', title: 'Scopes',  height: '750px', 
     type : 'pong-table', resourceURL: 'scope' 
   })
   scopePg.addView({  id: 'AddScope', 
-    title: 'Add Scopes',  height: '150px', 
+    title: 'Add / Edit Scopes',  height: '150px', 
     type : 'pong-form', resourceURL: 'scope',
     moduleConfig : {
-      label:'Add Scope',
-      description: "Add Scope",
+//      label:'Add Scope',
+//      description: "Add Scope",
       id: 'AddScopeForm',
       fieldGroups:[{ columns: [
         { formFields: [{ id: "scopeId", label: "Id", type: "text" } ]},
@@ -37,7 +37,7 @@ async function init( ) {
         { formFields: [{ id: "tags", label: "Tags, comma separated", type: "text" } ]}
       ] }],
       actions : [ 
-        { id: "PropertyAddBtn", actionName: "Add", update: [{ resId:'Scopes' }], 
+        { id: "PropertyAddBtn", actionName: "Add / Update", update: [{ resId:'Scopes' }], 
           actionURL: 'scope', target: "modal" }
       ]
     }
@@ -134,13 +134,15 @@ async function init( ) {
     }]
 
     rows.push({
-      id: 'AppEntitiesTbl', title: 'App Entities',  height: '550px', 
+      id: 'AppEntitiesTbl', title: 'App Entities',  height: '650px', 
       type : 'pong-table', resourceURL: 'app/entity',  decor: 'decor', rowId: 'AppEntitiesTbl',
       moduleConfig : {
         dataURL: "",
-        rowId: "id",
+        rowId: [ 'appId', 'entityId' ],
         cols: [
-          { id: "id",         label: "Id",         width: "20%", cellType: "text" },
+          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+            method: "GET", setData: [ { resId : 'AppEntitiesAdd' } ] } ,
+          { id: "entityId",   label: "Id",         width: "20%", cellType: "text" },
           { id: "title",      label: "Title",      width: "20%", cellType: "text" },
           { id: "scope",      label: "Scope",      width: "20%", cellType: "text" },
           { id: "propLnk",    label: "Properties", width: "20%", cellType: "text" },
@@ -150,14 +152,15 @@ async function init( ) {
     })
 
     rows.push({ 
-      id: 'AppEntitiesAdd', rowId: 'AppEntitiesAdd', title: 'Add Entity',  height: '150px', 
+      id: 'AppEntitiesAdd', rowId: 'AppEntitiesAdd', title: 'Add / Update Entity',  height: '150px', 
       type : 'pong-form', resourceURL: 'app/entity',   decor: 'decor',
       moduleConfig : {
         description: "Add",
         id: 'AppEntitiesAddForm',
         fieldGroups:[{ columns: [
           { formFields: [{ id: "appId", label: "App", type: "text", defaultVal: appId, readonly: true } ]},
-          { formFields: [{ id: "entityId",   label: "Id", type: "text" } ]},
+          { formFields: [{ id: "entityId",   label: "Id", type: "text",
+            descr: 'Define wisely! You cannot change this (easily)!' } ]},
           { formFields: [{ id: "title", label: "Title", type: "text" } ]},
           { formFields: [{ id: "scope", label: "Scope", type: "select",
             options: addOptions([ "inherit", "inherit-readonly", 'no-inherit' ]) } ]} ,
@@ -166,7 +169,7 @@ async function init( ) {
 
         ] }],
         actions : [ 
-          { id: "AddFormBtn", actionName: "Add", actionURL: 'app/entity', 
+          { id: "AddFormBtn", actionName: "Add / Update", actionURL: 'app/entity', 
             update: [{ resId:'AppEntitiesTbl' }], target: "modal" }
         ]
       }

@@ -153,36 +153,55 @@ async function addScope( req, res ) {
     return res.status(400).send('Scope ID invalid') 
   }
   let scopes = await userDta.geScopeArr( user.rootScopeId )
+  let resultTxt = 'Scope added'
   for ( let scope of scopes ) {
-    if ( scopes.id == req.body.scopeId ) {
-      log.warn( 'POST scope: id exists', req.body.scopeId )
-      return res.status(400).send('Scope ID exists') 
+    if ( scope.id == req.body.scopeId ) {
+      log.info( 'POST scope: id exists', req.body.scopeId )
+      resultTxt = 'Scope updated'
     }
   }
   let name = ( req.body.name ? req.body.name : req.body.scopeId )
   let tags = ( req.body.tags ?  req.body.tags.split(',') : [] )
   await userDta.addScope( req.body.scopeId, name, tags )
-  // TODO POST /scope
-  res.send( 'scope added' ) 
+  res.send( resultTxt ) 
 }
 
 async function getScope( req, res ) {
+  log.debug( 'getScope', req.query )
   let user = await userDta.getUserInfoFromReq(gui,  req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   let scopeArr = await userDta.geScopeArr( user.scopeId )
-  let result = []
-  for ( let scope of scopeArr ) {
-    let rec = {
-      id : scope.id,
-      name : scope.name,
-      tagStr : scope.tagArr.join()
+
+  if ( req.query.id ) { // get by id 
+
+    for ( let scope of scopeArr ) {
+      if ( scope.id == req.query.id ) {
+        let resultScope = {
+          scopeId : scope.id,
+          name    : scope.name,
+          tags    : scope.tagArr
+        }
+        return res.send( resultScope )
+      }
     }
-    for ( let tag of scope.tagArr ) {
-      rec[ "tag"+tag ] = true
+    return res.send( null ) // id not in scopes
+ 
+  } else { // get all related scopes
+
+    let scopeTbl = []
+    for ( let scope of scopeArr ) {
+      let rec = {
+        id : scope.id,
+        name : scope.name,
+        tagStr : scope.tagArr.join()
+      }
+      for ( let tag of scope.tagArr ) {
+        rec[ "tag"+tag ] = true
+      }
+      scopeTbl.push( rec )
     }
-    result.push( rec )
+    res.send( scopeTbl )   
   }
-  res.send( result ) 
 }
 
 async function  getScopeTbl( req, res ) {
@@ -192,6 +211,8 @@ async function  getScopeTbl( req, res ) {
     dataURL: "",
     rowId: "id",
     cols: [
+      { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+        method: "GET", setData: [ { resId : 'AddScope' } ] } ,
       { id: "id",    label: "Id",   width: "20%", cellType: "text" },
       { id: "name",  label: "Name", width: "20%", cellType: "text" },
       // { id: "tag",   label: "Tags", width: "20%", cellType: "text" },
@@ -262,18 +283,36 @@ async function getEntity( req, res )  {
   let app = await dta.getAppById( appId )
   if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send([]) }
 
-  let entityArr = []
-  for ( let entityId in app.entity ) {
-    let entity = app.entity[ entityId ]
-    entityArr.push({
-      id : entityId,
-      title : entity.title,
-      scope : entity.scope,
-      maintainer : entity.maintainer,
-      propLnk :'<a href="index.html?layout=AppEntityProperties-nonav&id='+appId+','+entityId+'">Manage Properties</a>'
-    })
+  if (  req.query.appId &&  req.query.entityId && ! req.query.title  ) { // get by id 
+  
+    if ( app.entity[ req.query.entityId ] ) {
+      let entity = app.entity[ req.query.entityId ]
+      return res.send({
+        appId      : appId,
+        entityId   : req.query.entityId,
+        title      : entity.title,
+        scope      : entity.scope,
+        maintainer : entity.maintainer,
+      }) 
+
+    } else { return res.send( null )  } // id not in scopes
+  
+  } else {  // get by abb id
+  
+    let entityArr = []
+    for ( let entityId in app.entity ) {
+      let entity = app.entity[ entityId ]
+      entityArr.push({
+        entityId   : entityId,
+        appId      : appId,
+        title      : entity.title,
+        scope      : entity.scope,
+        maintainer : entity.maintainer,
+        propLnk :'<a href="index.html?layout=AppEntityProperties-nonav&id='+appId+','+entityId+'">Manage Properties</a>'
+      })
+    }
+    res.send( entityArr )
   }
-  res.send( entityArr )
 }
 
 async function addEntity( req, res ) {
@@ -289,9 +328,10 @@ async function addEntity( req, res ) {
   }
   log.info( 'POST app', newEntity )
   if ( ! app.entity ) { app.entity = {} }
+  let resultTxt = ( app.entity[ req.body.entityId ] ? 'Updated' : 'Created' )
   app.entity[ req.body.entityId ] = newEntity
   await dta.saveApp( req.body.appId, app )
-  res.send( 'Created' )
+  res.send( resultTxt )
 }
 
 // --------------------------------------------------------------------------

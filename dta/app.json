@@ -218,13 +218,10 @@
             "type": "Action"
           },
           "Invoice": {
-            "ref": "Invoice"
+            "selectRef": "1000/device-inventory-app/1.0.0/Invoice"
           },
           "Devices": {
             "selectRef": "1000/device-mgr-app/1.0.0/DeviceHardware"
-          },
-          "Invoice": {
-            "selectRef": "1000/device-inventory-app/1.0.0/Invoice"
           }
         },
         "divs": [
@@ -284,20 +281,12 @@
         ]
       },
       "Invoice": {
-        "title": "Invoice",
+        "title": "Invoice XZYAB",
         "scope": "inherit",
         "maintainer": [
           "appUser"
         ],
-        "properties": {
-          "InvoiceNo": {
-            "type": "String"
-          },
-          "SapNo": {
-            "label": "SAP-No",
-            "type": "String"
-          }
-        }
+        "properties": {}
       }
     },
     "startPage": [
