@@ -21,7 +21,7 @@ Adapters use service credentials defined on a dedicated scope.
 
 All **operations are exposed as API**, e.g. for the adapters.
 
-![sceenshot](locode-erm.png)
+![sceenshot](doc/locode-erm.png)
 
 # Run it
 
@@ -36,7 +36,7 @@ Login with user `demo` and password `demo`
 
 # Entity / Document Model
 
-![sceenshot](locode.png)
+![sceenshot](doc/locode.png)
 
 Data types (and their Web GUI mapping)
 - `Strings` (simple input fields)
