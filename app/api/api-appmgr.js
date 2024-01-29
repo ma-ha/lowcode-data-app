@@ -428,15 +428,18 @@ async function addProperty ( req, res ) {
   if ( ! app ) { log.warn('POST /entity/property: app not found'); return res.status(400).send("App Id not found") }
   if ( ! app.entity ) { app.entity = {} }
   let entity = app.entity[ req.body.entityId ]
-  if ( ! app ) { log.warn('POST /entity/property: entity not found'); return res.status(400).send("Entity Id not found") }
+  if ( ! entity ) { log.warn('POST /entity/property: entity not found'); return res.status(400).send("Entity Id not found") }
   entity.properties[ id ] = { }
   if ( req.body.label ) { entity.properties[ id ].label = req.body.label }
   entity.properties[ id ].type = req.body.type 
 
   // special types need additional info
   if ( req.body.type == 'Select' ) {
+
     entity.properties[ id ].Select = req.body.ref.split(',')
-  } else {
+
+  } else if ( ['docMap','selectRef','refArray','ref'].includes(  req.body.typ ) ) {
+
     if ( ! isValidId( req.body.ref ) ) {
       return res.status(400).send("Ref not vot a valid ID") 
     }
@@ -459,6 +462,7 @@ async function addProperty ( req, res ) {
       entity.properties[ id ].ref = req.body.ref
     }
   }
+
   await dta.saveApp( req.body.appId, app )
   res.send( 'Added' + addResultTxt )
 }
