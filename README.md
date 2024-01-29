@@ -9,12 +9,11 @@ Web forms and lists are generated to maintain data (documents) of this entities.
 
 All data, users and authorizations are within **hierarchical scopes** (like tenants).
 Entity definitions and data can be inherited to lower hierarchy scopes.
-A logged in web gui user can change the scope within his authorizations on the top right in the gui.
-
-Additionally scopes have tags which can also be used to select entities valid on tagged scope.
+A web gui user can switch the scope in the gui.
 
 Entities are bundled in apps, so they can be exported and imported via a app marketplace. 
 Apps are installed and can be customized within a scope.
+Tags can also be used to assign apps to a scope.
 
 To start process **adapters can subscribe to events**, e.g. data changes. 
 Adapters use service credentials defined on a dedicated scope. 
@@ -56,9 +55,20 @@ So relations are
 - **n:1**= `selectRef`
 - **n:m** = `multiSelectRef`
 
-# Integration APIs
+# Integration 
 
-see [API and Format Reference Docu](doc/README.md)
+## APIs
+
+Adapters and connectors can use ReST APIs,
+see [API and Format Reference Docu](doc/README.md).
+
+# Event Hub
+
+Adapters can subscribe to data events, to start processes or sync the data with external systems.
+
+# GUI Links
+
+Entities can refer to external GUI Apps using links. Placeholders in the links are populated with the entity data.
 
 # Customizing
 
@@ -102,4 +112,5 @@ Simple color scheme changes can be done easily, just focus on the 1st 15 lines i
 - [ ] Entity JSON field type
 - [ ] Scope meta data
 - [ ] Link field type
+- [ ] Metrics data type
 
