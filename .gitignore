@@ -9,6 +9,8 @@ notes
 build/app
 examples
 app/config/DEMO.yaml
+dta/oidc-session.json
+dta/user-scope.json
 .vscode
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
