@@ -301,7 +301,9 @@ async function getDoc( req, res ) {
           tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
           break 
         case 'DocMap':
-          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+          let params = prop.docMap.split('/')
+          let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ params[4] +'='+ rec.id
+          tblRec[ propId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
           break 
         case 'Ref':
           tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
@@ -312,11 +314,11 @@ async function getDoc( req, res ) {
         case 'Link': 
           tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
           break 
-        case 'Sub':
-          let params = prop.sub.split('/')
-          let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ prop.prop +'='+ rec.id
-          tblRec[ propId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
-          break 
+        // case 'Sub':
+        //   let params = prop.sub.split('/')
+        //   let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ prop.prop +'='+ rec.id
+        //   tblRec[ propId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
+        //   break 
         default:   // String, Number, Select
           tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
           break 

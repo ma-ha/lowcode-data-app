@@ -189,7 +189,7 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
       case 'Link': 
         // do nothing
         break 
-      case 'Sub':
+      case 'DocMap':
         // do nothing
         break 
       default:   // String, Number, Select, DocMap

@@ -93,21 +93,25 @@ async function getERM( req, res )  {
           rel : {}
         }
         for ( let prpId in entity.properties ) {
-          if ( entity.properties[ prpId ].selectRef ) {
+          let prop = entity.properties[ prpId ]
+          if ( prop.type == 'SelectRef' ) {
             e.rel[ prpId ] = {
-              toEntity : entity.properties[ prpId ].selectRef,
+              toEntity : prop.selectRef,
               mFrm     : 'n',
               mTo      : '1'
             }
-          } else if ( entity.properties[ prpId ].docMap ) {
+          } else if ( prop.type == 'DocMap' ) {
+            try {
+              let p = prop.docMap.split('/') // this is scope/app/ver/ent/prop
+              e.rel[ prpId ] = {
+                toEntity : p[0] +'/'+ p[1] +'/'+ p[2]  +'/'+ p[3], // this is scope/app/ver
+                mFrm     : '1',
+                mTo      : 'n'
+              }
+            } catch ( exc ) { log.warn( 'ERM rel', exc ) }
+          } else if ( prop.type == 'MultiSelectRef' ) {
             e.rel[ prpId ] = {
-              toEntity : entity.properties[ prpId ].docMap,
-              mFrm     : '1',
-              mTo      : 'n'
-            }
-          } else if ( entity.properties[ prpId ].multiSelectRef ) {
-            e.rel[ prpId ] = {
-              toEntity : entity.properties[ prpId ].multiSelectRef,
+              toEntity : prop.multiSelectRef,
               mFrm     : 'n',
               mTo      : 'm'
             }
@@ -128,7 +132,7 @@ async function getERM( req, res )  {
 
 async function saveERM( req, res ) {
   try {
-    log.info( 'POST erm' )
+    log.debug( 'POST erm' )
     let user = await userDta.getUserInfoFromReq( gui, req )
     if ( ! user ) { return res.status(401).send( 'login required' ) }
     let ermCfg = {}
@@ -387,18 +391,22 @@ async function getProperty( req, res ) {
   for ( let propId in app.entity[ entityId ].properties ) {
     let prop = app.entity[ entityId ].properties[ propId ]
     let pType = ( prop.type ? prop.type : "?" )
+    
     switch ( pType ) {
       case 'Select':
         pType = "Select: ["+prop.options.join()+']'
         break 
       case 'SelectRef':
-        pType = "SelectRef: "+prop.selectRef
+        pType = "SelectRef: " + genLink( 'AppEntityProperties-nonav', prop.selectRef ) 
+        break 
+      case 'MultiSelectRef':
+        pType = "MultiSelectRef: " + genLink( 'AppEntityProperties-nonav', prop.multiSelectRef ) 
         break 
       case 'DocMap':
-        pType = "DocMap: "+prop.docMap
+        pType = "DocMap: " + genLink( 'AppEntityProperties-nonav',  prop.docMap )
         break 
       case 'Ref':
-        pType = "Ref: "+prop.ref
+        pType = "Ref: "+ + genLink( 'AppEntityProperties-nonav', prop.ref ) 
         break 
       case 'RefArray':
         pType = "RefArray: "+prop.refArray
@@ -419,6 +427,22 @@ async function getProperty( req, res ) {
   res.send( propArr )
 }
 
+function genLink( page, id ) {
+  let param = getRefId( id )
+  let lnk = 'index.html?layout='+page+'&id='+param
+  let ref = '<a href="'+lnk+'">'+id+'</>'
+  return ref 
+}
+
+function getRefId( id ) {
+  let param = ''
+  try {
+    let p = id.split('/')
+    param = p[0] +'/'+ p[1] +'/'+ p[2] +','+ p[3]
+  } catch ( exc ) { log.warn( 'gen link failed', id, exc ) }
+  return param
+}
+
 async function addProperty ( req, res ) {
   let id = req.body.propId
   let addResultTxt = ''
@@ -436,29 +460,50 @@ async function addProperty ( req, res ) {
   // special types need additional info
   if ( req.body.type == 'Select' ) {
 
-    entity.properties[ id ].Select = req.body.ref.split(',')
+    entity.properties[ id ].options = req.body.ref.split(',')
 
-  } else if ( ['docMap','selectRef','refArray','ref'].includes(  req.body.typ ) ) {
+  } else if ( ['DocMap','SelectRef','RefArray','Ref'].includes(  req.body.type ) ) {
 
-    if ( ! isValidId( req.body.ref ) ) {
-      return res.status(400).send("Ref not vot a valid ID") 
+    if ( ! req.body.ref ) {
+      return res.status(400).send( '"ref" is required' ) 
     }
-    if ( ! app.entity[ req.body.ref ] ) {
-      app.entity[ req.body.ref ] = {
-        title : req.body.ref,
+    let p = req.body.ref.split('/')
+    if ( req.body.type == 'DocMap'  ) { 
+      if ( p.length != 5 ) {
+        return res.status(400).send( '"ref" format must be like  "scope/app/version/entity/prop"' ) 
+      }
+    } else if ( p.length != 4 ) { // shpuld be  scope/app/version/entity
+      return res.status(400).send( '"ref" format must be like  "scope/app/version/entity"' ) 
+    }
+    let refAppId    = p[0] +'/'+ p[1] +'/'+ p[2]
+    let refEntityId = p[3]
+    let refApp =  await dta.getAppById( refAppId )
+    if ( ! refApp ) {
+      return res.status(400).send( '"ref" app "'+refAppId+'" not found' ) 
+    }
+    if ( ! refApp.entity[ refEntityId] ) {
+      refApp.entity[ refEntityId ] = {
+        title : refEntityId,
         scope : 'inherited',
         maintainer : ['appUser'],
         properties : {}
       }
       addResultTxt += ', created new entity "'+ req.body.ref + '"'
     }
-    if ( req.body.type == 'docMap' ) {
+    if ( req.body.type == 'DocMap' ) {
+      let refPropertyId = p[4]
+      if ( ! refApp.entity[ refEntityId ].properties[ refPropertyId ] ) {
+        refApp.entity[ refEntityId ].properties[ refPropertyId ] = {
+          type: "String"
+        }
+        addResultTxt += ', created property "'+ refPropertyId + '"'
+      }
       entity.properties[ id ].docMap = req.body.ref
-    } else if ( req.body.type == 'selectRef' ) {
+    } else if ( req.body.type == 'SelectRef' ) {
       entity.properties[ id ].selectRef = req.body.ref
-    } else if ( req.body.type == 'refArray' ) {
+    } else if ( req.body.type == 'RefArray' ) {
       entity.properties[ id ].refArray = req.body.ref
-    } else if ( req.body.type == 'ref' ) {
+    } else if ( req.body.type == 'Ref' ) {
       entity.properties[ id ].ref = req.body.ref
     }
   }
