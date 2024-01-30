@@ -68,6 +68,11 @@ async function initPages( ) {
     resourceURL: 'content/welcome',
     decor: 'none'
   }) 
+
+  // ..........................................................................
+
+   gui.dynamicTitle( async ( title, req, page ) => {  return 'Low Code App' } )
+
   // ..........................................................................
 
   addHtmlPage( gui, 'gtc-en', 'GTC', 'GTC' )

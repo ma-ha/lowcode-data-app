@@ -90,16 +90,20 @@ async function getAppById( fullAppId ) {
   }
   return null
 }
+
 async function addApp( fullAppId, app ) {
   log.info( 'getApp',fullAppId )
   await syncTbl( 'app' )
   data.app[ fullAppId ] = app
   await writeFile( APP_TBL, JSON.stringify( data[ 'app' ], null, '  ' ) )
+  eh.publishDataChgEvt( 'customize', fullAppId, 'app', app )
 }
+
 async function saveApp( fullAppId, app ) {
   log.info( 'saveApp',fullAppId )
   data.app[ fullAppId ] = app
   await writeFile( APP_TBL, JSON.stringify( data[ 'app' ], null, '  ' ) )
+  eh.publishDataChgEvt( 'customize', fullAppId, 'app', app )
 }
 // ============================================================================
 

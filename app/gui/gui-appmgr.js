@@ -134,7 +134,7 @@ async function init( ) {
     }]
 
     rows.push({
-      id: 'AppEntitiesTbl', title: 'App Entities',  height: '650px', 
+      id: 'AppEntitiesTbl', title: 'App Entities',  height: '600px', 
       type : 'pong-table', resourceURL: 'app/entity',  decor: 'decor', rowId: 'AppEntitiesTbl',
       moduleConfig : {
         dataURL: "",
@@ -144,9 +144,11 @@ async function init( ) {
             method: "GET", setData: [ { resId : 'AppEntitiesAdd' } ] } ,
           { id: "entityId",   label: "Id",         width: "20%", cellType: "text" },
           { id: "title",      label: "Title",      width: "20%", cellType: "text" },
-          { id: "scope",      label: "Scope",      width: "20%", cellType: "text" },
+          { id: "scope",      label: "Scope",      width: "15%", cellType: "text" },
           { id: "propLnk",    label: "Properties", width: "20%", cellType: "text" },
-          { id: "maintainer", label: "Maintainer", width: "20%", cellType: "text" }
+          { id: "maintainer", label: "Maintainer", width: "15%", cellType: "text" },
+          { id: 'Del', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-trash', 
+            method: "DELETE", update: [ { resId : 'AppEntitiesTbl' } ], target: "modal" }
         ]
       }
     })
@@ -223,7 +225,9 @@ async function init( ) {
             method: "GET", setData: [ { resId : 'AppEntityPropAdd' } ] },
           { id: "propId",      label: "Id",       width: "20%", cellType: "text" },
           { id: "label",   label: "Label",    width: "20%", cellType: "text" },
-          { id: "type",    label: "Type",     width: "20%", cellType: "text" }
+          { id: "type",    label: "Type",     width: "50%", cellType: "text" },
+          { id: 'Del', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-trash', 
+            method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" }
         ]
       }
     })

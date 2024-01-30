@@ -95,7 +95,7 @@ if th users aren't already there.
 
 ## Web Content 
 
-Some [static docu files](app/html/), GTC, imprint etc. need to be customized to your needs.
+Some [static docertyu files](app/html/), GTC, imprint etc. need to be customized to your needs.
 
 A simple markdown docu can be implemented, as well as a self-service onboarding, see [api-content.js](app/api-content.js).
 
@@ -114,4 +114,4 @@ Simple color scheme changes can be done easily, just focus on the 1st 15 lines i
 - [ ] Document delete function
 - [ ] Entity JSON field type
 - [ ] Scope meta data
-
+- [ ] Delete Entities

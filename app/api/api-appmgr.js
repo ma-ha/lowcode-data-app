@@ -32,8 +32,10 @@ async function setupAPI( app ) {
   svc.post( '/app', guiAuthz, addApp )
   svc.get(  '/app/entity', guiAuthz, getEntity )
   svc.post( '/app/entity', guiAuthz, addEntity )
+  svc.delete( '/app/entity', guiAuthz, delEntity )
   svc.get(  '/app/entity/property', guiAuthz, getProperty )
   svc.post( '/app/entity/property', guiAuthz, addProperty )
+  svc.delete( '/app/entity/property', guiAuthz,delProperty )
   svc.get(  '/erm', getERM )
   svc.post( '/erm', saveERM )
 }
@@ -321,6 +323,9 @@ async function getEntity( req, res )  {
 
 async function addEntity( req, res ) {
   log.info( 'POST entity', req.body )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+
   let app = await dta.getAppById( req.body.appId )
   if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send("App Id not found") }
 
@@ -336,6 +341,24 @@ async function addEntity( req, res ) {
   app.entity[ req.body.entityId ] = newEntity
   await dta.saveApp( req.body.appId, app )
   res.send( resultTxt )
+}
+
+
+async function delEntity( req, res ) {
+  log.info( 'DELETE entity', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.query.appId || ! req.query.entityId ) { return res.status(401).send( 'appId and entityId required' ) }
+
+  let app = await dta.getAppById( req.query.appId )
+  if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send("App not found") }
+  if ( app.entity[ req.query.entityId ] ) {
+    delete app.entity[ req.query.entityId ]
+    await dta.saveApp( req.query.appId, app )
+    res.send( 'Entity deleted!')
+  } else { 
+    return res.status(401).send( 'Entity not found' )
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -510,6 +533,30 @@ async function addProperty ( req, res ) {
 
   await dta.saveApp( req.body.appId, app )
   res.send( 'Added' + addResultTxt )
+}
+
+
+async function delProperty( req, res ) {
+  log.info( 'DELETE property', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.query.appId || ! req.query.entityId || ! req.query.propId ) { 
+    return res.status(401).send( 'appId and entityId required' ) 
+  }
+
+  let app = await dta.getAppById( req.query.appId )
+  if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send("App not found") }
+  if ( app.entity[ req.query.entityId ] ) {
+    if ( app.entity[ req.query.entityId ].properties[ req.query.propId ] ) {
+      delete app.entity[ req.query.entityId ].properties[ req.query.propId ]
+      await dta.saveApp( req.query.appId, app )
+      res.send( 'Property deleted!')
+    }  else { 
+      return res.status(401).send( 'Property not found' )
+    }
+  } else { 
+    return res.status(401).send( 'Entity not found' )
+  }
 }
 
 // ============================================================================
