@@ -62,11 +62,11 @@ So relations are
 Adapters and connectors can use ReST APIs,
 see [API and Format Reference Docu](doc/README.md).
 
-# Event Hub
+## Event Hub
 
 Adapters can subscribe to data events, to start processes or sync the data with external systems.
 
-# GUI Links
+## GUI Links
 
 Entities can refer to external GUI Apps using links. Placeholders in the links are populated with the entity data.
 
