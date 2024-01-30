@@ -111,4 +111,4 @@ Simple color scheme changes can be done easily, just focus on the 1st 15 lines i
 - [ ] Refactor ext. data API
 - [ ] Refactor API for scopes
 - [ ] Event filter
-- [ ] Scope meta data
+- [ ] Data filter in table

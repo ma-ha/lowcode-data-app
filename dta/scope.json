@@ -11,7 +11,10 @@
     "name": "Region Germany",
     "tag": [
       "region"
-    ]
+    ],
+    "meta": {
+      "SAP-tenant": "12345678/1"
+    }
   },
   "1000/DE/Berlin": {
     "name": "City: Berlin",
@@ -19,42 +22,60 @@
       "city",
       "capital",
       "huge"
-    ]
+    ],
+    "meta": {
+      "SAP-tenant": "12345678/2"
+    }
   },
   "1000/DE/Hamburg": {
     "name": "City: Hamburg",
     "tag": [
       "city",
       "huge"
-    ]
+    ],
+    "meta": {
+      "SAP-tenant": "12345678/3"
+    }
   },
   "1000/DE/Munich": {
     "name": "City: Munich",
     "tag": [
       "city",
       "huge"
-    ]
+    ],
+    "meta": {
+      "SAP-tenant": "12345678/4"
+    }
   },
   "1000/DE/Essen": {
     "name": "City: Essen",
     "tag": [
       "city",
       "huge"
-    ]
+    ],
+    "meta": {
+      "SAP-tenant": "12345678/5"
+    }
   },
   "1000/DE/Bochum": {
     "name": "City: Bochum",
     "tag": [
       "city",
       "mid"
-    ]
+    ],
+    "meta": {
+      "SAP-tenant": "12345678/6"
+    }
   },
   "1000/DE/Hattingen": {
     "name": "City: Hattingen",
     "tag": [
       "city",
       "small"
-    ]
+    ],
+    "meta": {
+      "SAP-tenant": "12345678/7"
+    }
   },
   "1000/UK": {
     "name": "UK",
@@ -67,6 +88,9 @@
     "tag": [
       "city",
       "mid"
-    ]
+    ],
+    "meta": {
+      "SAP-tenant": "12345678/8"
+    }
   }
 }

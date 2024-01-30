@@ -159,17 +159,19 @@ async function geScopeArr( rootScopeId ) {
       scopeArr.push({
         id     : scopeId,
         name   : scopeTbl[ scopeId ].name,
-        tagArr : scopeTbl[ scopeId ].tag
+        tagArr : scopeTbl[ scopeId ].tag,
+        meta   : scopeTbl[ scopeId ].meta
       })
     }
   }
   return scopeArr
 }
-async function addScope( id, name, tagArr ) {
+async function addScope( id, name, tagArr, meta) {
   let scopeTbl = await getScope() 
   scopeTbl[ id ] = {
     name : name,
-    tag  : tagArr
+    tag  : tagArr,
+    meta : meta
   }
   await writeScope() 
 }

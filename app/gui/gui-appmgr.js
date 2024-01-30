@@ -21,11 +21,11 @@ async function init( ) {
   scopePg.navLabel = 'Scopes'
   scopePg.setPageWidth( '90%' )
   scopePg.addView({ id: 'Scopes', 
-    rowId: 'Scopes', title: 'Scopes',  height: '750px', 
+    rowId: 'Scopes', title: 'Scopes',  height: '650px', 
     type : 'pong-table', resourceURL: 'scope' 
   })
   scopePg.addView({  id: 'AddScope', 
-    title: 'Add / Edit Scopes',  height: '150px', 
+    title: 'Add / Edit Scopes',  height: '200px', 
     type : 'pong-form', resourceURL: 'scope',
     moduleConfig : {
 //      label:'Add Scope',
@@ -34,7 +34,8 @@ async function init( ) {
       fieldGroups:[{ columns: [
         { formFields: [{ id: "scopeId", label: "Id", type: "text" } ]},
         { formFields: [{ id: "name", label: "Name", type: "text" } ]},
-        { formFields: [{ id: "tags", label: "Tags, comma separated", type: "text" } ]}
+        { formFields: [{ id: "tags", label: "Tags, comma separated", type: "text" } ]},
+        { formFields: [{ id: "metaJSON", label: "Meta Data (JSON)", type: "text", rows: 6 } ]}
       ] }],
       actions : [ 
         { id: "PropertyAddBtn", actionName: "Add / Update", update: [{ resId:'Scopes' }], 

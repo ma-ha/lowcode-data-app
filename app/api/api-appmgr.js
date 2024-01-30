@@ -168,7 +168,11 @@ async function addScope( req, res ) {
   }
   let name = ( req.body.name ? req.body.name : req.body.scopeId )
   let tags = ( req.body.tags ?  req.body.tags.split(',') : [] )
-  await userDta.addScope( req.body.scopeId, name, tags )
+  let meta = {}
+  if ( req.body.metaJSON &&  req.body.metaJSON.trim().startsWith('{') ) { try {
+      meta = JSON.parse( req.body.metaJSON )
+  } catch ( exc ) { res.status(400).send('Meta Data not a valid JSON')  } }
+  await userDta.addScope( req.body.scopeId, name, tags, meta )
   res.send( resultTxt ) 
 }
 
@@ -182,10 +186,12 @@ async function getScope( req, res ) {
 
     for ( let scope of scopeArr ) {
       if ( scope.id == req.query.id ) {
+        log.info('sc',scope )
         let resultScope = {
-          scopeId : scope.id,
-          name    : scope.name,
-          tags    : scope.tagArr
+          scopeId  : scope.id,
+          name     : scope.name,
+          tags     : scope.tagArr,
+          metaJSON : ( scope.meta ? JSON.stringify( scope.meta, null, ' ' )  : '' )
         }
         return res.send( resultScope )
       }
