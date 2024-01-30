@@ -41,6 +41,7 @@ async function setupAPI( app ) {
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity', guiAuthz, getDocArr )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, getDoc )
   svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, addDoc )
+  svc.delete( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, delDoc )
   
   svc.get( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/property', guiAuthz, async ( req, res ) => {
     log.error( 'GET entity/property', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
@@ -213,7 +214,7 @@ async function getDocTblDef ( req, res ) {
     // log.info( 'appEntity', appEntityProps )
     let cnt = 0
     for ( let propId in appEntityProps ) { cnt++ }
-    let width = Math.round( 85/cnt ) + '%'
+    let width = Math.round( 80/cnt ) + '%'
 
     for ( let propId in appEntityProps ) {
       let prop =  appEntityProps[ propId ]
@@ -246,6 +247,8 @@ async function getDocTblDef ( req, res ) {
       }
     }
   }
+  cols.push({ id: 'Del', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-trash', 
+              method: "DELETE", update: [ { resId : 'EntityList'+req.params.entityId } ], target: "modal" })
   // log.info( 'colArr',  req.params.entityId , cols )
   res.send({ 
     rowId   : [ 'recId' ], 
@@ -341,7 +344,6 @@ async function addDoc( req, res )  {
   let app = await dta.getAppById( appId )
   if ( ! app ) { return res.send( 'ERROR: App not found') }
 
-  if ( ! app ) { return res.status(401).send( 'ERROR: Login required') }
   let dtaColl = user.rootScopeId + req.params.entityId
   
   // let existRec = await dta.idExists( dtaColl, req.body.id )  
@@ -353,6 +355,17 @@ async function addDoc( req, res )  {
   let result = await dta.addDataObj( dtaColl, req.body.id, req.body )
   // TODO check entity
   res.send( 'OK' )
+}
+
+
+async function delDoc( req, res )  {
+  log.info( 'Del entity', req.params, req.query  )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.query.recId ) { return res.send( 'ERROR: id required') }
+  let dtaColl = user.rootScopeId + req.params.entityId
+  let result = await dta.delDataObj( dtaColl, req.query.recId )
+  res.send( result )
 }
 
 

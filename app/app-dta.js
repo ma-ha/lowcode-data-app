@@ -17,7 +17,8 @@ exports: module.exports = {
   getDataById,
   getDataObjX,
   idExists,
-  addDataObj
+  addDataObj,
+  delDataObj
 }
 
 // ============================================================================
@@ -96,14 +97,14 @@ async function addApp( fullAppId, app ) {
   await syncTbl( 'app' )
   data.app[ fullAppId ] = app
   await writeFile( APP_TBL, JSON.stringify( data[ 'app' ], null, '  ' ) )
-  eh.publishDataChgEvt( 'customize', fullAppId, 'app', app )
+  eh.publishDataChgEvt( 'app.add', fullAppId, 'app', app )
 }
 
 async function saveApp( fullAppId, app ) {
   log.info( 'saveApp',fullAppId )
   data.app[ fullAppId ] = app
   await writeFile( APP_TBL, JSON.stringify( data[ 'app' ], null, '  ' ) )
-  eh.publishDataChgEvt( 'customize', fullAppId, 'app', app )
+  eh.publishDataChgEvt( 'app.chg', fullAppId, 'app', app )
 }
 // ============================================================================
 
@@ -231,9 +232,25 @@ async function addDataObj( tbl, id, obj ) {
   let dbFile = DB_DIR + tbl + '.json'
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
   
-  eh.publishDataChgEvt( 'add', obj.scopeId+'/'+id, tbl, obj )
+  eh.publishDataChgEvt( 'dta.add', id, tbl, obj )
   return true
 }
+
+
+async function delDataObj( tbl, id, ) {
+  log.info( 'delDataObj', tbl, id )
+  await syncTbl( tbl )
+  let idT = id.trim() 
+  if ( ! data[ tbl ]  ||  ! data[ tbl ][ idT ] ) { return "Not found" }
+  log.info( 'delDataObj', tbl, data[ tbl ][ idT ] )
+  delete  data[ tbl ][ idT ]
+  let dbFile = DB_DIR + tbl + '.json'
+  await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
+
+  eh.publishDataChgEvt( 'dta.del', id, tbl )
+  return "Deleted"
+}
+
 
 async function syncTbl( tbl ) {
   log.debug( 'syncTbl', tbl )
