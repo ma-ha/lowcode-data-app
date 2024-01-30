@@ -107,9 +107,8 @@ Simple color scheme changes can be done easily, just focus on the 1st 15 lines i
 
 - [ ] MultiSelectRef field type
 - [ ] Metrics field type
+- [ ] Entity JSON field type
 - [ ] Refactor ext. data API
 - [ ] Refactor API for scopes
 - [ ] Event filter
-- [ ] Document delete function
-- [ ] Entity JSON field type
 - [ ] Scope meta data
