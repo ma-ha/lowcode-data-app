@@ -106,7 +106,6 @@ Simple color scheme changes can be done easily, just focus on the 1st 15 lines i
 # TODOs
 
 - [ ] MultiSelectRef field type
-- [ ] Link field type
 - [ ] Metrics field type
 - [ ] Refactor ext. data API
 - [ ] Refactor API for scopes

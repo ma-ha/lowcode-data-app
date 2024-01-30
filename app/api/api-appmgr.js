@@ -485,6 +485,10 @@ async function addProperty ( req, res ) {
 
     entity.properties[ id ].options = req.body.ref.split(',')
 
+  } else   if ( req.body.type == 'Link' ) {
+
+    entity.properties[ id ].link = req.body.ref
+
   } else if ( ['DocMap','SelectRef','RefArray','Ref'].includes(  req.body.type ) ) {
 
     if ( ! req.body.ref ) {
@@ -513,21 +517,27 @@ async function addProperty ( req, res ) {
       }
       addResultTxt += ', created new entity "'+ req.body.ref + '"'
     }
-    if ( req.body.type == 'DocMap' ) {
-      let refPropertyId = p[4]
-      if ( ! refApp.entity[ refEntityId ].properties[ refPropertyId ] ) {
-        refApp.entity[ refEntityId ].properties[ refPropertyId ] = {
-          type: "String"
+    switch ( req.body.type ) {
+      case 'DocMap':
+        let refPropertyId = p[4]
+        if ( ! refApp.entity[ refEntityId ].properties[ refPropertyId ] ) {
+          refApp.entity[ refEntityId ].properties[ refPropertyId ] = {
+            type: "String"
+          }
+          addResultTxt += ', created property "'+ refPropertyId + '"'
         }
-        addResultTxt += ', created property "'+ refPropertyId + '"'
-      }
-      entity.properties[ id ].docMap = req.body.ref
-    } else if ( req.body.type == 'SelectRef' ) {
-      entity.properties[ id ].selectRef = req.body.ref
-    } else if ( req.body.type == 'RefArray' ) {
-      entity.properties[ id ].refArray = req.body.ref
-    } else if ( req.body.type == 'Ref' ) {
-      entity.properties[ id ].ref = req.body.ref
+        entity.properties[ id ].docMap = req.body.ref
+        break
+      case 'SelectRef':
+        entity.properties[ id ].selectRef = req.body.ref
+        break
+      case 'RefArray':
+        entity.properties[ id ].refArray = req.body.ref
+        break
+      case 'Ref':
+        entity.properties[ id ].ref = req.body.ref
+        break
+      default: break
     }
   }
 

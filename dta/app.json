@@ -435,6 +435,11 @@
               "MODBUS",
               "...other"
             ]
+          },
+          "LinkToSAP": {
+            "label": "Open in SAP",
+            "type": "Link",
+            "link": "https://localhost/sap/customer/${id}"
           }
         }
       },

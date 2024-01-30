@@ -44,7 +44,7 @@ async function setupAPI( app ) {
   svc.delete( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, delDoc )
   
   svc.get( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/property', guiAuthz, async ( req, res ) => {
-    log.error( 'GET entity/property', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
+    log.error( '>>>>>>>>>>>>>>>>>>>>> GET entity/property', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
     // let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
     // let app = await dta.getAppById( appId )
     // let propArr = []
@@ -71,6 +71,7 @@ async function setupAPI( app ) {
   })
 
   svc.get( '/guiapp/:tenantId/:appId/:appVersion/:entity/pong-form', guiAuthz, async ( req, res ) => {
+    log.error( '>>>>>>>>>>>>>>>>>>>> GET entity/pong-form' )
   })
 
   //---------------------------------------------------------------------------
@@ -315,13 +316,19 @@ async function getDoc( req, res ) {
           tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
           break 
         case 'Link': 
-          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+          if ( prop.link ) {
+            let href = prop.link
+            href = href.replaceAll( '${id}', rec[ 'id' ] )
+            href = href.replaceAll( '${scopeId}', rec[ 'scopeId' ] )
+            for ( let replaceId in entity.properties ) {
+              href = href.replaceAll( '${'+replaceId+'}', rec[ replaceId ] )
+            }
+            tblRec[ propId ] = '<a href="'+href+'" target="_blank">'+label+'</a>'
+          } else { tblRec[ propId ] = '' }
           break 
-        // case 'Sub':
-        //   let params = prop.sub.split('/')
-        //   let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ prop.prop +'='+ rec.id
-        //   tblRec[ propId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
-        //   break 
+        case 'JSON': 
+          tblRec[ propId ] = 'TODO' // open JSON editor
+          break 
         default:   // String, Number, Select
           tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
           break 
