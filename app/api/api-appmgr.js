@@ -27,7 +27,7 @@ async function setupAPI( app ) {
   svc.post( '/scope', addScope )
   svc.get(  '/scope', getScope )
   svc.get(  '/scope/pong-table', getScopeTbl )
-  svc.get(  '/app-lnk/html', guiAuthz, getAppLnk )
+  svc.get(  '/app-lnk/html', guiAuthz, getAppLnk ) // for HTML view above the app list
   svc.get(  '/app', guiAuthz, getApp )
   svc.post( '/app', guiAuthz, addApp )
   svc.get(  '/app/entity', guiAuthz, getEntity )
@@ -370,7 +370,7 @@ async function delEntity( req, res ) {
 // --------------------------------------------------------------------------
 
 async function getProperty( req, res ) {
-  log.info( 'GET /app/entity/property', req.query )
+  log.debug( 'GET /app/entity/property', req.query )
   let appId = ( req.query.appId ? req.query.appId : req.query.id.split(',')[0] )
   if ( ! appId ) { return res.status(400).send([]) }
   let entityId = ( req.query.entityId ? req.query.entityId : req.query.id.split(',')[1] )
@@ -388,6 +388,7 @@ async function getProperty( req, res ) {
       propId   : req.query.propId,
       type     :  dbProp.type,
       label    : ( dbProp.label ? dbProp.label : '' ),
+      filter   : ( dbProp.filter ? true : false ),
     }
     switch ( dbProp.type ) {
       case 'Select':
@@ -450,7 +451,8 @@ async function getProperty( req, res ) {
       entityId : entityId,
       propId   : propId,
       label    : prop.label,
-      type     : pType
+      type     : pType,
+      filter   : ( prop.filter   ? true : false )
     })
   }
   res.send( propArr )
@@ -473,6 +475,7 @@ function getRefId( id ) {
 }
 
 async function addProperty ( req, res ) {
+  log.info( 'addProperty', req.body )
   let id = req.body.propId
   let addResultTxt = ''
   if ( ! id ) { log.warn('POST /entity/property: id required'); return res.status(400).send("Id required") }
@@ -486,6 +489,12 @@ async function addProperty ( req, res ) {
   if ( req.body.label ) { entity.properties[ id ].label = req.body.label }
   entity.properties[ id ].type = req.body.type 
 
+  if ( req.body.filter  ) { 
+    entity.properties[ id ].filter = true 
+  } else {
+    delete entity.properties[ id ].filter
+  }
+  
   // special types need additional info
   if ( req.body.type == 'Select' ) {
 
@@ -546,6 +555,7 @@ async function addProperty ( req, res ) {
       default: break
     }
   }
+  log.info( 'addProperty e', entity.properties[ id ] )
 
   await dta.saveApp( req.body.appId, app )
   res.send( 'Added' + addResultTxt )

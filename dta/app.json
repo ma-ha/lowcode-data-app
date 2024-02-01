@@ -194,7 +194,8 @@
         ],
         "properties": {
           "OderNo": {
-            "type": "String"
+            "type": "String",
+            "filter": true
           },
           "OrderDate": {
             "type": "Date"
@@ -209,7 +210,8 @@
             ]
           },
           "ItemPrice": {
-            "type": "String"
+            "type": "String",
+            "filter": true
           },
           "Taxes": {
             "type": "String"

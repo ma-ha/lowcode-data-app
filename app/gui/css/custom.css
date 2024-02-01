@@ -483,6 +483,26 @@
   padding-top: 5px;
  }
 
+ #AppEntityPropAddContentfilter {
+  width: auto;
+ }
+ .pong-table button {
+  padding:  3px 12px 3px 12px;
+ }
+
+ #AppEntitiesAppInfoContentlnkDiv,
+ #AppEntitiesAppInfoContentermLnkDiv,
+ #AppEntityInfoContentlnkDiv,
+ #AppEntityInfoContentermLnkDiv {
+  padding-left: 30px;
+  padding-top: 16px;
+ }
+ #AppEntitiesAppInfoContentlnkDiv label,
+ #AppEntitiesAppInfoContentermLnkDiv label,
+ #AppEntityInfoContentlnkDiv label,
+ #AppEntityInfoContentermLnkDiv label {
+  width: 80px;
+ }
  /* ==================================================== */
 
  .decor-tm-title,

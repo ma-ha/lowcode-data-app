@@ -207,7 +207,8 @@ async function init( ) {
         fieldGroups:[{ columns: [
           { formFields: [{ id: "appId", label: "App Id",   type: "text", defaultVal: appId,  readonly: true } ]},
           // { formFields: [{ id: "name", label: "Name", type: "text", defaultVal: app.title, readonly: true } ]},
-          { formFields: [{ id: "name", label: "Entity", type: "text", defaultVal: entityId, readonly: true } ]},
+          { formFields: [{ id: "name", label: "Entity Id", type: "text", defaultVal: entityId, readonly: true } ]},
+          { formFields: [{ id: "title", label: "Entity Title", type: "text", defaultVal: entityId, readonly: true } ]},
           { formFields: [{ id: "lnk", label: "", linkText:"Back to Entities", type: "link", defaultVal: "index.html?layout=AppEntities-nonav&id="+appId } ]},
           { formFields: [{ id: "ermLnk", linkText:"Show Data Model", type: "link", defaultVal: 'index.html?layout=ERM-nonav' }] }
         ] }]
@@ -222,12 +223,13 @@ async function init( ) {
         dataURL: "",
         rowId: [ 'appId', 'entityId', 'propId' ],
         cols: [
-          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'7%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AppEntityPropAdd' } ] },
-          { id: "propId",      label: "Id",       width: "20%", cellType: "text" },
+          { id: "propId",  label: "Id",       width: "20%", cellType: "text" },
           { id: "label",   label: "Label",    width: "20%", cellType: "text" },
-          { id: "type",    label: "Type",     width: "50%", cellType: "text" },
-          { id: 'Del', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-trash', 
+          { id: "type",    label: "Type",     width: "40%", cellType: "text" },
+          { id: "filter",  label: "Filter",   width: "5%",  cellType: "checkbox" },
+          { id: 'Del', label: "&nbsp;", cellType: "button", width :'8%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" }
         ]
       }
@@ -251,9 +253,10 @@ async function init( ) {
           { formFields: [ { id: "propId",  label: "Id", type: "text" },
                           { id: "label",   label: "Label", type: "text" } ]},
           { formFields: [{ id: "type",     label: "Type", type: "select",
-            options: addOptions([ 'String', 'Boolean', 'Number', 'Date', 'Select', 'DocMap', 
+               options: addOptions([ 'String', 'Boolean', 'Number', 'Date', 'Select', 'DocMap', 
               'SelectRef', 'Ref', 'RefArray', 'Metric', 'Link', 'JSON' ]) },
-          { id: "ref", label: "Ref", type: "text", options: refOptions } ]}
+            { id: "ref", label: "Ref", type: "text", options: refOptions } ]},
+          { formFields: [ { id: "filter",  label: "Filter", type: "checkbox" } ]}
         ] }],
         actions : [ 
           { id: "AddFormBtn", actionName: "Add / Update", actionURL: 'app/entity/property', 
