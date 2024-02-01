@@ -102,16 +102,16 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
     })
   }
 
-  if ( entity.divs ) {
-    rows.push({ 
-      rowId  : 'EntityList' + entityId,
-      title  : entity.title,
-      decor  : "decor",
-      type   : 'pong-list',
-      height : '500px',
-      resourceURL : 'guiapp/'+appId+'/entity/'+entityId
-    })  
-  } else {
+  // if ( entity.divs ) {
+  //   rows.push({ 
+  //     rowId  : 'EntityList' + entityId,
+  //     title  : entity.title,
+  //     decor  : "decor",
+  //     type   : 'pong-list',
+  //     height : '500px',
+  //     resourceURL : 'guiapp/'+appId+'/entity/'+entityId
+  //   })  
+  // } else {
     rows.push({ 
       rowId : 'EntityList' + entityId,
       title  : entity.title,
@@ -120,7 +120,7 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
       height      : '500px',
       resourceURL : 'guiapp/'+appId+'/entity/'+entityId
     })  
-  }
+  // }
 
   rows.push( 
     await genAddDataForm( 

@@ -210,6 +210,7 @@ async function getDocTblDef ( req, res ) {
     { id: 'recId', label: "Id",  cellType: "text", width:'10%' }
   ]
 
+  let filter = []
   if ( app && app.entity[ req.params.entityId ] ) {
     let appEntityProps = app.entity[ req.params.entityId ].properties
     // log.info( 'appEntity', appEntityProps )
@@ -220,6 +221,16 @@ async function getDocTblDef ( req, res ) {
     for ( let propId in appEntityProps ) {
       let prop =  appEntityProps[ propId ]
       let label = propId 
+      if ( prop.filter ) {
+        if ( prop.type == 'Select' ) {
+          let optArr = [{ option: ' ', value: ' ' }]
+          for ( let val of prop.options ) { optArr.push( { option: val, value: val }) }
+          filter.push({ id: 'filter'+propId, label: label, type: 'select', options: optArr  })
+        } else {
+          filter.push({ id: 'filter'+propId, label: label })
+        }
+      }
+
       switch ( prop.type ) {
         case 'Boolean':
           cols.push({ id: propId, label : label, cellType: 'checkbox', width:width })
@@ -251,11 +262,21 @@ async function getDocTblDef ( req, res ) {
   cols.push({ id: 'Del', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-trash', 
               method: "DELETE", update: [ { resId : 'EntityList'+req.params.entityId } ], target: "modal" })
   // log.info( 'colArr',  req.params.entityId , cols )
-  res.send({ 
+
+  let tbl = { 
     rowId   : [ 'recId' ], 
     dataURL : '',
     cols    : cols
-  })
+  }
+
+  if ( filter.length != 0 ) [
+    tbl.filter = {
+      dataReqParams    : filter,
+      dataReqParamsSrc : 'Form'
+    }
+  ]
+
+  res.send( tbl )
 }
 
 

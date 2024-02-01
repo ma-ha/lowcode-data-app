@@ -372,10 +372,12 @@
         ],
         "properties": {
           "DeviceNo": {
-            "type": "String"
+            "type": "String",
+            "filter": true
           },
           "Status": {
             "type": "Select",
+            "filter": true,
             "options": [
               "Ordered",
               "Inventory",
@@ -387,6 +389,7 @@
           },
           "Hardware": {
             "type": "SelectRef",
+            "filter": true,
             "selectRef": "1000/device-mgr-app/1.0.0/DeviceHardware"
           },
           "Description": {
@@ -394,6 +397,7 @@
           },
           "ConnType": {
             "type": "Select",
+            "filter": true,
             "options": [
               "COAP",
               "HTTP/S",
