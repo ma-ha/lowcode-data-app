@@ -96,7 +96,7 @@ if th users aren't already there.
 
 ## Web Content 
 
-Some [static docertyu files](app/html/), GTC, imprint etc. need to be customized to your needs.
+Some [static doc files](app/gui/html/), GTC, imprint etc. need to be customized to your needs.
 
 A simple markdown docu can be implemented, as well as a self-service onboarding, see [api-content.js](app/gui/api-content.js).
 
