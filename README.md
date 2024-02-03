@@ -106,7 +106,6 @@ Simple color scheme changes can be done easily, just focus on the 1st 15 lines i
 
 # TODOs / Ideas
 
-- [ ] Data filter in table
 - [ ] Entity JSON field type
 - [ ] MultiSelectRef field type
 - [ ] Metrics field type

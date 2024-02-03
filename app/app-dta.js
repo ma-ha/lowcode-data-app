@@ -175,8 +175,8 @@ async function idExists( tbl, id  ) {
   return null
 }
 
-async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeId, id  ) {
-  log.debug( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id )
+async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams ) {
+  log.info( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams )
   let tbl = rootScopeId + entityId
   await syncTbl( tbl )
   let inherit = await scopeInherited( rootScopeId, appId, appVersion, entityId )
@@ -195,7 +195,20 @@ async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeI
     for ( let recId in data[ tbl ] ) {
       let rec = data[ tbl ][ recId ]
       if ( scopeOK( userScopeId, rec.scopeId, inherit ) ) {
-        result.push( rec )  
+        if ( filterParams ) {  // only not null if there are params set
+          let hit = false
+          for ( let f in filterParams ) {
+            if ( rec[f] && rec[f].indexOf( filterParams[f] ) >= 0 ) {
+              hit = true
+              break
+            }
+          }
+          if ( hit ) {
+            result.push( rec )  
+          }
+        } else {
+          result.push( rec )  
+        }
       }
     }
   }

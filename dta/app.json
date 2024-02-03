@@ -202,6 +202,7 @@
           },
           "OrderStatus": {
             "type": "Select",
+            "filter": true,
             "options": [
               "open",
               "in progress",
@@ -220,8 +221,9 @@
             "type": "String"
           },
           "Shipping": {
-            "type": "Select",
             "label": "Shipping Method",
+            "type": "Select",
+            "filter": true,
             "options": [
               "Standard",
               " Express",

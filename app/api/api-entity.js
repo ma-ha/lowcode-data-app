@@ -225,10 +225,12 @@ async function getDocTblDef ( req, res ) {
       if ( prop.filter ) {
         if ( prop.type == 'Select' ) {
           let optArr = [{ option: ' ', value: ' ' }]
-          for ( let val of prop.options ) { optArr.push( { option: val, value: val }) }
-          filter.push({ id: 'filter'+propId, label: label, type: 'select', options: optArr  })
+          for ( let val of prop.options ) { 
+            optArr.push( { option: val, value: val })
+          }
+          filter.push({ id: propId, label: label, type: 'select', options: optArr  })
         } else {
-          filter.push({ id: 'filter'+propId, label: label })
+          filter.push({ id: propId, label: label })
         }
       }
 
@@ -288,7 +290,7 @@ async function getDocTblDef ( req, res ) {
 
 
 async function getDoc( req, res ) {
-  log.info( 'GET entity', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
+  log.info( 'GET entity', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId, req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
@@ -317,7 +319,9 @@ async function getDoc( req, res ) {
   if ( ! app.entity[ req.params.entityId ] ) { log.warn('GET data: app entity not found'); return res.status(400).send([]) }
   let entity = app.entity[ req.params.entityId ]
   // else doc array
-  let dataArr = await dta.getDataObjX( user.rootScopeId,  req.params.appId, req.params.appVersion, req.params.entityId, user.scopeId )
+  let filter = extractFilter( req.query.dataFilter )
+
+  let dataArr = await dta.getDataObjX( user.rootScopeId,  req.params.appId, req.params.appVersion, req.params.entityId, user.scopeId, null, filter )
 
   let result = []
   for ( let rec of dataArr ) {
@@ -368,7 +372,6 @@ async function getDoc( req, res ) {
             let cndProp = cnd[0].trim()
             let cndValArr = cnd[1].split(',')
             for ( let cndVal of cndValArr ) {
-              log.info( 'evt ==', cndProp, cndVal, rec[ cndProp ]  )
               if ( rec[ cndProp ]  &&  rec[ cndProp ] != cndVal.trim() ) {
                 eventLnk = ''
               }
@@ -378,7 +381,6 @@ async function getDoc( req, res ) {
             let cndProp = cnd[0].trim()
             let cndValArr = cnd[1].split(',')
             for ( let cndVal of cndValArr ) {
-              log.info( 'evt !=', cndProp, cndVal, rec[ cndProp ]  )
               if ( rec[ cndProp ]  &&  rec[ cndProp ] == cndVal.trim() ) {
                 eventLnk = ''
               }
@@ -465,4 +467,20 @@ async function docEvent( req, res )  {
     } 
   }
   res.redirect( '../../../../../../../index.html?layout=AppEntity-nonav&id='+p.tenantId+'/'+p.appId+'/'+p.appVersion )
+}
+
+
+
+function extractFilter( filterQuery ){
+  let filter = null
+  if ( filterQuery ) {
+    for (  let fp in filterQuery ) { try {
+      let query = filterQuery[ fp ].replaceAll( '%20', ' ' ).trim()
+      if ( query != '' ) {
+        if ( ! filter ) { filter = {} }
+        filter[ fp ] = query
+      }
+    } catch ( exc ) { log.warn( 'extractFilter', exc ) }}
+  }
+  return filter
 }
