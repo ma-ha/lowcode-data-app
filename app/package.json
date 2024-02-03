@@ -1,6 +1,6 @@
 {
   "name": "locode-gui",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "LowCode App Environment",
   "main": "app.js",
   "scripts": {

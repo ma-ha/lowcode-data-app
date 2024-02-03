@@ -200,7 +200,7 @@
           "OrderDate": {
             "type": "Date"
           },
-          "OderStatus": {
+          "OrderStatus": {
             "type": "Select",
             "options": [
               "open",
@@ -241,6 +241,21 @@
           "Devices": {
             "type": "SelectRef",
             "selectRef": "1000/device-mgr-app/1.0.0/DeviceHardware"
+          },
+          "InProgress": {
+            "label": "Start Progress",
+            "type": "Event",
+            "event": "OrderStatus == open"
+          },
+          "Shipped": {
+            "label": "Start Shipping",
+            "type": "Event",
+            "event": "OrderStatus == in progress"
+          },
+          "Cancel": {
+            "label": "Cancel",
+            "type": "Event",
+            "event": "OrderStatus != shipped,delivered"
           }
         },
         "divs": [
@@ -254,7 +269,7 @@
                 "prop": "OrderDate"
               },
               {
-                "prop": "OderStatus"
+                "prop": "OrderStatus"
               }
             ]
           },
@@ -313,6 +328,10 @@
           "InvoiceId": {
             "label": "Invoice Id",
             "type": "String"
+          },
+          "Approve": {
+            "type": "Event",
+            "event": "Approve"
           }
         },
         "Customer": {

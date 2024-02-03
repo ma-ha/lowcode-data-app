@@ -3,7 +3,7 @@
     "id": "x",
     "OderNo": "x",
     "OrderDate": "2024-02-02",
-    "OderStatus": "open",
+    "OrderStatus": "open",
     "ItemPrice": "1",
     "Taxes": "1",
     "TotalPrice": "1",
@@ -14,13 +14,16 @@
     "Devices": "Raspi5",
     "scopeId": "1000/DE",
     "_cre": 1706807653201,
-    "_upd": 1706807653201
+    "_upd": 1706952131328,
+    "eventArr": [
+      "InProgress"
+    ]
   },
   "z": {
     "id": "z",
     "OderNo": "x",
-    "OrderDate": "2024-02-02",
-    "OderStatus": "open",
+    "OrderDate": "",
+    "OrderStatus": "in progress",
     "ItemPrice": "1",
     "Taxes": "1",
     "TotalPrice": "1",
@@ -31,13 +34,13 @@
     "Devices": "Raspi5",
     "scopeId": "1000/DE",
     "_cre": 1706807678784,
-    "_upd": 1706807678784
+    "_upd": 1706942352836
   },
   "y": {
     "id": "y",
     "OderNo": "x",
-    "OrderDate": "2024-02-02",
-    "OderStatus": "open",
+    "OrderDate": "",
+    "OrderStatus": "shipped",
     "ItemPrice": "1",
     "Taxes": "1",
     "TotalPrice": "1",
@@ -48,6 +51,23 @@
     "Devices": "Raspi5",
     "scopeId": "1000/DE",
     "_cre": 1706807685808,
-    "_upd": 1706807685808
+    "_upd": 1706952694234
+  },
+  "a": {
+    "id": "a",
+    "OderNo": "a",
+    "OrderDate": "",
+    "OrderStatus": "open",
+    "ItemPrice": "1",
+    "Taxes": "1",
+    "TotalPrice": "1",
+    "Shipping": "Standard",
+    "ShipmentTracking": "no",
+    "Reorder": "",
+    "Invoice": "",
+    "Devices": "Raspi5",
+    "scopeId": "1000/DE",
+    "_cre": 1706953117150,
+    "_upd": 1706953117150
   }
 }

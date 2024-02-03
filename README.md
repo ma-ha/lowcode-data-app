@@ -46,9 +46,10 @@ Data types (and their Web GUI mapping)
 - `DocMap` master-detail reference (link to  filtered docs)
 - `SelectRef` to other entity  (pull down of ids)
 - `MultiSelectRef` to other entity  (pull down of ids)
-- `Metrics` link to a metrics (time series data) for this entity id
+- `Metrics` link to a metrics (time series data) for this entity id 
 - `JSON` (Multi Line Edit)
 - `Link`(simple input fields, will take placeholders)
+- `Event` (link to send an event. Ref can have a simple condition to render the link, e.g. "status == ready" or "status != in progress,done")
 
 So relations are
 - **1:n** = `docMap`

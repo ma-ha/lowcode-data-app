@@ -409,6 +409,9 @@ async function getProperty( req, res ) {
       case 'Link':
         prop.ref  = dbProp.link
         break 
+      case 'Event':
+        prop.ref  = dbProp.event
+        break 
       default: break 
     }
 
@@ -443,6 +446,9 @@ async function getProperty( req, res ) {
         break 
       case 'Link':
         pType = "Link: "+prop.link
+        break 
+      case 'Event':
+        pType = 'Event: '+prop.event
         break 
       default: break 
     }
@@ -503,6 +509,10 @@ async function addProperty ( req, res ) {
   } else   if ( req.body.type == 'Link' ) {
 
     entity.properties[ id ].link = req.body.ref
+
+  } else   if ( req.body.type == 'Event' ) {
+
+    entity.properties[ id ].event = req.body.ref
 
   } else if ( ['DocMap','SelectRef','RefArray','Ref'].includes(  req.body.type ) ) {
 

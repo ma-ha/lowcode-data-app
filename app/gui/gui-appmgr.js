@@ -254,7 +254,7 @@ async function init( ) {
                           { id: "label",   label: "Label", type: "text" } ]},
           { formFields: [{ id: "type",     label: "Type", type: "select",
                options: addOptions([ 'String', 'Boolean', 'Number', 'Date', 'Select', 'DocMap', 
-              'SelectRef', 'Ref', 'RefArray', 'Metric', 'Link', 'JSON' ]) },
+              'SelectRef', 'Ref', 'RefArray', 'Metric', 'Link', 'JSON', 'Event' ]) },
             { id: "ref", label: "Ref", type: "text", options: refOptions } ]},
           { formFields: [ { id: "filter",  label: "Filter", type: "checkbox" } ]}
         ] }],

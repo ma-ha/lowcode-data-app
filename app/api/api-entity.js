@@ -41,6 +41,7 @@ async function setupAPI( app ) {
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity', guiAuthz, getDocArr )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, getDoc )
   svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, addDoc )
+  svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/:recId/:event', guiAuthz, docEvent )
   svc.delete( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, delDoc )
   
   svc.get( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/property', guiAuthz, async ( req, res ) => {
@@ -253,6 +254,12 @@ async function getDocTblDef ( req, res ) {
         // case 'Link':
         //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
         //   break 
+        // case 'Event':
+        //   let p = req.params
+        //   cols.push({ id: propId, label : label, cellType: 'button',  method:"POST",
+        //     URL:'/guiapp/'+p.tenantId+'/'+p.appId+'/'+p.appId+'/'+p.appVersion+'/'+p.entityId+'/'+prop.event,  
+        //     target: 'modal', width:width }) 
+        //   break 
         default:  // String, Number, Select
           cols.push({ id: propId, label : label, cellType: 'text', width:width }) 
           break 
@@ -350,6 +357,36 @@ async function getDoc( req, res ) {
         case 'JSON': 
           tblRec[ propId ] = 'TODO' // open JSON editor
           break 
+        case 'Event': 
+          let p = req.params
+          let url =  'guiapp/'+p.tenantId+'/'+p.appId+'/'+p.appVersion+'/entity/'+p.entityId+'/'+rec.id+'/'+propId
+          let eventLnk = '<a href="'+url+'">'+( prop.label ? prop.label : propId ) +'</a>'
+          if ( rec.eventArr &&  rec.eventArr.indexOf(propId) >= 0 ) {
+            eventLnk = 'Pending...'
+          } else if ( prop.event && prop.event.indexOf('==') > 0 ) {
+            let cnd = prop.event.split('==')
+            let cndProp = cnd[0].trim()
+            let cndValArr = cnd[1].split(',')
+            for ( let cndVal of cndValArr ) {
+              log.info( 'evt ==', cndProp, cndVal, rec[ cndProp ]  )
+              if ( rec[ cndProp ]  &&  rec[ cndProp ] != cndVal.trim() ) {
+                eventLnk = ''
+              }
+            }
+          } else if ( prop.event && prop.event.indexOf('!=') > 0 ) {
+            let cnd = prop.event.split('!=')
+            let cndProp = cnd[0].trim()
+            let cndValArr = cnd[1].split(',')
+            for ( let cndVal of cndValArr ) {
+              log.info( 'evt !=', cndProp, cndVal, rec[ cndProp ]  )
+              if ( rec[ cndProp ]  &&  rec[ cndProp ] == cndVal.trim() ) {
+                eventLnk = ''
+              }
+            }
+          } 
+
+          tblRec[ propId ] = eventLnk //rec[ propId ].event
+          break 
         default:   // String, Number, Select
           tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
           break 
@@ -410,4 +447,22 @@ async function getEntitiesOfTenant( req, res ) {
     })
   }
   res.send( entityTbl )
+}
+
+
+async function docEvent( req, res )  {
+  log.info( 'Entity Event', req.params, req.query  )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  let p = req.params
+
+  let rec = await dta.getDataObjX( user.rootScopeId, p.appId, p.appVersion, p.entityId, user.scopeId, p.recId )
+  if ( rec ) {
+    if ( ! rec.eventArr ) { rec.eventArr = [] }
+    if ( rec.eventArr.indexOf( p.event ) == -1 ) {
+      rec.eventArr.push( p.event )
+      await dta.addDataObj( user.rootScopeId+p.entityId,  p.recId, rec )
+    } 
+  }
+  res.redirect( '../../../../../../../index.html?layout=AppEntity-nonav&id='+p.tenantId+'/'+p.appId+'/'+p.appVersion )
 }
