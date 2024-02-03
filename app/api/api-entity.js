@@ -182,6 +182,7 @@ async function getDocLstDef ( req, res ) {
   })
 }
 
+
 function genDivs( divArr, properties ) {
   let result = []
   for ( let aDiv of divArr ) {
@@ -200,10 +201,10 @@ function genDivs( divArr, properties ) {
   return result
 }
 
+
 async function getDocTblDef ( req, res ) {
   log.info( 'GET pong-table', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
   let app = await dta.getApp( req.params.tenantId, req.params.appId+'/'+req.params.appVersion )
-  
   
   let cols = [
     { id: 'Edit', label: "&nbsp;", cellType: "button", method: "GET", width :'5%', icon: 'ui-icon-pencil', 
@@ -262,6 +263,8 @@ async function getDocTblDef ( req, res ) {
         //     URL:'/guiapp/'+p.tenantId+'/'+p.appId+'/'+p.appId+'/'+p.appVersion+'/'+p.entityId+'/'+prop.event,  
         //     target: 'modal', width:width }) 
         //   break 
+        case 'JSON':
+          break 
         default:  // String, Number, Select
           cols.push({ id: propId, label : label, cellType: 'text', width:width }) 
           break 
@@ -295,7 +298,10 @@ async function getDoc( req, res ) {
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
   let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
-  // log.info( 'entity', entity )
+  let app = await dta.getAppById( appId )
+  if ( ! app ) { log.warn('GET data: app not found'); return res.status(400).send([]) }
+  if ( ! app.entity[ req.params.entityId ] ) { log.warn('GET data: app entity not found'); return res.status(400).send([]) }
+  let entity = app.entity[ req.params.entityId ]
 
   if ( req.query.recId ) { // single doc by id
     log.info( 'GET entity q/id', req.query.recId )
@@ -308,16 +314,21 @@ async function getDoc( req, res ) {
       req.query.recId
     )
     log.debug( 'GET entity doc', doc )
-    let result = JSON.parse( JSON.stringify( doc ) ) 
+    let result = JSON.parse( JSON.stringify( doc ) )
+
+    // make JSONs to Strings for GUI inputs
+    for ( let propId in entity.properties )  try {
+      if ( entity.properties[ propId ].type == 'JSON' ) try {
+        log.debug( 'result[ propId ]',propId,result[ propId ] )
+        result[ propId ] = ( result[ propId ] ? JSON.stringify( result[ propId ], null, ' ' ) : '{}' )
+      } catch ( exc ) { log.warn('getDoc nz id> stringify JSON', exc ) }
+    } catch ( exc ) { log.warn('getDoc nz id> stringify JSON', exc ) }
+
     result.recId =  req.query.recId
     log.debug( 'GET entity q/id', result )
     return  res.send( result )
   }
 
-  let app = await dta.getAppById( appId )
-  if ( ! app ) { log.warn('GET data: app not found'); return res.status(400).send([]) }
-  if ( ! app.entity[ req.params.entityId ] ) { log.warn('GET data: app entity not found'); return res.status(400).send([]) }
-  let entity = app.entity[ req.params.entityId ]
   // else doc array
   let filter = extractFilter( req.query.dataFilter )
 
@@ -359,7 +370,7 @@ async function getDoc( req, res ) {
           } else { tblRec[ propId ] = '' }
           break 
         case 'JSON': 
-          tblRec[ propId ] = 'TODO' // open JSON editor
+          tblRec[ propId ] = ( rec[ propId ] ? JSON.stringify( rec[ propId ], null, ' ' ) : '{}' )
           break 
         case 'Event': 
           let p = req.params
@@ -419,6 +430,22 @@ async function addDoc( req, res )  {
   // }
   let obj = req.body
   obj.scopeId = user.scopeId 
+
+  // JSOM input must be parsed to obj tree
+  for ( let propId in app.entity[ req.params.entityId ].properties ) try {
+    if ( app.entity[ req.params.entityId ].properties[ propId ].type == 'JSON' ) try {
+      log.debug( 'JSON', propId, req.body[ propId ], req.body )
+      if ( req.body[ propId ] ) {
+        req.body[ propId ] = JSON.parse( req.body[ propId ] )
+      } else {
+        req.body[ propId ] = {}
+      }
+    } catch ( exc ) { 
+      log.warn( 'addDoc: Parse JSON', exc ) 
+      req.body[ propId ] = {}
+    }
+  } catch ( exc ) { log.warn( 'addDoc: Parse JSON', exc ) }
+ 
   let result = await dta.addDataObj( dtaColl, req.body.id, req.body )
   // TODO check entity
   res.send( 'OK' )

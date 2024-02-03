@@ -355,13 +355,17 @@
             "label": "Invoices",
             "type": "DocMap",
             "docMap": "1000/device-inventory-app/1.0.0/Invoice/Customer"
+          },
+          "meta": {
+            "type": "JSON"
           }
         }
       }
     },
     "startPage": [
       "DeviceOrder",
-      "Invoice"
+      "Invoice",
+      "Customer"
     ],
     "role": [],
     "scope": {
