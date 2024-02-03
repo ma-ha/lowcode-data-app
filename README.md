@@ -104,12 +104,13 @@ A simple markdown docu can be implemented, as well as a self-service onboarding,
 
 Simple color scheme changes can be done easily, just focus on the 1st 15 lines in [custom.css](app/gui/css/custom.css) 
 
-# TODOs
+# TODOs / Ideas
 
+- [ ] Data filter in table
+- [ ] Entity JSON field type
 - [ ] MultiSelectRef field type
 - [ ] Metrics field type
-- [ ] Entity JSON field type
 - [ ] Refactor ext. data API
 - [ ] Refactor API for scopes
 - [ ] Event filter
-- [ ] Data filter in table
+- [ ] toggle rec delete button
