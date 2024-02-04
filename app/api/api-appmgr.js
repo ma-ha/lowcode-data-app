@@ -20,22 +20,25 @@ async function setupAPI( app ) {
   let svc = app.getExpress()
   gui = app
 
-  const myJWTcheck = apiSec.initJWTcheck()
   const guiAuthz = apiSec.userTenantAuthz( gui )
 
   // --------------------------------------------------------------------------
   svc.post( '/scope', addScope )
   svc.get(  '/scope', getScope )
   svc.get(  '/scope/pong-table', getScopeTbl )
+
   svc.get(  '/app-lnk/html', guiAuthz, getAppLnk ) // for HTML view above the app list
   svc.get(  '/app', guiAuthz, getApp )
   svc.post( '/app', guiAuthz, addApp )
-  svc.get(  '/app/entity', guiAuthz, getEntity )
-  svc.post( '/app/entity', guiAuthz, addEntity )
+
+  svc.get(    '/app/entity', guiAuthz, getEntity )
+  svc.post(   '/app/entity', guiAuthz, addEntity )
   svc.delete( '/app/entity', guiAuthz, delEntity )
-  svc.get(  '/app/entity/property', guiAuthz, getProperty )
-  svc.post( '/app/entity/property', guiAuthz, addProperty )
+
+  svc.get(    '/app/entity/property', guiAuthz, getProperty )
+  svc.post(   '/app/entity/property', guiAuthz, addProperty )
   svc.delete( '/app/entity/property', guiAuthz,delProperty )
+
   svc.get(  '/erm', getERM )
   svc.post( '/erm', saveERM )
 }
