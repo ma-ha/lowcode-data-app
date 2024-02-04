@@ -36,44 +36,11 @@ async function setupAPI( app ) {
 
   svc.get(  '/guiapp/:tenantId/entity', guiAuthz, getEntitiesOfTenant )
 
-  svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/pong-table', guiAuthz, getDocTblDef )
-  svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/pong-list', guiAuthz, getDocLstDef )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity', guiAuthz, getDocArr )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, getDoc )
   svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, addDoc )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/:recId/:event', guiAuthz, docEvent )
   svc.delete( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, delDoc )
-  
-  svc.get( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/property', guiAuthz, async ( req, res ) => {
-    log.error( '>>>>>>>>>>>>>>>>>>>>> GET entity/property', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
-    // let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
-    // let app = await dta.getAppById( appId )
-    // let propArr = []
-    // if ( app  &&  app.entity[ req.params.entityId ] ) {
-    //   for ( let propId in app.entity[ req.params.entityId ].properties ) {
-    //     let prop = app.entity[ req.params.entityId ].properties[ propId ]
-    //     log.info( prop )
-    //     let rec = { 
-    //       id    : propId,
-    //       type  : prop.type,
-    //       label : ( prop.label ? prop.label : propId )
-    //     }
-
-    //     if ( prop.selectRef ) {
-    //       rec.type = 'Select of "'+prop.selectRef+'"'
-    //     } else 
-    //     if ( prop.docMap ) {
-    //       rec.type = 'Map of "'+ prop.docMap+'"'
-    //     }
-    //     propArr.push( rec )
-    //   }
-    // }
-    res.send(  )
-  })
-
-  svc.get( '/guiapp/:tenantId/:appId/:appVersion/:entity/pong-form', guiAuthz, async ( req, res ) => {
-    log.error( '>>>>>>>>>>>>>>>>>>>> GET entity/pong-form' )
-  })
 
   //---------------------------------------------------------------------------
   // const apiAuthz = apiSec.apiAppAuthz( app )
@@ -158,139 +125,6 @@ async function getDocArr( req, res ) {
     })
   }
   res.send( entityArr )
-}
-
-async function getDocLstDef ( req, res ) {
-  log.info( 'GET pong-table', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let app = await dta.getApp( req.params.tenantId, req.params.appId+'/'+req.params.appVersion )
-  let divs = []
-  if ( app && app.entity[ req.params.entityId ] ) {
-    let entity = app.entity[ req.params.entityId ]
-    if ( entity.divs ) {
-      divs = genDivs( entity.divs, entity.properties )
-    }
-  }
-  res.send({ 
-    rowId   : ['id'], 
-    dataURL : '',
-    // divs     : divs
-    divs    : {
-      id       : 'EntityDiv',
-      cellType : 'div',
-      divs     : [ divs ]
-    }
-  })
-}
-
-
-function genDivs( divArr, properties ) {
-  let result = []
-  for ( let aDiv of divArr ) {
-    if ( aDiv.divs ) {
-      result.push({
-        id       : aDiv.id,  // TODO: make more robust
-        cellType : 'div',
-        divs     : genDivs( aDiv.divs, properties )
-      })
-    } else if ( aDiv.prop && properties[ aDiv.prop ] ) {
-      let propType = 'text'
-      if ( properties[ aDiv.prop ].type == 'Boolean ' ) { propType = 'checkbox' }
-      result.push({ id : aDiv.prop, cellType : propType })
-    }
-  }
-  return result
-}
-
-
-async function getDocTblDef ( req, res ) {
-  log.info( 'GET pong-table', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let app = await dta.getApp( req.params.tenantId, req.params.appId+'/'+req.params.appVersion )
-  
-  let cols = [
-    { id: 'Edit', label: "&nbsp;", cellType: "button", method: "GET", width :'5%', icon: 'ui-icon-pencil', 
-      setData: [ { resId : 'Add' + req.params.entityId } ] } ,
-    { id: 'recId', label: "Id",  cellType: "text", width:'10%' }
-  ]
-
-  let filter = []
-  if ( app && app.entity[ req.params.entityId ] ) {
-    let appEntityProps = app.entity[ req.params.entityId ].properties
-    // log.info( 'appEntity', appEntityProps )
-    let cnt = 0
-    for ( let propId in appEntityProps ) { cnt++ }
-    let width = Math.round( 80/cnt ) + '%'
-
-    for ( let propId in appEntityProps ) {
-      let prop =  appEntityProps[ propId ]
-      let label = propId 
-      if ( prop.filter ) {
-        if ( prop.type == 'Select' ) {
-          let optArr = [{ option: ' ', value: ' ' }]
-          for ( let val of prop.options ) { 
-            optArr.push( { option: val, value: val })
-          }
-          filter.push({ id: propId, label: label, type: 'select', options: optArr  })
-        } else {
-          filter.push({ id: propId, label: label })
-        }
-      }
-
-      if ( propId == 'id' ) { continue }
-
-      switch ( prop.type ) {
-        case 'Boolean':
-          cols.push({ id: propId, label : label, cellType: 'checkbox', width:width })
-          break 
-        case 'Date':
-          cols.push({ id: propId, label : label, cellType: 'date', width:width }) 
-          break 
-        // case 'SelectRef':
-        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
-        //   break 
-        // case 'DocMap':
-        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
-        //   break 
-        // case 'Ref':
-        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
-        //   break 
-        // case 'RefArray':
-        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
-        //   break 
-        // case 'Link':
-        //   cols.push({ id: propId, label : label, cellType: 'text', width:width }) // TODO
-        //   break 
-        // case 'Event':
-        //   let p = req.params
-        //   cols.push({ id: propId, label : label, cellType: 'button',  method:"POST",
-        //     URL:'/guiapp/'+p.tenantId+'/'+p.appId+'/'+p.appId+'/'+p.appVersion+'/'+p.entityId+'/'+prop.event,  
-        //     target: 'modal', width:width }) 
-        //   break 
-        case 'JSON':
-          break 
-        default:  // String, Number, Select
-          cols.push({ id: propId, label : label, cellType: 'text', width:width }) 
-          break 
-      }
-    }
-  }
-  cols.push({ id: 'Del', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-trash', 
-              method: "DELETE", update: [ { resId : 'EntityList'+req.params.entityId } ], target: "modal" })
-  // log.info( 'colArr',  req.params.entityId , cols )
-
-  let tbl = { 
-    rowId   : [ 'recId' ], 
-    dataURL : '',
-    cols    : cols
-  }
-
-  if ( filter.length != 0 ) [
-    tbl.filter = {
-      dataReqParams    : filter,
-      dataReqParamsSrc : 'Form'
-    }
-  ]
-
-  res.send( tbl )
 }
 
 

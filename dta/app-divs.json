@@ -260,6 +260,62 @@
             "event": "OrderStatus != shipped,delivered"
           }
         }
+        ,
+        "divs": [
+          {
+            "id": "O1",
+            "divs": [
+              {
+                "prop": "OrderNo"
+              },
+              {
+                "prop": "OrderDate"
+              },
+              {
+                "prop": "OrderStatus"
+              }
+            ]
+          },
+          {
+            "id": "O1",
+            "divs": [
+              {
+                "prop": "Devices"
+              },
+              {
+                "prop": "ItemPrice"
+              },
+              {
+                "prop": "Taxes"
+              },
+              {
+                "prop": "TotalPrice"
+              }
+            ]
+          },
+          {
+            "id": "O1",
+            "divs": [
+              {
+                "prop": "Shipping"
+              },
+              {
+                "prop": "ShipmentTracking"
+              }
+            ]
+          },
+          {
+            "id": "O1",
+            "divs": [
+              {
+                "prop": "Reorder"
+              },
+              {
+                "prop": "Invoice"
+              }
+            ]
+          }
+        ]
       },
       "Invoice": {
         "title": "Invoice",
