@@ -142,9 +142,18 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
 async function genAddDataForm( appId, entityId, entity, updateResArr, filter, user ) {
 
   let cols = []
-  cols.push({ formFields: [{ id: "id",   label: "Id", type: "text" } ]})
+  if ( entity.properties[ 'id' ] && entity.properties[ 'id' ].type == 'UUID' ) {
+    cols.push({ formFields: [{ 
+      id: "id", 
+      label: ( entity.properties[ 'id' ].label ? entity.properties[ 'id' ].label : "Id (UUID)" ), 
+      type: "text", readonly: true 
+    } ]})
+  } else { // every data rec need an id
+    cols.push({ formFields: [{ id: "id", label: "Id", type: "text" } ]})
+  }
 
   for ( let propId in entity.properties ) {
+    if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
     let lbl  = ( prop.label ? prop.label : propId )
     // console.log( 'LBL', lbl)
@@ -185,6 +194,9 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
         break 
       case 'RefArray':
         // TODO
+        break 
+      case 'UUID':
+        fld = { id: propId, label: lbl, type: 'text', readonly: true }
         break 
       case 'Link': 
         // do nothing
@@ -227,7 +239,10 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
       actions : [ 
         { id: "AddEntityBtn", actionName: "Add/update",
           actionURL: 'guiapp/'+appId+'/entity/'+entityId,
-          update: updateResArr, target: "modal" }
+          update: updateResArr, target: "modal" },
+        { id: "ResetEntityFormBtn", actionName: "Reset", method: 'GET',
+          actionURL: 'guiapp/'+appId+'/entity/'+entityId+'?recId=_empty',
+          setData:  [ { resId : 'Add' + entityId } ] }
       ]
     }
   }

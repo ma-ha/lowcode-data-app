@@ -334,6 +334,9 @@
           "Approve": {
             "type": "Event",
             "event": "Approve"
+          },
+          "id": {
+            "type": "UUID"
           }
         },
         "Customer": {

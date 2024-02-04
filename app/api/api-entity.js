@@ -6,7 +6,7 @@ const apiSec     = require( './api-sec' )
 const dta        = require( '../app-dta' )
 const userDta    = require( '../app-dta-user' )
 const bodyParser = require( 'body-parser' )
-
+const helper     = require( '../helper/helper' )
 
 exports: module.exports = { 
   setupAPI  
@@ -235,6 +235,8 @@ async function getDocTblDef ( req, res ) {
         }
       }
 
+      if ( propId == 'id' ) { continue }
+
       switch ( prop.type ) {
         case 'Boolean':
           cols.push({ id: propId, label : label, cellType: 'checkbox', width:width })
@@ -305,6 +307,19 @@ async function getDoc( req, res ) {
 
   if ( req.query.recId ) { // single doc by id
     log.info( 'GET entity q/id', req.query.recId )
+
+    if ( req.query.recId == '_empty' ) {
+      let rec = {}
+      for ( let propId in entity.properties ) {
+        if ( entity.properties[propId].type != 'Select' ) {
+          rec[ propId ] = ''
+        } else {
+          rec[ propId ] =  entity.properties[propId].options[0]
+        }
+      }
+      return res.send( rec )
+    }
+
     let doc = await dta.getDataObjX( 
       user.rootScopeId,  
       req.params.appId, 
@@ -417,10 +432,18 @@ async function addDoc( req, res )  {
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
-  if ( ! req.body.id ) {  return res.send( 'ERROR: id required') }
   let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
   let app = await dta.getAppById( appId )
   if ( ! app ) { return res.send( 'ERROR: App not found') }
+  let entity = app.entity[ req.params.entityId ]
+
+  if ( ! req.body.id ) {
+    if ( entity.properties[ 'id' ]  &&  entity.properties[ 'id' ].type == 'UUID' ) {
+      req.body.id = helper.uuidv4()
+    } else {
+      return res.send( 'ERROR: id required')
+    }
+  }
 
   let dtaColl = user.rootScopeId + req.params.entityId
   
@@ -432,19 +455,22 @@ async function addDoc( req, res )  {
   obj.scopeId = user.scopeId 
 
   // JSOM input must be parsed to obj tree
-  for ( let propId in app.entity[ req.params.entityId ].properties ) try {
-    if ( app.entity[ req.params.entityId ].properties[ propId ].type == 'JSON' ) try {
-      log.debug( 'JSON', propId, req.body[ propId ], req.body )
-      if ( req.body[ propId ] ) {
-        req.body[ propId ] = JSON.parse( req.body[ propId ] )
-      } else {
+  for ( let propId in entity.properties ) try {
+    if (entity.properties[ propId ].type == 'JSON' ) { 
+      try {
+        log.debug( 'JSON', propId, req.body[ propId ], req.body )
+        if ( req.body[ propId ] ) {
+          req.body[ propId ] = JSON.parse( req.body[ propId ] )
+        } else {
+          req.body[ propId ] = {}
+        }
+      } catch ( exc ) { 
+        log.warn( 'addDoc: Parse JSON', exc ) 
         req.body[ propId ] = {}
       }
-    } catch ( exc ) { 
-      log.warn( 'addDoc: Parse JSON', exc ) 
-      req.body[ propId ] = {}
     }
   } catch ( exc ) { log.warn( 'addDoc: Parse JSON', exc ) }
+  
  
   let result = await dta.addDataObj( dtaColl, req.body.id, req.body )
   // TODO check entity

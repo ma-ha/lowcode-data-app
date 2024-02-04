@@ -46,6 +46,7 @@ Data types (and their Web GUI mapping)
 - `DocMap` master-detail reference (link to  filtered docs)
 - `SelectRef` to other entity  (pull down of ids)
 - `MultiSelectRef` to other entity  (pull down of ids)
+- `UUID` auto generated, if field name is `id` this will be the collection id
 - `Metrics` link to a metrics (time series data) for this entity id 
 - `JSON` (Multi Line Edit)
 - `Link`(simple input fields, will take placeholders)
