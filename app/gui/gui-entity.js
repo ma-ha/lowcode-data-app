@@ -326,7 +326,7 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
       case 'JSON':
         fld = { id: propId, label: lbl, type: 'text', rows: 5 }
         break 
-      default:   // String, Number, Select, DocMap
+      default:   // String, Number
         fld = { id: propId, label: lbl, type: 'text' }
         break 
     }
