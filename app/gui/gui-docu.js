@@ -1,4 +1,4 @@
-/* LOCODE-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
+/* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
 const gui     = require( 'easy-web-app' )
 const log     = require( '../helper/log' ).logger
