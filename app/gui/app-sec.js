@@ -3,7 +3,7 @@
 const cfg  = require( 'config' )
 const log  = require( '../helper/log' ).logger
 const express = require( 'express' )
-const userDta = require( '../app-dta-user' )
+const userDta = require( '../persistence/app-dta-user' )
 
 exports: module.exports = {
   init

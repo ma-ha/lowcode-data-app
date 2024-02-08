@@ -5,7 +5,7 @@ const express = require( 'express' )
 const cfg     = require( 'config' )
 const log     = require( '../helper/log' ).logger
 const pjson   = require( '../package.json' )
-const weblog  = require( '../app-weblog' ) 
+const weblog  = require( './weblog' ) 
 
 const content = require( './api-content' ) 
 
@@ -15,8 +15,8 @@ const appGUI         = require( './gui-app' )
 const docuGUI        = require( './gui-docu' ) 
 const userGUI        = require( './gui-user' ) 
 
-const dta     = require( '../app-dta' )
-const userDta = require( '../app-dta-user' )
+const dta     = require( '../persistence/app-dta' )
+const userDta = require( '../persistence/app-dta-user' )
 
 exports: module.exports = {
   init,

@@ -1,10 +1,9 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-const log       = require( './helper/log' ).logger
-const cfg       = require( 'config' )
-const eh        = require( './eh/even-hub' )
-const fs        = require( 'fs' )
+const log       = require( '../helper/log' ).logger
+const eh        = require( '../eh/even-hub' )
 const userDB    = require( './app-dta-user' )
+const fs        = require( 'fs' )
 const { mkdir, writeFile, readFile, rename, rm, stat } = require( 'node:fs/promises' )
 
 exports: module.exports = { 

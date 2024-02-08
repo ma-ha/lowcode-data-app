@@ -4,7 +4,7 @@ const config  = require( 'config' )
 const log     = require( '../helper/log' ).logger
 
 const bodyParser = require( 'body-parser' )
-const userDta    = require( '../app-dta-user' )
+const userDta    = require( '../persistence/app-dta-user' )
 const jwt        = require( 'jsonwebtoken' )
 
 // const mailer     = require( '../mailer' )

@@ -3,7 +3,7 @@
 const log        = require( '../helper/log' ).logger
 const cfg        = require( 'config' )
 const apiSec     = require( './api-sec' )
-const userDta    = require( '../app-dta-user' )
+const userDta    = require( '../persistence/app-dta-user' )
 const bodyParser = require( 'body-parser' )
 
 exports: module.exports = { 

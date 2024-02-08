@@ -3,8 +3,8 @@
 const log        = require( '../helper/log' ).logger
 const cfg        = require( 'config' )
 const apiSec     = require( './api-sec' )
-const dta        = require( '../app-dta' )
-const userDta    = require( '../app-dta-user' )
+const dta        = require( '../persistence/app-dta' )
+const userDta    = require( '../persistence/app-dta-user' )
 const bodyParser = require( 'body-parser' )
 const helper     = require( '../helper/helper' )
 

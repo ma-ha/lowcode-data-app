@@ -3,8 +3,8 @@
 const log       = require( '../helper/log' ).logger
 const cfg       = require( 'config' )
 const jwtParser = require( 'jsonwebtoken' )
-const dta       = require( '../app-dta' )
-const userDta   = require( '../app-dta-user' )
+const dta       = require( '../persistence/app-dta' )
+const userDta   = require( '../persistence/app-dta-user' )
 
 exports: module.exports = { 
   userTenantAuthz,

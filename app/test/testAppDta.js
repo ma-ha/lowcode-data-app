@@ -2,7 +2,7 @@
 
 const assert = require( 'assert' )
 const cfg    = require( 'config' )
-const dta = require( '../app-dta' )
+const dta = require( '../persistence/app-dta' )
 
 describe( 'Test AppDta', () => { 
 

@@ -83,8 +83,8 @@ This is not recommended for production use.
 
 I should be simple to replace the persistence with a document DB. 
 Simply rewrite:
-- [app-dta.js](app/app-dta.js)
-- [app-dta-user.js](app/app-dta-user.js)
+- [app-dta.js](app/persistence/app-dta.js)
+- [app-dta-user.js](app/persistence/app-dta-user.js)
 
 ## OpenID Connect
 
