@@ -1,13 +1,11 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
 const config  = require( 'config' )
-const log     = require( './helper/log' ).logger
+const log     = require( '../helper/log' ).logger
 
 const bodyParser = require( 'body-parser' )
-const userDta    = require( './app-dta-user' )
+const userDta    = require( '../app-dta-user' )
 const jwt        = require( 'jsonwebtoken' )
-const fs        = require( 'fs' )
-const { mkdir, writeFile, readFile, rename, rm, stat } = require( 'node:fs/promises' )
 
 // const mailer     = require( '../mailer' )
 
@@ -80,7 +78,7 @@ async function getUserNameForToken( token ) {
 
 async function deleteUserIdForToken( token ) {
   delete oidcSessions[ token ]
-  await saveOidcSessions()
+  await userDta.saveOidcSessions( oidcSessions )
 }
 
 // ----------------------------------------------------------------------------

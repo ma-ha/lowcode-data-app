@@ -13,7 +13,7 @@ const appAPI    = require( './api/api-entity' )
 const userAPI   = require( './api/api-user' )
 const appMgrAPI = require( './api/api-appmgr' )
 const appMgrGUI = require( './gui/gui-appmgr' )
-const oidc      = require( './oidc.js' )
+const oidc      = require( './gui/oidc.js' )
 const eh        = require( './eh/even-hub.js' )
 
 
