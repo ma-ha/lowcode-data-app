@@ -1,6 +1,5 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-const config  = require( 'config' )
 const log     = require( '../helper/log' ).logger
 
 const bodyParser = require( 'body-parser' )
@@ -14,9 +13,11 @@ exports: module.exports = {
 }
 
 let gui = null
+let cfg = null
 
-async function init ( app ) {
+async function init ( app, oicdCfg ) {
   log.info( 'Init OpenID Login' )
+  cfg = oicdCfg
   gui = app
 
   let oidctPg = gui.addPage( 'openid-login-nonav', 'Login' )
@@ -263,9 +264,9 @@ async function oidcGetIdToken( req, email, cltId ) {
         email : uid,
         name  : user.name,
         sub   : userID,
-        exp   : Math.round( Date.now() / 1000 +  config.userSessionExpireMin * 60 )
+        exp   : Math.round( Date.now() / 1000 +  cfg.userSessionExpireMin * 60 )
         //TODO?
-      }, config.OPENID_SEC_KEY );
+      }, cfg.OPENID_SEC_KEY );
       // log.info( 'token', idToken )
       return idToken
   } catch ( exc ) { 

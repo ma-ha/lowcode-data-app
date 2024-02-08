@@ -1,7 +1,6 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
 const log        = require( '../helper/log' ).logger
-const cfg        = require( 'config' )
 const apiSec     = require( './api-sec' )
 const userDta    = require( '../persistence/app-dta-user' )
 const bodyParser = require( 'body-parser' )

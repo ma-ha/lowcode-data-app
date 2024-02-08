@@ -26,8 +26,7 @@ All **operations are exposed as API**, e.g. for the adapters.
 
     cd app
     npm i
-    export NODE_ENV=all-local
-    node app | node_modules/bunyan/bin/bunyan 
+    node example-standalone | node_modules/bunyan/bin/bunyan 
 
 Open http://localhost:8888/app/index.html
 

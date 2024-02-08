@@ -1,7 +1,6 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-const cfg  = require( 'config' )
-const log  = require( '../helper/log' ).logger
+const log     = require( '../helper/log' ).logger
 const express = require( 'express' )
 const userDta = require( '../persistence/app-dta-user' )
 
@@ -18,8 +17,8 @@ let publicPages = [
 ]
 
 // ----------------------------------------------------------------------------
-function init( gui ) {
-  log.info( 'Init security', cfg.AUTH_DOMAIN)
+function init( gui, cfg ) {
+  log.info( 'Init App security...' )
   
   // switch securiy on:
   gui.enableSec2({ 

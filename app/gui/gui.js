@@ -2,7 +2,6 @@
 
 const gui     = require( 'easy-web-app' )
 const express = require( 'express' )
-const cfg     = require( 'config' )
 const log     = require( '../helper/log' ).logger
 const pjson   = require( '../package.json' )
 const weblog  = require( './weblog' ) 
@@ -25,9 +24,11 @@ exports: module.exports = {
 
 
 const PRD_NAME = 'LowCode App'
+let cfg = {}
 
-function init( ) {
-  log.info( 'Starting gui', cfg.LOGOUT_REDIRECT )
+function init( appConfig ) {
+  cfg = appConfig
+  log.info( 'Starting GUI...' )
 
   // api.initAPI( gui.getExpress() )
 
@@ -44,7 +45,7 @@ function init( ) {
   //   return dynamicTitle( title, req, page )
   // })
 
-  content.init(  gui.getExpress() )
+  content.init( gui.getExpress(), )
 
   return gui
 }

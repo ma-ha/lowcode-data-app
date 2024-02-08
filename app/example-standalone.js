@@ -6,4 +6,9 @@
 let lowCodeApp = require( './index' ) 
 // let lowCodeApp = require( 'low-code-data-app' ) // ... when using the npm package
 
-lowCodeApp.init()
+lowCodeApp.init({
+  DATA_DIR : '../dta/',
+  GUI_URL  : 'http://localhost:8888/app/',
+  URL_PATH : '/app',
+  OIDC_SERVER : true
+})

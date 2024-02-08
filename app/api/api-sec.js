@@ -1,12 +1,12 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
 const log       = require( '../helper/log' ).logger
-const cfg       = require( 'config' )
 const jwtParser = require( 'jsonwebtoken' )
 const dta       = require( '../persistence/app-dta' )
 const userDta   = require( '../persistence/app-dta-user' )
 
 exports: module.exports = { 
+  init,
   userTenantAuthz,
   apiAppAuthz,
   initJWTcheck,
@@ -14,6 +14,12 @@ exports: module.exports = {
 }
 
 let gui = null
+let cfg = null
+
+function init( oicdCfg ) {
+  log.info( 'Starting API/sec...' )
+  cfg = oicdCfg
+}
 
 function userTenantAuthz( theGUI ) {
   gui = theGUI

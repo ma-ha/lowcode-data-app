@@ -1,7 +1,6 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
 const log   = require( '../helper/log' ).logger
-const cfg   = require( 'config' )
 const fs    = require( 'fs' )
 
 exports: module.exports = { 
@@ -11,8 +10,9 @@ exports: module.exports = {
 let dbCache = {
 }
 
-
-async function init( svc ) {
+let cfg = {}
+async function init( svc, appConfig ) {
+  cfg = appConfig
 
 
   svc.get( '/get-free-trial', async (req, res) => {
@@ -89,21 +89,6 @@ async function init( svc ) {
     }
     //log.info( 'form', form )
     res.status( 200 ).send( form )
-  })
-
-
-  svc.post( '/get-support', ( req, res ) => {
-    res.status( 200 ).send( cfg.EKOSYS_URL + '/index.html?layout=support' ) 
-  })
-  svc.post( '/get-services', ( req, res ) => {
-    res.status( 200 ).send( cfg.EKOSYS_URL + '/index.html?layout=mngSubscription' ) 
-  })
-  
-  svc.get( '/upgrade', ( req, res ) => {
-    res.redirect( cfg.EKOSYS_URL + '/index.html?layout=mngService&serviceProperties=MngPlan&id='+ req.query.id ) 
-  })
-  svc.get( '/support', ( req, res ) => {
-    res.redirect( cfg.EKOSYS_URL + '/index.html?index.html?layout=support&id='+ cfg.CLIENT_ID ) 
   })
 
   await initDbCache()

@@ -25,11 +25,11 @@ exports: module.exports = {
 let DB_DIR = null
 let APP_TBL = 'app' 
 
-async function init( dbDir ) {
+async function init( dbDir, fakeLogin ) {
   DB_DIR  = dbDir 
   if ( ! DB_DIR.endsWith( '/' ) ) { DB_DIR += '/' }
 
-  userDB.init( DB_DIR )
+  userDB.init( DB_DIR, fakeLogin )
 
   data[ 'app' ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )
 }

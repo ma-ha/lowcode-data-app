@@ -2,7 +2,6 @@
 
 const gui     = require( 'easy-web-app' )
 const log     = require( '../helper/log' ).logger
-const cfg     = require( 'config' )
 const pjson   = require( '../package.json' )
 
 const dta     = require( '../persistence/app-dta' )

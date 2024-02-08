@@ -1,6 +1,5 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-const cfg        = require( 'config' )
 const log        = require( '../helper/log' ).logger
 const helper     = require( '../helper/helper' )
 const apiSec     = require( '../api/api-sec' )
@@ -32,7 +31,6 @@ async function init( app ) {
   svc.use( bodyParser.urlencoded({  limit: "20mb", extended: false }) )
   svc.use( bodyParser.json({ limit: "20mb" }) )
 
-  // const myJWTcheck = apiSec.initJWTcheck()
   const apiAuthz = apiSec.apiAppAuthz( app )
   const guiAuthz = apiSec.userTenantAuthz( gui )
 

@@ -1,7 +1,6 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
 const log        = require( '../helper/log' ).logger
-const cfg        = require( 'config' )
 const apiSec     = require( './api-sec' )
 const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
@@ -18,14 +17,17 @@ exports: module.exports = {
 // this should also only be available for authenticated users
 let gui = null
 
-async function setupAPI( app ) {
+async function setupAPI( app, oauthCfg ) {
+  log.info( 'Starting API...' )
+
   let svc = app.getExpress()
   gui = app
 
   svc.use( bodyParser.urlencoded({  limit: "20mb", extended: false }) )
   svc.use( bodyParser.json({ limit: "20mb" }) )
 
-  const myJWTcheck = apiSec.initJWTcheck()
+  apiSec.init( oauthCfg )
+  //const myJWTcheck = apiSec.initJWTcheck()
   const guiAuthz = apiSec.userTenantAuthz( gui )
 
  

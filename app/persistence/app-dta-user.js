@@ -1,6 +1,5 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-const cfg       = require( 'config' )
 const log       = require( '../helper/log' ).logger
 const helper    = require( '../helper/helper' )
 const fs        = require( 'fs' )
@@ -34,7 +33,10 @@ let USER_AUTH_DB  = '../dta/user-auth.json'
 let USER_SCOPE_DB = '../dta/user-scope.json'
 let OICD_SESSION_DB = '../dta/oidc-session.json'
 
-async function init( dbDir ) {
+let FAKE_LOGIN = false
+
+async function init( dbDir, fakeLogin ) {
+  if ( fakeLogin ) { FAKE_LOGIN = fakeLogin }
   SCOPE_DB        = dbDir + 'scope.json'
   USER_AUTH_DB    = dbDir + 'user-auth.json'
   USER_SCOPE_DB   = dbDir + 'user-scope.json'
@@ -192,7 +194,7 @@ async function addScope( id, name, tagArr, meta) {
 async function getUserInfoFromReq( gui, req ) {
   // log.info( 'getUserInfoFromReq' )
   let userId = await gui.getUserIdFromReq( req )
-  if ( cfg.FAKE_LOGIN ) {  userId = cfg.FAKE_LOGIN  }
+  if ( FAKE_LOGIN ) {  userId = FAKE_LOGIN  }
   if ( ! userId ) { return null }
   let user = await getUserInfo( userId )
   return user 
