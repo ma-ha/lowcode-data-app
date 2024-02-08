@@ -32,6 +32,17 @@ Open http://localhost:8888/app/index.html
 
 Login with user `demo` and password `demo`
 
+Sample code {standalone mode}:
+
+    let lowCodeApp = require( 'low-code-data-app' )
+
+    lowCodeApp.init({
+      DATA_DIR : '../dta/',
+      GUI_URL  : 'http://localhost:8888/app/',
+      URL_PATH : '/app',
+      OIDC_SERVER : true
+    })
+
 # Entity / Document Model
 
 ![sceenshot](doc/locode.png)
@@ -66,6 +77,8 @@ see [API and Format Reference Docu](doc/README.md).
 ## Event Hub
 
 Adapters can subscribe to data events, to start processes or sync the data with external systems.
+
+ See [example code](example-adapter/event-subscriber-app.js).
 
 ## GUI Links
 
