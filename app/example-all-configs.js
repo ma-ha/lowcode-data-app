@@ -23,7 +23,7 @@ lowCodeApp.init({
 
   // OpenId Connect configuration // here for internal server
   OIDC : {
-    OPENID_SEC_KEY``: '_______change_me_______',
+    OPENID_SEC_KEY: '_______change_me_______',
     CLIENT_ID: 'a0000a0000a0000a0000a000',
     ISSUER: 'https://localhost/',
     JWKS_URI: 'https://localhost/.well-known/jwks.json',
