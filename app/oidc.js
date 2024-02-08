@@ -17,8 +17,6 @@ exports: module.exports = {
 
 let gui = null
 
-const DB = '../dta/oidc-session.json'
-
 async function init ( app ) {
   log.info( 'Init OpenID Login' )
   gui = app
@@ -49,18 +47,9 @@ async function init ( app ) {
   gui.getUserNameForToken  = getUserNameForToken
   gui.deleteUserIdForToken = deleteUserIdForToken
 
-  await loadOidcSessions()
+  oidcSessions = await userDta.loadOidcSessions()
 }
 
-async function loadOidcSessions() { 
-  if ( fs.existsSync( DB ) ) {
-    oidcSessions = JSON.parse( await readFile( DB ) )
-  }
-}
-
-async function saveOidcSessions() {
-  await writeFile( DB, JSON.stringify( oidcSessions, null, '  ' ) )
-}
 
 let oidcSessions = {}
 
@@ -70,7 +59,7 @@ async function createToken( uid ) { // TODO: cluster enable
   oidcSessions[ token ] = {
     uid : uid
   }
-  await saveOidcSessions()
+  await userDta.saveOidcSessions( oidcSessions )
   // log.info( 'createToken', token )
   return  token 
 }

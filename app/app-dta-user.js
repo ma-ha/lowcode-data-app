@@ -7,6 +7,7 @@ const fs        = require( 'fs' )
 const { mkdir, writeFile, readFile, rename, rm, stat } = require( 'node:fs/promises' )
 
 exports: module.exports = { 
+  init,
   authenticate,
   setSelScope,
   getSelScope,
@@ -19,16 +20,26 @@ exports: module.exports = {
   addScope,
   addUser,
   getUserArr,
-  getApiAppScopes
+  getApiAppScopes,
+  loadOidcSessions,
+  saveOidcSessions
 }
 
 // ============================================================================
 
 let userScopeCache = null
 
-const SCOPE_DB      = '../dta/scope.json'
-const USER_AUTH_DB  = '../dta/user-auth.json'
-const USER_SCOPE_DB = '../dta/user-scope.json'
+let SCOPE_DB      = '../dta/scope.json'
+let USER_AUTH_DB  = '../dta/user-auth.json'
+let USER_SCOPE_DB = '../dta/user-scope.json'
+let OICD_SESSION_DB = '../dta/oidc-session.json'
+
+async function init( dbDir ) {
+  SCOPE_DB        = dbDir + 'scope.json'
+  USER_AUTH_DB    = dbDir + 'user-auth.json'
+  USER_SCOPE_DB   = dbDir + 'user-scope.json'
+  OICD_SESSION_DB = dbDir + 'oidc-session.json'
+}
 
 async function getUserScope() {
   // if ( ! userScopeCache ) {
@@ -294,6 +305,21 @@ async function getApiAppScopes( appId, appSecret ) {
   }
 }
 
+
+
+// ============================================================================
+
+async function loadOidcSessions() { 
+  let oidcSessions = {}
+  if ( fs.existsSync( OICD_SESSION_DB ) ) {
+    oidcSessions = JSON.parse( await readFile( OICD_SESSION_DB ) )
+  }
+  return oidcSessions
+}
+
+async function saveOidcSessions( oidcSessions ) {
+  await writeFile( OICD_SESSION_DB, JSON.stringify( oidcSessions, null, '  ' ) )
+}
 
 // ============================================================================
 // ============================================================================

@@ -1,10 +1,10 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-const log       = require( './helper/log' ).logger
-const cfg       = require( 'config' )
-const helper    = require( './helper/helper' )
-const apiSec    = require( './api/api-sec' )
-const userDta    = require( './app-dta-user' )
+const cfg        = require( 'config' )
+const log        = require( '../helper/log' ).logger
+const helper     = require( '../helper/helper' )
+const apiSec     = require( '../api/api-sec' )
+const userDta    = require( '../app-dta-user' )
 const bodyParser = require( 'body-parser' )
 const axios      = require( 'axios' )
 const { mkdir, writeFile, readFile, rename, rm, stat } = require( 'node:fs/promises' )

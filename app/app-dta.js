@@ -2,8 +2,9 @@
 
 const log       = require( './helper/log' ).logger
 const cfg       = require( 'config' )
-const eh        = require( './even-hub' )
+const eh        = require( './eh/even-hub' )
 const fs        = require( 'fs' )
+const userDB    = require( './app-dta-user' )
 const { mkdir, writeFile, readFile, rename, rm, stat } = require( 'node:fs/promises' )
 
 exports: module.exports = { 
@@ -22,11 +23,16 @@ exports: module.exports = {
 }
 
 // ============================================================================
-const DB_DIR = '../dta/'
-const APP_TBL = DB_DIR + 'app.json' 
+let DB_DIR = null
+let APP_TBL = 'app' 
 
-async function init() {
-  data[ 'app' ] =  JSON.parse( await readFile( APP_TBL ) )
+async function init( dbDir ) {
+  DB_DIR  = dbDir 
+  if ( ! DB_DIR.endsWith( '/' ) ) { DB_DIR += '/' }
+
+  userDB.init( DB_DIR )
+
+  data[ 'app' ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )
 }
 
 // ============================================================================
@@ -242,7 +248,7 @@ async function addDataObj( tbl, id, obj ) {
     data[ tbl ][ id.trim() ]._cre = Date.now()
   }
   data[ tbl ][ id.trim() ]._upd = Date.now()
-  let dbFile = DB_DIR + tbl + '.json'
+  let dbFile = fileName( tbl )
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
   
   eh.publishDataChgEvt( 'dta.add', id, tbl, obj )
@@ -257,7 +263,7 @@ async function delDataObj( tbl, id, ) {
   if ( ! data[ tbl ]  ||  ! data[ tbl ][ idT ] ) { return "Not found" }
   log.info( 'delDataObj', tbl, data[ tbl ][ idT ] )
   delete  data[ tbl ][ idT ]
-  let dbFile = DB_DIR + tbl + '.json'
+  let dbFile = fileName( tbl )
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
 
   eh.publishDataChgEvt( 'dta.del', id, tbl )
@@ -267,14 +273,20 @@ async function delDataObj( tbl, id, ) {
 
 async function syncTbl( tbl ) {
   log.debug( 'syncTbl', tbl )
-  let dbFile = DB_DIR + tbl + '.json'
+  let dbFile = fileName( tbl )
   if ( ! fs.existsSync( dbFile ) ) {
-    await writeFile( dbFile, '{}' )
+    await writeFile( dbFilee, '{}' )
   }
   if ( ! data[ tbl ] ) {
-    log.info('>> readFile', dbFile)
+    log.info('>> readFile', dbFile )
     data[ tbl ] =  JSON.parse( await readFile( dbFile ) )
   } 
+}
+
+
+function fileName( tbl ) {
+  return DB_DIR + tbl + '.json'
+
 }
 
 
