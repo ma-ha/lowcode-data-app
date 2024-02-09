@@ -63,5 +63,17 @@
     "scopeId": "1000/DE",
     "_cre": 1706465346153,
     "_upd": 1706465699879
+  },
+  "b1": {
+    "id": "b1",
+    "DeviceNo": "b1x",
+    "Status": "Ordered",
+    "Hardware": "Raspi5",
+    "Description": "",
+    "ConnType": "COAP",
+    "Tags": "EH-PRD",
+    "scopeId": "1000/DE",
+    "_cre": 1707503066825,
+    "_upd": 1707504038829
   }
 }

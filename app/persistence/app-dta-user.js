@@ -4,6 +4,7 @@ const log       = require( '../helper/log' ).logger
 const helper    = require( '../helper/helper' )
 const fs        = require( 'fs' )
 const { mkdir, writeFile, readFile, rename, rm, stat } = require( 'node:fs/promises' )
+const { createHash, randomBytes } = require( 'node:crypto' )
 
 exports: module.exports = { 
   init,
@@ -91,7 +92,7 @@ async function writeAuthTbl() {
 
 async function authenticate( uid, pwd ) {
   let authTbl = await getAuthTbl()
-  if ( authTbl[ uid ] && authTbl[ uid ].password == pwd ) {
+  if ( authTbl[ uid ] && authTbl[ uid ].password == createHash('sha256').update( pwd ).digest('hex') ) {
     authTbl[ uid ].lastLogin = Date.now()
     writeAuthTbl()
     log.info( 'authenticate ok', uid  )
@@ -229,8 +230,10 @@ async function addUser( id, newUser ) {
   if ( id && authTbl[ id ] ) { return 'ERROR: ID exists' }
   if ( id ) { // add user
     authTbl[ id ] = newUser
-    newUser.password = helper.uuidv4()
-    return 'User added'
+    let pwd = randomBytes(5).toString('hex')
+    newUser.password = createHash('sha256').update( pwd ).digest('hex')
+    writeAuthTbl()
+    return 'User added, password is "'+pwd+'"'
   } else { // add API account
     let spId = helper.uuidv4()
     newUser.password = helper.uuidv4()

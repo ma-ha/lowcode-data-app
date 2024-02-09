@@ -4,7 +4,7 @@
   "description": "LowCode App Environment",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node example-standalone.js"
   },
   "author": "ma-ha",
   "homepage": "",
@@ -16,9 +16,22 @@
     "easy-web-app": "^2.9.12",
     "jsonwebtoken": "^9.0.2"
   },
-  "devDependencies": {
-    "mocha": "^9.0.2",
-    "should": "^7.1.0",
-    "supertest": "^3.2.0"
-  }
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/ma-ha/lowcode-data-app.git"
+  },
+  "keywords": [
+		"GUI",
+		"lowcode",
+		"low code",
+		"data",
+		"ERM",
+		"Entity Relationship Model",
+		"REST",
+		"RESTful",
+		"API",
+		"Event Hub",
+		"OpenID Connect",
+    "OICD"
+	]
 }

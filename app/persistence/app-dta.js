@@ -29,9 +29,47 @@ async function init( dbDir, fakeLogin ) {
   DB_DIR  = dbDir 
   if ( ! DB_DIR.endsWith( '/' ) ) { DB_DIR += '/' }
 
+  await prepDB()
+
   userDB.init( DB_DIR, fakeLogin )
 
   data[ 'app' ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )
+
+}
+
+// ============================================================================
+
+async function prepDB() {
+  if ( ! fs.existsSync( DB_DIR ) ) {
+    fs.mkdirSync( DB_DIR )
+    let dbFile = 
+    await writeFile( fileName( 'app' ), "{}" ) 
+    const { createHash } = require( 'node:crypto' )
+    let pwd = createHash('sha256').update('demo').digest('hex')
+
+    await writeFile( fileName( 'user-auth' ), JSON.stringify({
+      demo: {
+        name: "Demo",
+        role: {
+          dev     : [ "1000" ],
+          admin   : [ "1000" ],
+          appUser : [ "1000" ],
+          api     : []
+        },
+        password: pwd,
+        expires: 2234567890000,
+        lastLogin: 1707424667309
+      }
+    }, null, ' ' ))
+
+    await writeFile( fileName( 'scope' ), JSON.stringify({
+      1000: {
+        name: "Test Tenant",
+        tag: []
+      }
+    }, null, ' ' ))
+
+  }
 }
 
 // ============================================================================

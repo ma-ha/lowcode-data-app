@@ -6,7 +6,8 @@ const apiSec     = require( '../api/api-sec' )
 const userDta    = require( '../persistence/app-dta-user' )
 const bodyParser = require( 'body-parser' )
 const axios      = require( 'axios' )
-const { mkdir, writeFile, readFile, rename, rm, stat } = require( 'node:fs/promises' )
+const fs         = require( 'fs' )
+const { writeFile, readFile } = require( 'node:fs/promises' )
 
 exports: module.exports = { 
   init,
@@ -14,7 +15,7 @@ exports: module.exports = {
   subscribeEvt
 }
 
-const DB = '../dta/event-subscriptions.json'
+let DB = '../dta/event-subscriptions.json'
 
 // ============================================================================
 let subscriptions = {
@@ -24,8 +25,14 @@ let seqNo = 0
 // ============================================================================
 let gui = null
 
-async function init( app ) {
+async function init( app, dbDir ) {
+  if ( ! dbDir.endsWith( '/' ) ) { dbDir += '/' }
+  DB = dbDir + 'event-subscriptions.json'
+  if ( ! fs.existsSync( DB ) ) {
+    await writeFile( DB, '{}' )
+  }
   gui = app
+  
   subscriptions = JSON.parse( await readFile( DB ) )
   let svc = app.getExpress()
   svc.use( bodyParser.urlencoded({  limit: "20mb", extended: false }) )
@@ -71,7 +78,7 @@ async function getAppSubs( req, res ) {
 // ==========================================================================
 
 async function publishDataChgEvt( dtaOp, dtaId, dtaType, data ) {
-  if ( [ 'app','auth','erm','event-subscriptions','oidc-session','user-auth','user-scope' ].includes( dtaType )) { return }
+  if ( [ 'app','erm','event-subscriptions','oidc-session','user-auth','user-scope' ].includes( dtaType )) { return }
   let evt = {
     type : 'data',
     op   : dtaOp,
@@ -81,20 +88,20 @@ async function publishDataChgEvt( dtaOp, dtaId, dtaType, data ) {
     seqNo: ( seqNo++ ),
     dt   : Date.now()
   }
-  log.debug( 'evt', evt )
+  log.info( 'evt',evt )
   for ( let scope in subscriptions ) {
-    log.debug( 'evt scope', scope )
-    if ( dtaId.indexOf( scope) == 0 ) {
+    log.info( 'evt scope', scope )
+    if ( dtaType.indexOf( scope) == 0 ) {
       for ( let app in subscriptions[ scope ] ) {
-        log.debug( 'evt app', scope, app )
+        log.info( 'evt app', scope, app )
         try {
           let sub = subscriptions[ scope ][ app ]
           if ( sub.filter ) {
             // TODO
           }
-          log.debug( 'evt post', sub.webHook )
+          log.info( 'evt post', sub.webHook )
           let result = await axios.post( sub.webHook, evt )
-          log.debug( 'evt post', sub.webHook ,result.status )
+          log.info( 'evt post', sub.webHook ,result.status )
         } catch ( exc ) { log.warn( 'event err', app ) }
       }  
     }

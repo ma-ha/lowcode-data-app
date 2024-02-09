@@ -4,6 +4,8 @@
     "Name": "DE-North",
     "Short": "DE-North",
     "Size": "L",
-    "scopeId": "1000"
+    "scopeId": "1000",
+    "_cre": 1707503032823,
+    "_upd": 1707503044172
   }
 }
