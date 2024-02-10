@@ -26,6 +26,8 @@ async function setupAPI( app ) {
 
   // --------------------------------------------------------------------------
   svc.post( '/user', userTenantAutz, addUser )
+  svc.post( '/user/lock', userTenantAutz, addUser )
+  svc.post( '/user/unlock', userTenantAutz, addUser )
   svc.get(  '/user', userTenantAutz, getUser )
 }
 
@@ -38,7 +40,11 @@ async function addUser( req, res ) {
 
   if ( req.body.email ) {
 
-    let newUser = {
+    if ( ! isValidEmail( req.body.email ) ) {
+      return res.status(401).send( 'Email not valid' )
+    }
+
+    let userRec = {
       name : req.body.name,
       role : {
         dev     : [],
@@ -49,17 +55,25 @@ async function addUser( req, res ) {
       password : 'secret',
       expires  : getExpireDate( req.body.expire )
     }
-    if ( req.body.dev ) { newUser.role.dev.push( user.scopeId ) }
-    if ( req.body.admin ) { newUser.role.admin.push( user.scopeId ) }
-    if ( req.body.dev ) { newUser.role.dev.push( user.scopeId ) }
+    if ( req.body.dev   ) { userRec.role.dev.push( user.scopeId ) }
+    if ( req.body.admin ) { userRec.role.admin.push( user.scopeId ) }
+    if ( req.body.dev   ) { userRec.role.dev.push( user.scopeId ) }
 
-    let result = await userDta.addUser( req.body.email, newUser )
+
+    let result = ''
+    if ( req.body.mode == 'update' ) {
+      result = await userDta.updateUser( req.body.uid, req.body.email, userRec, user.scopeId  )
+    } else {
+      result = await userDta.addUser( req.body.email, userRec )
+    }
+     
     res.send( result ) 
 
-  } else if (  req.body.name ) {
+  } else if (  req.body.sp_name ) {
 
     let newSP = {
-      name : req.body.name,
+      name : req.body.sp_name,
+      sp   : true,
       role : {
         dev     : [],
         admin   : [],
@@ -67,10 +81,15 @@ async function addUser( req, res ) {
         api     : [ user.scopeId ] 
       },
       password : 'secret',
-      expires  : getExpireDate( req.body.expire )
+      expires  : getExpireDate( req.body.sp_expire )
     }
 
-    let result = await userDta.addUser( null, newSP )
+    let result = ''
+    if ( req.body.mode == 'update' ) {
+      result = await userDta.updateUser( req.body.sp_id, null, newSP, user.scopeId  )
+    } else {
+      result = await userDta.addUser( null, newSP )
+    }
     res.send( result ) 
 
   } else {
@@ -89,7 +108,7 @@ function getExpireDate( expire ) {
       expireDate = Date.now() + 1000*60*60*24*180
       break;
     case '1y':
-      expireDates = Date.now() + 1000*60*60*24*356
+      expireDate = Date.now() + 1000*60*60*24*356
       break;
       
     default:
@@ -103,17 +122,17 @@ async function getUser( req, res ) {
   let user = await userDta.getUserInfoFromReq( gui,  req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
-  let scopeArr = await userDta.getUserArr( user.scopeId )
-  // let result = []
-  // for ( let scope of scopeArr ) {
-  //   let rec = {
-  //     id : scope.id,
-  //     name : scope.name,
-  //     tagStr : scope.tagArr.join()
-  //   }
-  //   result.push( rec )
-  // }
-  res.send( scopeArr ) 
+  if ( req.query.id ) {
+
+    let userRec = await userDta.getUser( req.query.id, user.scopeId )
+    res.send( userRec ) 
+
+  } else {
+    let userArr = await userDta.getUserArr( user.scopeId )
+    res.send( userArr ) 
+
+  }
+
 }
 
 // --------------------------------------------------------------------------
@@ -137,4 +156,9 @@ function getAllTags( scopeArr ) {
     }
   }
   return tags
+}
+
+function isValidEmail( email ) {
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  return re.test( String( email ).toLowerCase() )
 }

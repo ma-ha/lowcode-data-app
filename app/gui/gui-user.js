@@ -30,12 +30,18 @@ async function init( ) {
         { id: "id",     label: "Id",   width: "20%", cellType: "text" },
         { id: "name",   label: "Name", width: "12%", cellType: "text" },
         { id: "lastLogin",label: "Last Login [UTC]", width: "10%", cellType: "text" },
-        { id: "expires",label: "Expires [UTC]", width: "10%", cellType: "text" },
+        { id: "expires",label: "Expires [UTC]", width: "5%", cellType: "text" },
         { id: "scope",  label: "Scope", width: "5%", cellType: "text" },
         { id: "dev",    label: "Dev Scope", width: "5%", cellType: "text" },
         { id: "admin",  label: "Admin Scope", width: "5%", cellType: "text" },
-        { id: "secret", label: "", width: "10%", cellType: "text" },
-        { id: "subs",   label: "", width: "10%", cellType: "text" }
+        { id: "secret", label: "", width: "7%", cellType: "text" },
+        { id: "subs",   label: "", width: "7%", cellType: "text" },
+        { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+          method: "GET", setData: [ { resId : 'AddUser' }, { resId : 'AddPrincipal' } ] } ,
+        { id: 'Lock', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-locked', 
+          method: "POST", update: [ { resId : 'User' } ], target: "modal" } ,
+        { id: 'ResetPwd', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-unlocked', 
+          method: "POST", update: [ { resId : 'User' } ], target: "modal" } 
       ]
     }
   })
@@ -51,14 +57,40 @@ async function init( ) {
         { formFields: [{ id: "dev",  label: "Developer", type: "checkbox" } ]},
         { formFields: [{ id: "admin",  label: "Admin", type: "checkbox" } ]},
         { formFields: [{ id: "expire",  label: "Expires", type: "select", 
-            options:  addOptions([ "never", "3m", '6m', '1y' ]) } ]}
+            options:  addOptions([ "never", "3m", '6m', '1y' ]) } ]},
+        { formFields: [{ id: "uid",  type: "text", hidden: true, defaultVal: 'add' } ]},
+        { formFields: [{ id: "mode", type: "text", hidden: true, defaultVal: 'add' } ]}
       ] }],
       actions : [ 
-        { id: "PropertyAddBtn", actionName: "Invite", update: [{ resId:'User' }], 
-          actionURL: 'user', target: "modal" }
+        { id: "AddUserBtn", actionName: "Add/Update", update: [{ resId:'User' }], 
+          actionURL: 'user', target: "modal" },
+        { id: "ResetUserBtn", actionName: "Reset", method: 'GET',
+          actionURL: 'user?id=empty', setData:  [ { resId : 'AddUser'  } ] }
       ]
     }
   })
+
+  userPg.addView({ id: 'AddPrincipal', 
+    title: 'Add API Account',  height: '120px', 
+    type : 'pong-form', resourceURL: 'user',
+    moduleConfig : {
+      id: 'AddPrincipalForm',
+      fieldGroups:[{ columns: [
+        { formFields: [{ id: "sp_name",label: "App Name", type: "text" } ]},
+        { formFields: [{ id: "sp_expire",  label: "Expires", type: "select", 
+            options:  addOptions([ '6m', '1y', '2y' ]) } ]},
+        { formFields: [{ id: "sp_id",  type: "text", hidden: true, defaultVal: 'add' } ]},
+        { formFields: [{ id: "mode", type: "text", hidden: true, defaultVal: 'add' } ]}
+      ] }],
+      actions : [ 
+        { id: "SpAddBtn", actionName: "Add/Update API Account", update: [{ resId:'User' }], 
+          actionURL: 'user', target: "modal" },
+        { id: "ResetSpBtn", actionName: "Reset", method: 'GET',
+          actionURL: 'user?id=empty_sp', setData:  [ { resId : 'AddPrincipal'  } ] }
+      ]
+    }
+  })
+
 
   let appSubPg = gui.addPage( 'AppSubscription-nonav' ) 
   appSubPg.title    = 'App Subscriptions'
@@ -80,22 +112,6 @@ async function init( ) {
     }
   })
 
-  userPg.addView({ id: 'AddPrincipal', 
-    title: 'Add API Account',  height: '120px', 
-    type : 'pong-form', resourceURL: 'user',
-    moduleConfig : {
-      id: 'AddPrincipalForm',
-      fieldGroups:[{ columns: [
-        { formFields: [{ id: "name",label: "App Name", type: "text" } ]},
-        { formFields: [{ id: "expire",  label: "Expires", type: "select", 
-            options:  addOptions([ '6m', '1y', '2y' ]) } ]}
-      ] }],
-      actions : [ 
-        { id: "PropertyAddBtn", actionName: "Add Account", update: [{ resId:'User' }], 
-          actionURL: 'user', target: "modal" }
-      ]
-    }
-  })
 }
 
 // ============================================================================

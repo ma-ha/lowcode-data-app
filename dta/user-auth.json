@@ -19,6 +19,7 @@
   },
   "5a095719-cfbe-49d3-8927-a55da94221ed": {
     "name": "Markus Super App",
+    "sp": true,
     "role": {
       "dev": [],
       "admin": [],

@@ -249,6 +249,23 @@ async function addUser( id, newUser ) {
 async function getUser( uid, scopeId ) {
   log.info( 'getUser..' )
   let authTbl = await getAuthTbl()
+
+  if ( uid == 'empty' ) {
+    return {
+      email  : '',
+      name   : '',
+      dev    : '',
+      admin  : '',
+      expire : '1y'
+    }
+  } else if ( uid == 'empty_sp' ) {
+    return {
+      sp_name   : '',
+      sp_expire : '1y',
+      sp_id     : ''
+    }
+  }
+
   let idnty = authTbl[ uid ]
 
   let ret = {
@@ -272,17 +289,18 @@ async function getUser( uid, scopeId ) {
 
 
 async function updateUser( uid, newEmail, user, scopeId ) {
-  log.info( 'updateUser..' )
+  log.info( 'updateUser..', uid, user )
   let authTbl = await getAuthTbl()
   let idnty = authTbl[ uid ]
   if ( ! idnty ) { return 'not found' }
+   
+  idnty.name    = user.name
+  idnty.expires = user.expires
   
   if ( idnty.sp ) {
-    idnty.name    = user.name
-    idnty.expires = user.expires
-
-  } else {
-
+    // TODO ?
+  } else { 
+    // TODO ?
   }
 
   await writeAuthTbl()
