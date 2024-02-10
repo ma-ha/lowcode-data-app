@@ -26,10 +26,10 @@ async function setupAPI( app ) {
 
   // --------------------------------------------------------------------------
   svc.post( '/user', userTenantAutz, addUser )
-  svc.post( '/user/lock', userTenantAutz, addUser )
-  svc.post( '/user/unlock', userTenantAutz, addUser )
   svc.get(  '/user', userTenantAutz, getUser )
-}
+  svc.post( '/user/lock',  userTenantAutz, lockUser )
+  svc.post( '/user/reset', userTenantAutz, resetUser )
+  }
 
 // ============================================================================
 
@@ -133,6 +133,27 @@ async function getUser( req, res ) {
 
   }
 
+}
+
+// --------------------------------------------------------------------------
+
+async function lockUser( req, res ) {
+  log.info( 'POST /user/lock', req.body )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.body.id ) { return res.status( 400 ).send( 'id required' ) }
+  let result = await userDta.updateUser( req.body.id, null, null, user.scopeId, "lock" )
+  res.send( result ) 
+}
+
+
+async function resetUser( req, res ) {
+  log.info( 'POST /user/reset', req.body )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.body.id ) { return res.status( 400 ).send( 'id required' ) }
+  let result = await userDta.updateUser( req.body.id, null, null, user.scopeId, "reset" )
+  res.send( result ) 
 }
 
 // --------------------------------------------------------------------------

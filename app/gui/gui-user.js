@@ -26,23 +26,24 @@ async function init( ) {
       dataURL: "",
       rowId: "id",
       cols: [
-        { id: "type",   label: "Type", width: "7%", cellType: "text" },
+        { id: "type",   label: "Type", width: "6%", cellType: "text" },
         { id: "id",     label: "Id",   width: "20%", cellType: "text" },
-        { id: "name",   label: "Name", width: "12%", cellType: "text" },
+        { id: "name",   label: "Name", width: "10%", cellType: "text" },       
         { id: "lastLogin",label: "Last Login [UTC]", width: "10%", cellType: "text" },
-        { id: "expires",label: "Expires [UTC]", width: "5%", cellType: "text" },
+        { id: "expires",label: "Valid", width: "5%", cellType: "text" },
         { id: "scope",  label: "Scope", width: "5%", cellType: "text" },
         { id: "dev",    label: "Dev Scope", width: "5%", cellType: "text" },
         { id: "admin",  label: "Admin Scope", width: "5%", cellType: "text" },
         { id: "secret", label: "", width: "7%", cellType: "text" },
         { id: "subs",   label: "", width: "7%", cellType: "text" },
-        { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+        { id: 'Edit', label: "&nbsp;", cellType: "button", width :'4%', icon: 'ui-icon-pencil', 
           method: "GET", setData: [ { resId : 'AddUser' }, { resId : 'AddPrincipal' } ] } ,
-        { id: 'Lock', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-locked', 
-          method: "POST", update: [ { resId : 'User' } ], target: "modal" } ,
-        { id: 'ResetPwd', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-unlocked', 
-          method: "POST", update: [ { resId : 'User' } ], target: "modal" } 
-      ]
+        { id: 'Lock', label: "&nbsp;", cellType: "button", width :'4%', icon: 'ui-icon-locked', 
+          method: "POST", URL: 'user/lock', target: "modal" } ,
+        { id: 'ResetPwd', label: "&nbsp;", cellType: "button", width :'4%', icon: 'ui-icon-unlocked', 
+          method: "POST", URL: 'user/reset', target: "modal" } 
+      ],
+      pollDataSec: "5",
     }
   })
 

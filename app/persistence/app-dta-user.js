@@ -288,11 +288,25 @@ async function getUser( uid, scopeId ) {
 }
 
 
-async function updateUser( uid, newEmail, user, scopeId ) {
+async function updateUser( uid, newEmail, user, scopeId, action ) {
   log.info( 'updateUser..', uid, user )
   let authTbl = await getAuthTbl()
   let idnty = authTbl[ uid ]
   if ( ! idnty ) { return 'not found' }
+
+  if ( action == 'lock' ) {
+
+    idnty.password = null
+    await writeAuthTbl()
+    return 'User login disabled!'
+
+  } else if ( action == 'reset' ) {
+
+    let pwd = randomBytes(5).toString('hex')
+    idnty.password = createHash('sha256').update( pwd ).digest('hex')
+    await writeAuthTbl()
+    return 'User login reset! New password: '+ pwd
+  }
    
   idnty.name    = user.name
   idnty.expires = user.expires
@@ -332,7 +346,14 @@ async function getUserArr( scopeId ) {
       userScope = apiScope
       subs = '<a href="index.html?layout=AppSubscription-nonav&id='+uid+'">Subscriptions</a>'
     }
-    let expireStr = ( new Date( idnty.expires ) ).toISOString().substring(0,10).replace('T',' ')
+    let expireStr = ''
+    if ( idnty.password === null ){
+      expireStr = '<span style="color:red">BLOCKED</span>'
+    } else if ( idnty.expires === null ) {
+      expireStr = 'unlimited'
+    } else {
+      expireStr = ( new Date( idnty.expires ) ).toISOString().substring(0,10).replace('T',' ')
+    }
     let lastLoginStr = '-'
     if ( idnty.lastLogin ) { try {
       lastLoginStr = ( new Date( idnty.lastLogin ) ).toISOString().substring(0,16).replace('T',' ')
