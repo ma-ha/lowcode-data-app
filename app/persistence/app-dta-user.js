@@ -12,6 +12,7 @@ exports: module.exports = {
   setSelScope,
   getSelScope,
   getSelScopeName,
+  getUser,
   getUserInfo,
   getUserInfoFromReq,
   geScopeArr,
@@ -19,6 +20,7 @@ exports: module.exports = {
   getScopeList,
   addScope,
   addUser,
+  updateUser,
   getUserArr,
   getApiAppScopes,
   loadOidcSessions,
@@ -94,7 +96,7 @@ async function authenticate( uid, pwd ) {
   let authTbl = await getAuthTbl()
   if ( authTbl[ uid ] && authTbl[ uid ].password == createHash('sha256').update( pwd ).digest('hex') ) {
     authTbl[ uid ].lastLogin = Date.now()
-    writeAuthTbl()
+    await writeAuthTbl()
     log.info( 'authenticate ok', uid  )
     return true
   }
@@ -232,26 +234,61 @@ async function addUser( id, newUser ) {
     authTbl[ id ] = newUser
     let pwd = randomBytes(5).toString('hex')
     newUser.password = createHash('sha256').update( pwd ).digest('hex')
-    writeAuthTbl()
+    await writeAuthTbl()
     return 'User added, password is "'+pwd+'"'
   } else { // add API account
     let spId = helper.uuidv4()
     newUser.password = helper.uuidv4()
     authTbl[ spId ] = newUser
-    writeAuthTbl()
+    await writeAuthTbl()
     return 'API account "'+spId+'" added'
   } 
 } 
 
 
-function inScope( scopeId, scopeArr ) {
-  if ( ! scopeArr ) { return null }
-  for ( aScopeId of scopeArr ) {
-    if ( scopeId.startsWith( aScopeId ) ) {
-      return aScopeId
-    }
+async function getUser( uid, scopeId ) {
+  log.info( 'getUser..' )
+  let authTbl = await getAuthTbl()
+  let idnty = authTbl[ uid ]
+
+  let ret = {
+    mode   : 'update'
   }
+
+  if ( idnty.sp ) {
+    ret.sp_id     = uid
+    ret.sp_name   = idnty.name
+    ret.sp_expire = '1y'
+  } else {
+    ret.uid    = uid
+    ret.email  = uid
+    ret.name   = idnty.name
+    ret.dev    = inScope( scopeId, idnty.role.dev )
+    ret.admin  = inScope( scopeId, idnty.role.admin )
+    ret.expire = '1y'
+  }
+  return ret
 }
+
+
+async function updateUser( uid, newEmail, user, scopeId ) {
+  log.info( 'updateUser..' )
+  let authTbl = await getAuthTbl()
+  let idnty = authTbl[ uid ]
+  if ( ! idnty ) { return 'not found' }
+  
+  if ( idnty.sp ) {
+    idnty.name    = user.name
+    idnty.expires = user.expires
+
+  } else {
+
+  }
+
+  await writeAuthTbl()
+  return 'OK'
+}
+
 
 async function getUserArr( scopeId ) {
   log.info( 'getUserArr...' )
@@ -273,11 +310,11 @@ async function getUserArr( scopeId ) {
     let subs   = ''
     if ( apiScope ) {
       type   = 'API Account'
-      secret = '<a href="javascript:alert(\'API Secret:\\n'+idnty.password+'\')">Show secret</a>'
+      secret = '<a href="javascript:alert(\'API Secret:\\n'+idnty.password+'\')">API-Secret</a>'
       userScope = apiScope
-      subs = '<a href="index.html?layout=AppSubscription-nonav&id='+uid+'">Event subscriptions</a>'
+      subs = '<a href="index.html?layout=AppSubscription-nonav&id='+uid+'">Subscriptions</a>'
     }
-    let expireStr = ( new Date( idnty.expires ) ).toISOString().substring(0,16).replace('T',' ')
+    let expireStr = ( new Date( idnty.expires ) ).toISOString().substring(0,10).replace('T',' ')
     let lastLoginStr = '-'
     if ( idnty.lastLogin ) { try {
       lastLoginStr = ( new Date( idnty.lastLogin ) ).toISOString().substring(0,16).replace('T',' ')
@@ -310,6 +347,15 @@ async function getApiAppScopes( appId, appSecret ) {
   }
 }
 
+
+function inScope( scopeId, scopeArr ) {
+  if ( ! scopeArr ) { return null }
+  for ( aScopeId of scopeArr ) {
+    if ( scopeId.startsWith( aScopeId ) ) {
+      return aScopeId
+    }
+  }
+}
 
 
 // ============================================================================
