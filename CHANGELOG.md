@@ -1,3 +1,7 @@
+# 0.6.1
+- Customize App: Add "Edit" button
+- Fix ERM
+
 # 0.6.0 
 
 Rework app management

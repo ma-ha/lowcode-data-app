@@ -74,7 +74,7 @@ async function prepDB() {
 
 // ============================================================================
 async function getAppList( scopeId, scopeTags, mode ) {
-  log.info( 'getAppList', scopeId, scopeTags )
+  log.debug( 'getAppList', scopeId, scopeTags )
   let rootScope = scopeId
   if ( scopeId.indexOf('/') > 0 ) {
     rootScope = scopeId.substring(0, scopeId.indexOf('/') )  
@@ -87,7 +87,7 @@ async function getAppList( scopeId, scopeTags, mode ) {
   for ( let appId in data[ APP_TBL ] ) {
     let app = data[ APP_TBL ][ appId ]
     let appInScope = false
-    log.info( 'getAppList >', app.scope,  app.scopeId )
+    log.debug( 'getAppList >', app.scope,  app.scopeId )
     if ( mode == 'admin'  &&  appId.startsWith( rootScope ) ) {
       appInScope = true
     } else if ( app.scope[ scopeId ] || app.scopeId == scopeId ) {

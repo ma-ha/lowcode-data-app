@@ -607,9 +607,8 @@
     "scope": {
       "#city": {
         "role": [
-          "user"
-        ],
-        "srcURL": ""
+          "appUser"
+        ]
       }
     }
   }

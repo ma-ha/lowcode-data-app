@@ -30,6 +30,7 @@ async function setupAPI( app ) {
   svc.get(  '/app-lnk/html', guiAuthz, getAppLnk ) // for HTML view above the app list
   svc.get(  '/app', guiAuthz, getApp )
   svc.post( '/app', guiAuthz, addApp )
+  svc.get(  '/app/customize', guiAuthz, getAppForCustomize )
 
   svc.get(    '/app/entity', guiAuthz, getEntity )
   svc.post(   '/app/entity', guiAuthz, addEntity )
@@ -62,7 +63,7 @@ async function getERM( req, res )  {
   } else {
     let ermCfg = await dta.getDataById( 'erm', user.scopeId )
     if ( ! ermCfg ) { ermCfg = {} }
-    let appMap = await dta.getData( 'app', user.scopeId )
+    let appMap = await dta.getAppList( user.scopeId, [], 'admin' )
     let erm = {
       entity: {}
     }
@@ -220,7 +221,7 @@ async function getScope( req, res ) {
 }
 
 async function getScopeOpts( req, res ) {
-  log.info( 'getScopeOpts' )
+  log.debug( 'getScopeOpts' )
   let user = await userDta.getUserInfoFromReq(gui,  req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   let scopeArr = await userDta.geScopeArr( user.scopeId )
@@ -228,7 +229,7 @@ async function getScopeOpts( req, res ) {
 
   scopeTbl.push(  {
     id   : '-',
-    name : 'none'
+    name : 'all'
   } )
   for ( let scope of scopeArr ) {
     scopeTbl.push({
@@ -265,7 +266,7 @@ async function  getScopeTbl( req, res ) {
 // --------------------------------------------------------------------------
 
 async function getApp( req, res )  {
-  log.info( 'GET app' )
+  log.debug( 'GET app' )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   let appId = req.query.id
@@ -277,19 +278,12 @@ async function getApp( req, res )  {
     let apps = []
     for ( let appId in appMap ) {
       let app = appMap[ appId ]
-      let tags = ''
-      for ( let scope in app.scope ) {
-        if ( scope.startsWith( '#' ) ) {
-          if ( tags != '' ) { tags += ', ' }
-          tags += scope.substring( 1 )
-        }
-      }
       apps.push({
         active : ( app.role.length > 0),
         id : appId,
         title : app.title,
-        scope : ( app.scopeId ? app.scopeId : '-' ),
-        tags  : tags,
+        scope : ( app.scopeId ? app.scopeId : 'all' ),
+        tags  : getTagsCSV( app.scope ),
         role  : ( app.role ? app.role.join() : '' ),
         entitiesLnk :'<a href="index.html?layout=AppEntities-nonav&id='+appId+'">Manage Entities</a>',
         pagesLnk :'<a href="index.html?layout=AppPages-nonav&id='+appId+'">Manage Pages</a>',
@@ -299,6 +293,38 @@ async function getApp( req, res )  {
     res.send( apps )
   }
 }
+
+
+async function getAppForCustomize( req, res )  {
+  log.debug( 'GET app/customize' )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.query.id ) { return res.status(400).send( 'id required' ) }
+  let app = await dta.getAppById( req.query.id )
+  if ( ! app ) { return res.status(400).send( 'for found' ) }
+  let appId = req.query.id
+
+  let cApp = {
+    appId : appId.substring( appId.indexOf('/') + 1 ),
+    name  : app.title,
+    scope : ( app.scopeId ? app.scopeId : '-' ),
+    tags  : getTagsCSV( app.scope ),
+    role  : ( app.role.length > 0 ? app.role[0] : '-' )
+  }
+
+  res.send( cApp )
+}
+
+function getTagsCSV( scope ) {
+  let tags = []
+  for ( let tag in scope ) {
+    if ( tag.startsWith('#') ) {
+      tags.push( tag.substring(1) )
+    }
+  }
+  return tags.join()
+}
+
 
 async function addApp( req, res ) {
   let user = await userDta.getUserInfoFromReq( gui, req )

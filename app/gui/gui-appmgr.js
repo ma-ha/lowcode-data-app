@@ -75,10 +75,12 @@ async function init( ) {
         dataURL: "",
         rowId: "id",
         cols: [
+          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+          method: "GET", URL: 'app/customize', setData: [ { resId : 'CustomizeAddApp' } ] } ,
           { id: "active",      label: "Enabled",   width: "5%",  cellType: "checkbox" },
           { id: "id",          label: "Id",        width: "20%", cellType: "text" },
           { id: "title",       label: "Title",     width: "15%", cellType: "text" },
-          { id: "scope",       label: "Scope",     width: "20%", cellType: "text" },
+          { id: "scope",       label: "Scope",     width: "15%", cellType: "text" },
           { id: "tags",        label: "Tags",      width: "15%", cellType: "text" },
           { id: "role",        label: "Role",      width: "10%", cellType: "text" },
           { id: "entitiesLnk", label: "Entities",  width: "10%", cellType: "text" },
@@ -98,7 +100,7 @@ async function init( ) {
         id: 'CustomizeAddAppForm',
         fieldGroups:[{ columns: [
           { formFields: [{ id: "appId", label: "Id", type: "text" } ]},
-          { formFields: [{ id: "name",  label: "App", type: "text" } ]},
+          { formFields: [{ id: "name",  label: "App Title", type: "text" } ]},
           { formFields: [{ id: "scope", label: "Scope", type: "select", 
             optionsResource: { resourceURL: 'scope/options', optionValue: 'id',optionField:'name' } } ]},
           { formFields: [{ id: "tags", label: "Tags (comma separated)", type: "text" } ]},
