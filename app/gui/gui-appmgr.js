@@ -75,11 +75,15 @@ async function init( ) {
         dataURL: "",
         rowId: "id",
         cols: [
+          { id: "active",      label: "Enabled",   width: "5%",  cellType: "checkbox" },
           { id: "id",          label: "Id",        width: "20%", cellType: "text" },
-          { id: "title",       label: "Title",     width: "20%", cellType: "text" },
-          { id: "entitiesLnk", label: "Entities",  width: "20%", cellType: "text" },
-          { id: "pagesLnk",    label: "App Pages", width: "20%", cellType: "text" },
-          { id: "appLnk",      label: "Test App",  width: "20%", cellType: "text" }
+          { id: "title",       label: "Title",     width: "15%", cellType: "text" },
+          { id: "scope",       label: "Scope",     width: "20%", cellType: "text" },
+          { id: "tags",        label: "Tags",      width: "15%", cellType: "text" },
+          { id: "role",        label: "Role",      width: "10%", cellType: "text" },
+          { id: "entitiesLnk", label: "Entities",  width: "10%", cellType: "text" },
+          // { id: "pagesLnk",    label: "App Pages", width: "20%", cellType: "text" },
+          { id: "appLnk",      label: "Test App",  width: "10%", cellType: "text" }
         ]
       }
     }
@@ -95,10 +99,12 @@ async function init( ) {
         fieldGroups:[{ columns: [
           { formFields: [{ id: "appId", label: "Id", type: "text" } ]},
           { formFields: [{ id: "name",  label: "App", type: "text" } ]},
-          { formFields: [{ id: "scope", label: "Scope", type: "text" } ]},
+          { formFields: [{ id: "scope", label: "Scope", type: "select", 
+            optionsResource: { resourceURL: 'scope/options', optionValue: 'id',optionField:'name' } } ]},
+          { formFields: [{ id: "tags", label: "Tags (comma separated)", type: "text" } ]},
           { formFields: [{ id: "role",  label: "Role",  type: "select",
-            options: addOptions([ "appUser", "admin", 'dev' ]) } ]}
-        ] }],
+            options: addOptions([ "appUser", "admin", 'dev', '-' ]) } ]}
+          ] }],
         actions : [ 
           { id: "AddFormBtn", actionName: "Add",
             actionURL: 'app',   update: [{ resId:'CustomizeAppsTbl' }], 
@@ -144,10 +150,11 @@ async function init( ) {
             method: "GET", setData: [ { resId : 'AppEntitiesAdd' } ] } ,
           { id: "entityId",   label: "Id",         width: "20%", cellType: "text" },
           { id: "title",      label: "Title",      width: "20%", cellType: "text" },
-          { id: "scope",      label: "Scope",      width: "15%", cellType: "text" },
-          { id: "propLnk",    label: "Properties", width: "20%", cellType: "text" },
-          { id: "maintainer", label: "Maintainer", width: "15%", cellType: "text" },
-          { id: 'Del', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-trash', 
+          { id: "scope",      label: "Scope",      width: "10%", cellType: "text" },
+          { id: "startPage",  label: "Start Page", width: "10%", cellType: "text" },
+          { id: "propLnk",    label: "Properties", width: "10%", cellType: "text" },
+          { id: "maintainer", label: "Maintainer", width: "10%", cellType: "text" },
+          { id: 'Del', label: "&nbsp;", cellType: "button", width :'7%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntitiesTbl' } ], target: "modal" }
         ]
       }
@@ -167,8 +174,8 @@ async function init( ) {
           { formFields: [{ id: "scope", label: "Scope", type: "select",
             options: addOptions([ "inherit", "inherit-readonly", 'no-inherit' ]) } ]} ,
           { formFields: [{ id: "maintainer", label: "Maintainer", type: "select",
-            options: addOptions([ "appUser", 'admin', 'dev' ]) } ]} 
-
+            options: addOptions([ "appUser", 'admin', 'dev' ]) } ]} ,
+          { formFields: [{ id: "start", label: "Start Page", type: "checkbox" } ]}
         ] }],
         actions : [ 
           { id: "AddFormBtn", actionName: "Add / Update", actionURL: 'app/entity', 

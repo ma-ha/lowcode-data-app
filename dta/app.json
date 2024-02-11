@@ -182,7 +182,7 @@
   },
   "1000/device-inventory-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
-    "scopeId": "1000",
+    "scopeId": null,
     "title": "Order Device",
     "require": {},
     "entity": {
@@ -294,20 +294,7 @@
         "maintainer": [
           "appUser"
         ],
-        "properties": {
-          "Name": {
-            "label": "Name",
-            "type": "String"
-          },
-          "Invoices": {
-            "label": "Invoices",
-            "type": "DocMap",
-            "docMap": "1000/device-inventory-app/1.0.0/Invoice/Customer"
-          },
-          "meta": {
-            "type": "JSON"
-          }
-        }
+        "properties": {}
       }
     },
     "startPage": [
@@ -315,7 +302,9 @@
       "Invoice",
       "Customer"
     ],
-    "role": [],
+    "role": [
+      "appUser"
+    ],
     "scope": {
       "#region": {
         "role": [
@@ -333,7 +322,7 @@
   },
   "1000/device-mgr-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
-    "scopeId": "1000",
+    "scopeId": null,
     "title": "Device Manager",
     "require": {},
     "entity": {
@@ -478,7 +467,9 @@
       "DeviceHardware",
       "DeviceTags"
     ],
-    "role": [],
+    "role": [
+      "appUser"
+    ],
     "scope": {
       "#region": {
         "role": [
@@ -496,7 +487,7 @@
   },
   "1000/city-mgr-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
-    "scopeId": "1000",
+    "scopeId": null,
     "title": "City Manager",
     "require": {
       "region-mgr/1.0.0": {
@@ -525,11 +516,13 @@
       }
     },
     "startPage": "city",
-    "role": [],
+    "role": [
+      "admin"
+    ],
     "scope": {
       "#region": {
         "role": [
-          "appUser"
+          "admin"
         ],
         "srcURL": ""
       }
@@ -537,7 +530,7 @@
   },
   "1000/region-mgr/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
-    "scopeId": "1000",
+    "scopeId": null,
     "title": "Region Manager",
     "require": {},
     "entity": {
@@ -573,7 +566,7 @@
     },
     "startPage": "region",
     "role": [
-      "region-manager"
+      "admin"
     ],
     "scope": {
       "1000": {
@@ -586,7 +579,7 @@
   },
   "1000/city-light-mgr/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
-    "scopeId": "1000",
+    "scopeId": null,
     "title": "City Light Manager",
     "require": {
       "city-mgr/1.0.0": {
@@ -608,6 +601,9 @@
       }
     },
     "startPage": "gateway",
+    "role": [
+      "appUser"
+    ],
     "scope": {
       "#city": {
         "role": [

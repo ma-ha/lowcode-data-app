@@ -45,6 +45,32 @@ Standalone mode:
       URL_PATH : '/app',
       OIDC_SERVER : true
     })
+    
+## Getting Started With Empty DB
+
+### Create User
+
+1. Login as "demo" / "demo"
+2. Open "Users" tab
+3. Add a new user with developer and admin role enabled
+4. Logout and Login with new user
+5. In Open "Users" tab, click the "deactivate" button for the "demo" user
+
+### Add a new App
+
+1. Open "Customize" tab
+2. In the "Add App" form enter an Id (e.g. "MyAwesomeApp), a name (e.g. "Mz Awesome App"), Scope (e.g. "Test Tenant", if all is still default), role "AppUser" and click "Add"
+
+### Add Entities to the new App
+
+1. In the newly created app click "Manage Entities" 
+2. In the "Add / Update Entity" form define an ID (e.g. "Customer") and a title (Optional, but can contain spaces and special characters) and push the "Add" button.
+3. Click "Manage Properties"
+4. Add some property fields, e.g. id="name", Label="Name", Type="String", Filter=checked
+
+### Test the App
+
+Open your new app in the "App" tab (the app is only visible in the defined scope)
 
 # Entity / Document Model
 

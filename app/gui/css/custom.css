@@ -503,6 +503,13 @@
  #AppEntityInfoContentermLnkDiv label {
   width: 80px;
  }
+
+#AppEntitiesAddContentstart {
+  width: unset;
+}
+#AppEntitiesAddContentstartDiv label {
+  width: unset;
+}
  /* ==================================================== */
 
  .decor-tm-title,

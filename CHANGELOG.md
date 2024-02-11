@@ -1,3 +1,7 @@
+# 0.6.0 
+
+Rework app management
+
 # 0.5.0/1
 
 Manager Users

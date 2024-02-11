@@ -33,7 +33,7 @@ async function init( dbDir, fakeLogin ) {
 
   userDB.init( DB_DIR, fakeLogin )
 
-  data[ 'app' ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )
+  data[ APP_TBL ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )
 
 }
 
@@ -43,7 +43,7 @@ async function prepDB() {
   if ( ! fs.existsSync( DB_DIR ) ) {
     fs.mkdirSync( DB_DIR )
     let dbFile = 
-    await writeFile( fileName( 'app' ), "{}" ) 
+    await writeFile( fileName( APP_TBL ), "{}" ) 
     const { createHash } = require( 'node:crypto' )
     let pwd = createHash('sha256').update('demo').digest('hex')
 
@@ -73,53 +73,43 @@ async function prepDB() {
 }
 
 // ============================================================================
-async function getAppList( scopeId, scopeTags ) {
-  log.debug( 'getAppList', scopeId, scopeTags )
+async function getAppList( scopeId, scopeTags, mode ) {
+  log.info( 'getAppList', scopeId, scopeTags )
   let rootScope = scopeId
   if ( scopeId.indexOf('/') > 0 ) {
     rootScope = scopeId.substring(0, scopeId.indexOf('/') )  
   }
   // log.info( 'getAppList rootScope', rootScope )
 
-  let appMap = await getData( 'app', rootScope )
-  let apps = []
-  // log.info( 'getAppList appMap', appMap )
-  if ( appMap ) {
-    for ( let appId in appMap ){
-      let app = appMap[ appId ]
-      // log.info( 'getAppList appId', appId,  app.scope )
-      if ( app.scope[ scopeId ] ) {
-        // log.info( '   >>> add' )
-        apps.push({ 
-          id: appId, 
-          title: app.title,
-          img   : ( app.img ? app.img : 'img/k8s-ww-conn.png' ),
-          link  : appId,
-          startPage : app.startPage
-        })
-      } else {
-        for ( let tag of scopeTags ) {
-          if ( app.scope[ '#'+tag ] ) {
-            // log.info( '   >>> add #', tag )
-            apps.push({ 
-              id    : appId, 
-              title : app.title,
-              img   : ( app.img ? app.img : 'img/k8s-ww-conn.png' ),
-              link  : appId,
-              startPage : app.startPage
-            })
-            break
-          }
+  await syncTbl( APP_TBL )
+
+  let apps = {}
+  for ( let appId in data[ APP_TBL ] ) {
+    let app = data[ APP_TBL ][ appId ]
+    let appInScope = false
+    log.info( 'getAppList >', app.scope,  app.scopeId )
+    if ( mode == 'admin'  &&  appId.startsWith( rootScope ) ) {
+      appInScope = true
+    } else if ( app.scope[ scopeId ] || app.scopeId == scopeId ) {
+      appInScope = true
+    } else {
+      for ( let tag of scopeTags ) {
+        if ( app.scope[ '#'+tag ] ) {
+          log.debug( 'getAppList > #',tag )
+          appInScope = true
         }
       }
     }
-  } 
+    if ( appInScope ) {
+      apps[ appId ] = app
+    }
+  }
   return apps
 }
 
 async function getApp( scopeId, appId ) {
   log.debug( 'getApp', scopeId, appId )
-  await syncTbl( 'app' )
+  await syncTbl( APP_TBL )
   if ( data.app[ scopeId +'/'+ appId ] ) {
     return data.app[  scopeId +'/'+ appId  ]
   }
@@ -128,7 +118,7 @@ async function getApp( scopeId, appId ) {
 
 async function getAppById( fullAppId ) {
   log.debug( 'getApp',fullAppId )
-  await syncTbl( 'app' )
+  await syncTbl( APP_TBL )
   if ( data.app[fullAppId] ) {
     return data.app[  fullAppId ]
   }
@@ -137,23 +127,23 @@ async function getAppById( fullAppId ) {
 
 async function addApp( fullAppId, app ) {
   log.info( 'getApp',fullAppId )
-  await syncTbl( 'app' )
+  await syncTbl( APP_TBL )
   data.app[ fullAppId ] = app
-  await writeFile( APP_TBL, JSON.stringify( data[ 'app' ], null, '  ' ) )
-  eh.publishDataChgEvt( 'app.add', fullAppId, 'app', app )
+  await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
+  eh.publishDataChgEvt( 'app.add', fullAppId, APP_TBL, app )
 }
 
 async function saveApp( fullAppId, app ) {
   log.info( 'saveApp',fullAppId )
   data.app[ fullAppId ] = app
-  await writeFile( APP_TBL, JSON.stringify( data[ 'app' ], null, '  ' ) )
-  eh.publishDataChgEvt( 'app.chg', fullAppId, 'app', app )
+  await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
+  eh.publishDataChgEvt( 'app.chg', fullAppId, APP_TBL, app )
 }
 // ============================================================================
 
 // tbl param can be like "1000city" or "1000/region-mgr/1.0.0/city"
-async function getData( tbl, scopeId ) {  
-  log.debug( 'getData',  tbl, scopeId )
+async function getData( tbl, scopeId, admin ) {  
+  log.info( 'getData',  tbl, scopeId )
   let table = tbl
   let inheritData = false
   if ( tbl.indexOf('/') > 0 ) {
@@ -171,9 +161,12 @@ async function getData( tbl, scopeId ) {
   await syncTbl( table )
   let result = {}
   for ( let recId in data[ table ] ) {
-    log.debug( 'getData dta', recId, inheritData  )
-    if ( inheritData ) {
-      if ( scopeId.indexOf( data[ table ][ recId ].scopeId ) >= 0 ) {
+    log.info( 'getData dta',inheritData,  recId, scopeId, data[ table ][ recId ].scopeId  )
+    if ( admin ) {
+      result[ recId ] = data[ table ][ recId ]
+    } else  if ( inheritData ) {
+      // if ( scopeId.indexOf( data[ table ][ recId ].scopeId ) >= 0 ) {
+      if ( data[ table ][ recId ].scopeId.startsWith( scopeId ) ) {
         result[ recId ] = data[ table ][ recId ]
       }
     } else {

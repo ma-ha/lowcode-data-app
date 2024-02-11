@@ -33,7 +33,7 @@ async function setupAPI( app, oauthCfg ) {
  
   // --------------------------------------------------------------------------
   svc.get( '/setscope',  guiAuthz,  setScope )
-  svc.get( '/gui/tenant/app/icons', guiAuthz, getApp )
+  svc.get( '/gui/tenant/app/icons', guiAuthz, getAppIcons )
   svc.get( '/app/:tenantId/:appId/:appVersion/:view', guiAuthz, getAppView )
 
   svc.get(  '/guiapp/:tenantId/entity', guiAuthz, getEntitiesOfTenant )
@@ -78,17 +78,18 @@ async function setScope ( req, res ) {
 }
 
 
-async function getApp( req, res ) {
+async function getAppIcons( req, res ) {
   // log.info( 'GET apps', req.user )
-  let appArr = await dta.getAppList( req.user.scopeId, req.user.scopeTags )
+  let appMap = await dta.getAppList( req.user.scopeId, req.user.scopeTags )
   let icons = []
-  for ( let app of appArr ) {
-    let entityId = app.startPage
+  for ( let appId in appMap ) {
+    let app = appMap[ appId ]
+    if ( app.role == [] ) { continue }
     icons.push({
-      id     : app.id,
-      layout : 'AppEntity-nonav&id='+app.id,
+      id     : appId,
+      layout : 'AppEntity-nonav&id=' + appId,
       label  : app.title,
-      img    : app.img
+      img    : ( app.img ? app.img : 'img/k8s-ww-conn.png' )
     })
   }
   // log.info( 'GET apps', appArr )

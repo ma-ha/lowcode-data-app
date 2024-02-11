@@ -24,6 +24,7 @@ async function setupAPI( app ) {
   // --------------------------------------------------------------------------
   svc.post( '/scope', addScope )
   svc.get(  '/scope', getScope )
+  svc.get(  '/scope/options', getScopeOpts )
   svc.get(  '/scope/pong-table', getScopeTbl )
 
   svc.get(  '/app-lnk/html', guiAuthz, getAppLnk ) // for HTML view above the app list
@@ -218,6 +219,27 @@ async function getScope( req, res ) {
   }
 }
 
+async function getScopeOpts( req, res ) {
+  log.info( 'getScopeOpts' )
+  let user = await userDta.getUserInfoFromReq(gui,  req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  let scopeArr = await userDta.geScopeArr( user.scopeId )
+  let scopeTbl = []
+
+  scopeTbl.push(  {
+    id   : '-',
+    name : 'none'
+  } )
+  for ( let scope of scopeArr ) {
+    scopeTbl.push({
+      id   : scope.id,
+      name : scope.name
+    })
+  }
+  res.send( scopeTbl )   
+  
+}
+
 async function  getScopeTbl( req, res ) {
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
@@ -251,13 +273,24 @@ async function getApp( req, res )  {
     let app = await dta.getAppById( appId )
     res.send( app )
   } else {
-    let appMap = await dta.getData( 'app', user.scopeId )
+    let appMap = await dta.getAppList( user.scopeId, [], 'admin' )
     let apps = []
     for ( let appId in appMap ) {
       let app = appMap[ appId ]
+      let tags = ''
+      for ( let scope in app.scope ) {
+        if ( scope.startsWith( '#' ) ) {
+          if ( tags != '' ) { tags += ', ' }
+          tags += scope.substring( 1 )
+        }
+      }
       apps.push({
+        active : ( app.role.length > 0),
         id : appId,
         title : app.title,
+        scope : ( app.scopeId ? app.scopeId : '-' ),
+        tags  : tags,
+        role  : ( app.role ? app.role.join() : '' ),
         entitiesLnk :'<a href="index.html?layout=AppEntities-nonav&id='+appId+'">Manage Entities</a>',
         pagesLnk :'<a href="index.html?layout=AppPages-nonav&id='+appId+'">Manage Pages</a>',
         appLnk :'<a href="index.html?layout=AppEntity-nonav&id='+appId+','+app.startPage+'">Open App</a>'
@@ -271,18 +304,36 @@ async function addApp( req, res ) {
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   let appId =  user.scopeId +'/'+ req.body.appId
-  log.info( 'POST /app', appId )
+  log.info( 'POST /app', req.body )
   let app = await dta.getAppById( appId )
-  if ( app ) { log.warn('GET entity: app exists'); return res.status(400).send('App exists') }
-  await dta.addApp( appId, {
-    scopeId: user.scopeId,
-    title  : ( req.body.name ? req.body.name : req.body.id ),
-    require: {},
-    entity : {},
-    page   : {},
-    role   : [ req.body.role ],
-    scope : {}
-  })
+  if ( ! app ) {
+    app = {
+      require   : {},
+      entity    : {},
+      page      : {},
+      startPage : []
+    }
+  }
+  app.scopeId = ( req.body.scope == '-' ? null : req.body.scope )
+  app.title   = ( req.body.name ? req.body.name : req.body.id )
+  if ( req.body.role == '-' ) {
+    app.role = []
+  } else {
+    app.role = [ req.body.role ]
+  }
+ 
+  let scope = {}
+  if ( req.body.tags ) {
+    let tags = req.body.tags.split(',')
+    for ( let tag of tags ) {
+      scope[ '#'+tag ] = {
+        role   : app.role
+      }
+    }
+  }
+  app.scope = scope
+
+  await dta.addApp( appId, app)
   res.send( 'OK' )
 }
 
@@ -296,6 +347,7 @@ async function getEntity( req, res )  {
   let appId = ( req.query.appId ? req.query.appId : req.query.id )
   let app = await dta.getAppById( appId )
   if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send([]) }
+  if ( ! app.startPage ) { app.startPage = [] }
 
   if (  req.query.appId &&  req.query.entityId && ! req.query.title  ) { // get by id 
   
@@ -307,6 +359,7 @@ async function getEntity( req, res )  {
         title      : entity.title,
         scope      : entity.scope,
         maintainer : entity.maintainer,
+        start      : ( app.startPage.indexOf( req.query.entityId ) < 0 ? false : 'start' )
       }) 
 
     } else { return res.send( null )  } // id not in scopes
@@ -321,6 +374,7 @@ async function getEntity( req, res )  {
         appId      : appId,
         title      : entity.title,
         scope      : entity.scope,
+        startPage  : ( app.startPage.indexOf( entityId ) < 0 ? '': 'Y' ),
         maintainer : entity.maintainer,
         propLnk :'<a href="index.html?layout=AppEntityProperties-nonav&id='+appId+','+entityId+'">Manage Properties</a>'
       })
@@ -336,6 +390,7 @@ async function addEntity( req, res ) {
 
   let app = await dta.getAppById( req.body.appId )
   if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send("App Id not found") }
+  if ( ! app.startPage ) { app.startPage = [] }
 
   let newEntity = {
     title : req.body.title,
@@ -343,6 +398,17 @@ async function addEntity( req, res ) {
     maintainer : [req.body.maintainer],
     properties : {}
   }
+
+  if ( req.body.start ) {
+    if ( app.startPage.indexOf( req.body.entityId ) == -1 ) {
+      app.startPage.push( req.body.entityId )
+    }
+  } else {
+    if ( app.startPage.indexOf( req.body.entityId ) >= 0 ) {
+      app.startPage.splice( app.startPage.indexOf( req.body.entityId ), 1 )
+    }
+  }
+
   log.info( 'POST app', newEntity )
   if ( ! app.entity ) { app.entity = {} }
   let resultTxt = ( app.entity[ req.body.entityId ] ? 'Updated' : 'Created' )
