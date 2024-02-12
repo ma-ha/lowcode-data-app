@@ -1,5 +1,7 @@
 # Prototype of a "Low Code Data App".
 
+Build your multi tenant data driven apps quickly with the npm package: https://www.npmjs.com/package/lowcode-data-app
+
 ## General Idea
 
 It starts with a generic, secure **web gui**.
@@ -39,7 +41,7 @@ A sample "database" is initialized already, so you should see already some apps,
 
 # Sample code 
 
-Standalone mode:
+Standalone mode using it as npm package: https://www.npmjs.com/package/lowcode-data-app
 
     let lowCodeApp = require( 'lowcode-data-app' )
 
