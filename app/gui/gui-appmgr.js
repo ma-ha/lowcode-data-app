@@ -85,7 +85,8 @@ async function init( ) {
           { id: "role",        label: "Role",      width: "10%", cellType: "text" },
           { id: "entitiesLnk", label: "Entities",  width: "10%", cellType: "text" },
           // { id: "pagesLnk",    label: "App Pages", width: "20%", cellType: "text" },
-          { id: "appLnk",      label: "Test App",  width: "10%", cellType: "text" }
+          { id: "appLnk",      label: "Test App",  width: "10%", cellType: "text" },
+          { id: "expLnk",      label: "Export",    width: "10%", cellType: "text" }
         ]
       }
     }
@@ -108,7 +109,7 @@ async function init( ) {
             options: addOptions([ "appUser", "admin", 'dev', '-' ]) } ]}
           ] }],
         actions : [ 
-          { id: "AddFormBtn", actionName: "Add",
+          { id: "AddFormBtn", actionName: "Add / Change",
             actionURL: 'app',   update: [{ resId:'CustomizeAppsTbl' }], 
             target: "modal" }
         ]
@@ -276,10 +277,39 @@ async function init( ) {
     return rows
   })
 
+  // --------------------------------------------------------------------------
+
+  let uploadAppPage = gui.addPage( 'UploadApp-nonav' ) 
+  uploadAppPage.title    = 'LCA Upload App'
+  uploadAppPage.navLabel = 'LCA Upload App'
+  uploadAppPage.setPageWidth( '90%' )
+  uploadAppPage.addView( uploadAppForm() )
+  uploadAppPage.addView( uploadAppOut() )
+
 }
 
 // ============================================================================
 
+function uploadAppForm() {
+  return {
+    rowId: "AppUpload", title: "Upload Files",
+    type : "pong-upload", resourceURL: "app/json",
+    height: '100px', 
+    moduleConfig: {
+      update : [ "AppUploadOut" ],
+      input: []
+    }
+  }
+}
+
+function uploadAppOut() {
+  return {
+    rowId: "AppUploadOut", title: "Upload Files", resourceURL: "app/json",
+    height: '300px'
+  }
+}
+
+// ============================================================================
 
 function addOptions( optArr, selected ) {
   let opts = []

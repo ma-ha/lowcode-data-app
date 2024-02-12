@@ -99,7 +99,7 @@ Data types (and their Web GUI mapping)
 
 So relations are
 - **1:n** = `docMap`
-- **n:1**= `selectRef`
+- **n:1** = `selectRef`
 - **n:m** = `multiSelectRef`
 
 # Integration 

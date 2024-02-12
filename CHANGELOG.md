@@ -1,3 +1,6 @@
+# 0.7.0
+- App JSON export
+
 # 0.6.1
 - Customize App: Add "Edit" button
 - Fix ERM

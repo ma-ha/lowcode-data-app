@@ -31,6 +31,8 @@ async function setupAPI( app ) {
   svc.get(  '/app', guiAuthz, getApp )
   svc.post( '/app', guiAuthz, addApp )
   svc.get(  '/app/customize', guiAuthz, getAppForCustomize )
+  svc.get(  '/app/json/:scope/:id', guiAuthz, getAppJSON )
+  svc.post( '/app/json', guiAuthz, uploadAppJSON )
 
   svc.get(    '/app/entity', guiAuthz, getEntity )
   svc.post(   '/app/entity', guiAuthz, addEntity )
@@ -38,7 +40,7 @@ async function setupAPI( app ) {
 
   svc.get(    '/app/entity/property', guiAuthz, getProperty )
   svc.post(   '/app/entity/property', guiAuthz, addProperty )
-  svc.delete( '/app/entity/property', guiAuthz,delProperty )
+  svc.delete( '/app/entity/property', guiAuthz, delProperty )
 
   svc.get(  '/erm', getERM )
   svc.post( '/erm', saveERM )
@@ -287,7 +289,8 @@ async function getApp( req, res )  {
         role  : ( app.role ? app.role.join() : '' ),
         entitiesLnk :'<a href="index.html?layout=AppEntities-nonav&id='+appId+'">Manage Entities</a>',
         pagesLnk :'<a href="index.html?layout=AppPages-nonav&id='+appId+'">Manage Pages</a>',
-        appLnk :'<a href="index.html?layout=AppEntity-nonav&id='+appId+','+app.startPage+'">Open App</a>'
+        appLnk :'<a href="index.html?layout=AppEntity-nonav&id='+appId+','+app.startPage+'">Open App</a>',
+        expLnk :'<a href="app/json/'+appId.replaceAll('/','_').replace('_','/')+'" target="_blank">Export</a>'
       })
     }
     res.send( apps )
@@ -314,6 +317,67 @@ async function getAppForCustomize( req, res )  {
 
   res.send( cApp )
 }
+
+
+async function getAppJSON( req, res )  {
+  log.info( 'GET app/json', req.params.id )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.params.scope ) { return res.status(400).send( 'scope required' ) }
+  if ( ! req.params.id ) { return res.status(400).send( 'id required' ) }
+
+  let appId = req.params.id.replaceAll( '_', '/' )
+  let app = await dta.getAppById( req.params.scope +'/'+ appId )
+
+  if ( ! app ) { return res.status(400).send( 'for found' ) }
+
+  let appCopy = JSON.parse( JSON.stringify( app ) )
+  appCopy.require = []
+  for ( let entityId in appCopy.entity ) {
+    let entity = appCopy.entity[ entityId ]
+    for ( propId in entity.properties ) {
+      let prop = entity.properties[ propId ]
+      switch ( prop.type ) {
+        case 'DocMap' : 
+          prop.docMap = stripScopeFrmId( prop.docMap )
+          addRefApp( appCopy.require, prop.docMap )
+          break
+        case 'SelectRef' : 
+          prop.selectRef = stripScopeFrmId( prop.selectRef )
+          addRefApp( appCopy.require, prop.selectRef )
+          break
+        case 'MultiSelectRef' : 
+          prop.multiSelectRef = stripScopeFrmId( prop.multiSelectRef )
+          addRefApp( appCopy.require, prop.multiSelectRef )
+          break
+        default: break
+      }
+    }
+  }
+
+  let exportApp = {}
+  exportApp[ appId ] = appCopy
+  res.json( exportApp )
+}
+
+function stripScopeFrmId( refId ) { 
+  return refId.substring( refId.indexOf('/') +1 )
+}
+function addRefApp( requireArr, refId ) { 
+  let appId = refId.substring( 0, refId.lastIndexOf('/') )
+  if ( requireArr.indexOf( appId ) == -1 ) { 
+    requireArr.push( appId )
+  }
+}
+
+async function uploadAppJSON( req, res ) {
+  log.info( 'POST /app/json', req.body )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  
+  res.send( 'OK' )
+}
+
 
 function getTagsCSV( scope ) {
   let tags = []
