@@ -4,6 +4,7 @@ const log        = require( '../helper/log' ).logger
 const apiSec     = require( './api-sec' )
 const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
+const fileupload = require( 'express-fileupload' )
 
 exports: module.exports = { 
   setupAPI
@@ -32,14 +33,15 @@ async function setupAPI( app ) {
   svc.post( '/app', guiAuthz, addApp )
   svc.get(  '/app/customize', guiAuthz, getAppForCustomize )
   svc.get(  '/app/json/:scope/:id', guiAuthz, getAppJSON )
-  svc.post( '/app/json', guiAuthz, uploadAppJSON )
+  svc.post( '/app/json', fileupload(),guiAuthz, uploadAppJSON )
+  svc.get(  '/app/json/html', guiAuthz, getUploadAppResult )
 
   svc.get(    '/app/entity', guiAuthz, getEntity )
   svc.post(   '/app/entity', guiAuthz, addEntity )
   svc.delete( '/app/entity', guiAuthz, delEntity )
 
   svc.get(    '/app/entity/property', guiAuthz, getProperty )
-  svc.post(   '/app/entity/property', guiAuthz, addProperty )
+  svc.post(   '/app/entity/property',  guiAuthz, addProperty )
   svc.delete( '/app/entity/property', guiAuthz, delProperty )
 
   svc.get(  '/erm', getERM )
@@ -370,14 +372,66 @@ function addRefApp( requireArr, refId ) {
   }
 }
 
+// ============================================================================
+let uploadResult = '... '
+
 async function uploadAppJSON( req, res ) {
-  log.info( 'POST /app/json', req.body )
   let user = await userDta.getUserInfoFromReq( gui, req )
+  log.info( 'POST /app/json', user  ) // , req.files.file.data
   if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  }
+  try {
+    let newApps = JSON.parse( '' + req.files.file.data )
+    let dbApps = await  dta.getAppList( user.scopeId, [], 'admin' )
+    uploadResult = 'Parsed successfully'
+    uploadOK     = true
+    for ( let appId in newApps ) {
+      if ( dbApps[ user.rootScopeId +'/'+ appId ] ) {
+        uploadResult += '<p> ERROR, ALREADY EXISTS: App ID <b>' + appId + '</b>'
+        uploadOK = false
+        continue 
+      } 
+      let app = newApps[ appId ]
+      uploadResult += '<p> App ID: <b>' + appId  + '</b>'
+      for ( let requireAppId of app.require ) {
+        if ( dbApps[ user.rootScopeId +'/'+ requireAppId ] ) {
+          uploadResult += '<br> Dependency: ' +  user.rootScopeId +'/'+ requireAppId + ' ... already available'
+        } else  if ( newApps[ requireAppId ] ) {
+          uploadResult += '<br> Dependency uploaded: ' + requireAppId 
+        } else {
+          uploadResult += '<br> ERROR: Dependency: NOT FOUND'
+          uploadOK = false
+        }
+      }
+    }
+    if ( uploadOK ) {
+      for ( let appId in newApps ) {
+        uploadResult += '<p> TODO load to DB ' + appId
+      }
+    } else {
+      uploadResult += '<p> <b> UPLOAD FAILED! </b>'
+    }
+   
+  } catch ( exc ) {  
+    log.warn( 'uploadAppJSON', exc )
+    return res.status(400).send( 'Error' )
+  }
+
   
   res.send( 'OK' )
 }
 
+async function getUploadAppResult( req, res ) {
+  log.info( 'GET /app/json/html'  ) // , req.files.file.data
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  res.send( uploadResult )
+  uploadResult = '... '
+}
+
+// ============================================================================
 
 function getTagsCSV( scope ) {
   let tags = []

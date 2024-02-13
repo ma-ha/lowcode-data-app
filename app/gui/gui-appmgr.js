@@ -305,7 +305,7 @@ function uploadAppForm() {
 function uploadAppOut() {
   return {
     rowId: "AppUploadOut", title: "Upload Files", resourceURL: "app/json",
-    height: '300px'
+    height: '500px'
   }
 }
 
