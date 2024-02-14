@@ -4,7 +4,7 @@ const log        = require( '../helper/log' ).logger
 const apiSec     = require( './api-sec' )
 const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
-const fileupload = require( 'express-fileupload' )
+const appImport  = require( './api-app-import' )
 
 exports: module.exports = { 
   setupAPI
@@ -32,10 +32,7 @@ async function setupAPI( app ) {
   svc.get(  '/app', guiAuthz, getApp )
   svc.post( '/app', guiAuthz, addApp )
   svc.get(  '/app/customize', guiAuthz, getAppForCustomize )
-  svc.get(  '/app/json/:scope/:id', guiAuthz, getAppJSON )
-  svc.post( '/app/json', fileupload(),guiAuthz, uploadAppJSON )
-  svc.get(  '/app/json/html', guiAuthz, getUploadAppResult )
-
+  
   svc.get(    '/app/entity', guiAuthz, getEntity )
   svc.post(   '/app/entity', guiAuthz, addEntity )
   svc.delete( '/app/entity', guiAuthz, delEntity )
@@ -46,6 +43,8 @@ async function setupAPI( app ) {
 
   svc.get(  '/erm', getERM )
   svc.post( '/erm', saveERM )
+
+  appImport.setupAPI( app )
 }
 // ============================================================================
 
@@ -318,117 +317,6 @@ async function getAppForCustomize( req, res )  {
   }
 
   res.send( cApp )
-}
-
-
-async function getAppJSON( req, res )  {
-  log.info( 'GET app/json', req.params.id )
-  let user = await userDta.getUserInfoFromReq( gui, req )
-  if ( ! user ) { return res.status(401).send( 'login required' ) }
-  if ( ! req.params.scope ) { return res.status(400).send( 'scope required' ) }
-  if ( ! req.params.id ) { return res.status(400).send( 'id required' ) }
-
-  let appId = req.params.id.replaceAll( '_', '/' )
-  let app = await dta.getAppById( req.params.scope +'/'+ appId )
-
-  if ( ! app ) { return res.status(400).send( 'for found' ) }
-
-  let appCopy = JSON.parse( JSON.stringify( app ) )
-  appCopy.require = []
-  for ( let entityId in appCopy.entity ) {
-    let entity = appCopy.entity[ entityId ]
-    for ( propId in entity.properties ) {
-      let prop = entity.properties[ propId ]
-      switch ( prop.type ) {
-        case 'DocMap' : 
-          prop.docMap = stripScopeFrmId( prop.docMap )
-          addRefApp( appCopy.require, prop.docMap )
-          break
-        case 'SelectRef' : 
-          prop.selectRef = stripScopeFrmId( prop.selectRef )
-          addRefApp( appCopy.require, prop.selectRef )
-          break
-        case 'MultiSelectRef' : 
-          prop.multiSelectRef = stripScopeFrmId( prop.multiSelectRef )
-          addRefApp( appCopy.require, prop.multiSelectRef )
-          break
-        default: break
-      }
-    }
-  }
-
-  let exportApp = {}
-  exportApp[ appId ] = appCopy
-  res.json( exportApp )
-}
-
-function stripScopeFrmId( refId ) { 
-  return refId.substring( refId.indexOf('/') +1 )
-}
-function addRefApp( requireArr, refId ) { 
-  let appId = refId.substring( 0, refId.lastIndexOf('/') )
-  if ( requireArr.indexOf( appId ) == -1 ) { 
-    requireArr.push( appId )
-  }
-}
-
-// ============================================================================
-let uploadResult = '... '
-
-async function uploadAppJSON( req, res ) {
-  let user = await userDta.getUserInfoFromReq( gui, req )
-  log.info( 'POST /app/json', user  ) // , req.files.file.data
-  if ( ! user ) { return res.status(401).send( 'login required' ) }
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send('No files were uploaded.');
-  }
-  try {
-    let newApps = JSON.parse( '' + req.files.file.data )
-    let dbApps = await  dta.getAppList( user.scopeId, [], 'admin' )
-    uploadResult = 'Parsed successfully'
-    uploadOK     = true
-    for ( let appId in newApps ) {
-      if ( dbApps[ user.rootScopeId +'/'+ appId ] ) {
-        uploadResult += '<p> ERROR, ALREADY EXISTS: App ID <b>' + appId + '</b>'
-        uploadOK = false
-        continue 
-      } 
-      let app = newApps[ appId ]
-      uploadResult += '<p> App ID: <b>' + appId  + '</b>'
-      for ( let requireAppId of app.require ) {
-        if ( dbApps[ user.rootScopeId +'/'+ requireAppId ] ) {
-          uploadResult += '<br> Dependency: ' +  user.rootScopeId +'/'+ requireAppId + ' ... already available'
-        } else  if ( newApps[ requireAppId ] ) {
-          uploadResult += '<br> Dependency uploaded: ' + requireAppId 
-        } else {
-          uploadResult += '<br> ERROR: Dependency: NOT FOUND'
-          uploadOK = false
-        }
-      }
-    }
-    if ( uploadOK ) {
-      for ( let appId in newApps ) {
-        uploadResult += '<p> TODO load to DB ' + appId
-      }
-    } else {
-      uploadResult += '<p> <b> UPLOAD FAILED! </b>'
-    }
-   
-  } catch ( exc ) {  
-    log.warn( 'uploadAppJSON', exc )
-    return res.status(400).send( 'Error' )
-  }
-
-  
-  res.send( 'OK' )
-}
-
-async function getUploadAppResult( req, res ) {
-  log.info( 'GET /app/json/html'  ) // , req.files.file.data
-  let user = await userDta.getUserInfoFromReq( gui, req )
-  if ( ! user ) { return res.status(401).send( 'login required' ) }
-  res.send( uploadResult )
-  uploadResult = '... '
 }
 
 // ============================================================================
