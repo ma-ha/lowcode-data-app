@@ -363,6 +363,7 @@
             "type": "String"
           },
           "ConnType": {
+            "label": "In Data Link",
             "type": "Select",
             "filter": true,
             "options": [
@@ -375,6 +376,7 @@
             ]
           },
           "Tags": {
+            "label": "Out Data Link",
             "type": "MultiSelectRef",
             "multiSelectRef": "1000/device-mgr-app/1.0.0/DeviceTags"
           }
@@ -439,10 +441,12 @@
             "type": "String"
           },
           "TrafficStats": {
-            "type": "Metrics"
+            "type": "Metric",
+            "apiManaged": true
           },
           "DeviceStats": {
-            "type": "Metrics"
+            "type": "Metric",
+            "apiManaged": true
           },
           "DeviceTags": {
             "type": "MultiSelectRef",

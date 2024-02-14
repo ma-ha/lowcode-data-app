@@ -498,6 +498,9 @@ async function getProperty( req, res ) {
       case 'SelectRef':
         prop.ref  = dbProp.selectRef
         break 
+      case 'MultiSelectRef':
+        prop.ref  = dbProp.multiSelectRef
+        break 
       case 'DocMap':
         prop.ref  = dbProp.docMap
         break 
@@ -623,7 +626,7 @@ async function addProperty ( req, res ) {
 
     entity.properties[ id ].event = req.body.ref
 
-  } else if ( ['DocMap','SelectRef','RefArray','Ref'].includes(  req.body.type ) ) {
+  } else if ( ['DocMap','SelectRef','MultiSelectRef','RefArray','Ref'].includes(  req.body.type ) ) {
 
     if ( ! req.body.ref ) {
       return res.status(400).send( '"ref" is required' ) 
@@ -664,6 +667,9 @@ async function addProperty ( req, res ) {
         break
       case 'SelectRef':
         entity.properties[ id ].selectRef = req.body.ref
+        break
+      case 'MultiSelectRef':
+        entity.properties[ id ].multiSelectRef = req.body.ref
         break
       case 'RefArray':
         entity.properties[ id ].refArray = req.body.ref

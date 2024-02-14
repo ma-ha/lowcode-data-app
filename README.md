@@ -98,9 +98,9 @@ Data types (and their Web GUI mapping)
 - `Event` (link to send an event. Ref can have a simple condition to render the link, e.g. "status == ready" or "status != in progress,done")
 
 So relations are
-- **1:n** = `docMap`
-- **n:1** = `selectRef`
-- **n:m** = `multiSelectRef`
+- **1:n** = `DocMap`
+- **n:1** = `SelectRef`
+- **n:m** = `MultiSelectRef`
 
 Property features:
 - you can select a property for the data table filter

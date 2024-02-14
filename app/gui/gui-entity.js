@@ -204,7 +204,7 @@ function genTblColsConfig( entityId, entity ) {
 
   for ( let propId in appEntityProps ) {
     let prop =  appEntityProps[ propId ]
-    let label = propId 
+    let label = ( prop.label ? prop.label : propId )
     if ( prop.filter ) {
       if ( prop.type == 'Select' ) {
         let optArr = [{ option: ' ', value: ' ' }]
@@ -324,6 +324,9 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
       case 'Event':
         // do nothing
         break 
+      case 'Metrics':
+        // do nothing
+        break 
       case 'JSON':
         fld = { id: propId, label: lbl, type: 'text', rows: 5 }
         break 
@@ -374,7 +377,7 @@ async function renderDynEntityPrpRows( staticRows, req, pageName ) {
   if ( ! entityId ) { log.warn( 'appEntityPage.dynamicRow entityId not set', req.query.id  ); return [] }
   let app    = await dta.getAppById( appId )
   if ( ! app ) { log.warn( 'appEntityPage.dynamicRow app not found', appId ); return [] }
-  let type  = await dta.getAppById( app.type )
+  // let type  = await dta.getAppById( app.type )
   // if ( ! type ) { log.warn( 'appEntityPage.dynamicRow app.type not found', app.type ); return [] }
   // if ( ! type[ entityId ] ) { log.warn( 'appEntityPage.dynamicRow app.type.entity not found', app.type, entityId ); return [] }
   let rowArr = renderEntityPrpRows( app, appId, entityId )
