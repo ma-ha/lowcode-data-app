@@ -102,6 +102,11 @@ So relations are
 - **n:1** = `selectRef`
 - **n:m** = `multiSelectRef`
 
+Property features:
+- you can select a property for the data table filter
+- you can define a property as "API managed", means zou will see it only in the table, 
+  but there is no input available in the add/change GUI form
+
 # Integration 
 
 ## APIs
