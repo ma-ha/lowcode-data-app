@@ -258,6 +258,11 @@
             "label": "Cancel",
             "type": "Event",
             "event": "OrderStatus != shipped,delivered"
+          },
+          "ActiveStatus": {
+            "label": "Active",
+            "type": "String",
+            "apiManaged": true
           }
         }
       },

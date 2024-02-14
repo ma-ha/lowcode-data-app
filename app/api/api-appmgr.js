@@ -601,6 +601,7 @@ async function getProperty( req, res ) {
       type     :  dbProp.type,
       label    : ( dbProp.label ? dbProp.label : '' ),
       filter   : ( dbProp.filter ? true : false ),
+      apiManaged : ( dbProp.apiManaged ? true : false ),
     }
     switch ( dbProp.type ) {
       case 'Select':
@@ -670,7 +671,9 @@ async function getProperty( req, res ) {
       propId   : propId,
       label    : prop.label,
       type     : pType,
-      filter   : ( prop.filter   ? true : false )
+      filter   : ( prop.filter   ? true : false ),
+      api      : ( prop.apiManaged ? true : false ),
+
     })
   }
   res.send( propArr )
@@ -712,7 +715,13 @@ async function addProperty ( req, res ) {
   } else {
     delete entity.properties[ id ].filter
   }
-  
+
+  if ( req.body.apiManaged  ) { 
+    entity.properties[ id ].apiManaged = true 
+  } else {
+    delete entity.properties[ id ].apiManaged
+  }
+
   // special types need additional info
   if ( req.body.type == 'Select' ) {
 

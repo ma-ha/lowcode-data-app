@@ -1,3 +1,6 @@
+# 0.7.1
+- API managed properties can not be set bz GUI form
+
 # 0.7.0
 - App JSON export
 

@@ -271,6 +271,7 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
+    if ( prop.apiManaged ){ continue } 
     let lbl  = ( prop.label ? prop.label : propId )
     // console.log( 'LBL', lbl)
 

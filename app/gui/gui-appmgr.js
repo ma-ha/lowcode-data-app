@@ -238,6 +238,7 @@ async function init( ) {
           { id: "label",   label: "Label",    width: "20%", cellType: "text" },
           { id: "type",    label: "Type",     width: "40%", cellType: "text" },
           { id: "filter",  label: "Filter",   width: "5%",  cellType: "checkbox" },
+          { id: "api",     label: "API Managed",   width: "5%",  cellType: "checkbox" },
           { id: 'Del', label: "&nbsp;", cellType: "button", width :'8%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" }
         ]
@@ -265,8 +266,11 @@ async function init( ) {
                options: addOptions([ 'String', 'Boolean', 'Number', 'Date', 'Select', 'DocMap', 
               'SelectRef', 'Ref', 'RefArray', 'UUID', 'Metric', 'Link', 'JSON', 'Event' ]) },
             { id: "ref", label: "Ref", type: "text", options: refOptions } ]},
-          { formFields: [ { id: "filter",  label: "Filter", type: "checkbox" } ]}
-        ] }],
+          { formFields: [ { id: "filter",  label: "Filter", type: "checkbox" },
+                          { id: "apiManaged",  label: "API managed", type: "checkbox",
+                            descr: "will not appear in the GUI form" }
+          ]}
+          ] }],
         actions : [ 
           { id: "AddFormBtn", actionName: "Add / Update", actionURL: 'app/entity/property', 
             update: [{ resId:'AppEntityProp' }], target: "modal" }

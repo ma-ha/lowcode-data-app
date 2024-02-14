@@ -486,6 +486,9 @@
  #AppEntityPropAddContentfilter {
   width: auto;
  }
+ #AppEntityPropAddContentapiManaged {
+  width: auto;
+ }
  .pong-table button {
   padding:  3px 12px 3px 12px;
  }
