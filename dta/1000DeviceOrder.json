@@ -4,20 +4,18 @@
     "OderNo": "x",
     "OrderDate": "2024-02-02",
     "OrderStatus": "open",
-    "ItemPrice": "11,00 €",
     "Quantity": "2",
+    "ItemPrice": "11,00 €",
     "TotalPrice": "22,00 €",
     "Shipping": "Standard",
     "ShipmentTracking": "",
     "Reorder": "",
     "Invoice": "",
     "Devices": "Raspi5",
+    "Customer": "111",
     "scopeId": "1000/DE",
     "_cre": 1706807653201,
-    "_upd": 1706952131328,
-    "eventArr": [
-      "InProgress"
-    ]
+    "_upd": 1707936169378
   },
   "z": {
     "id": "z",
@@ -32,9 +30,10 @@
     "Reorder": "",
     "Invoice": "5797fe5d-b959-4f84-aae7-9a729ebdc405",
     "Devices": "Raspi5",
+    "Customer": "111",
     "scopeId": "1000/DE",
     "_cre": 1706807678784,
-    "_upd": 1707935654589
+    "_upd": 1707936177408
   },
   "y": {
     "id": "y",
@@ -49,9 +48,10 @@
     "Reorder": "",
     "Invoice": "e4d71b25-e222-4a0e-8796-edb02358eec8",
     "Devices": "Raspi5",
+    "Customer": "111",
     "scopeId": "1000/DE",
     "_cre": 1706807685808,
-    "_upd": 1707935626212
+    "_upd": 1707936184815
   },
   "a": {
     "id": "a",
@@ -66,6 +66,7 @@
     "Reorder": "",
     "Invoice": "",
     "Devices": "Raspi5",
+    "Customer": "111",
     "scopeId": "1000/DE",
     "_cre": 1706953117150,
     "_upd": 1706953117150
@@ -83,6 +84,7 @@
     "Reorder": "",
     "Invoice": "",
     "Devices": "Raspi5",
+    "Customer": "111",
     "scopeId": "1000/DE",
     "_cre": 1707046913455,
     "_upd": 1707046913455

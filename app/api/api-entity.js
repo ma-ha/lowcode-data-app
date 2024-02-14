@@ -174,6 +174,9 @@ async function getDoc( req, res ) {
         log.debug( 'result[ propId ]',propId,result[ propId ] )
         result[ propId ] = ( result[ propId ] ? JSON.stringify( result[ propId ], null, ' ' ) : '{}' )
       } catch ( exc ) { log.warn('getDoc nz id> stringify JSON', exc ) }
+      if ( entity.properties[ propId ].type == 'Date'  ) try {
+        result[ propId ] = new Date( result[ propId ] ).getTime()
+      } catch ( exc ) { log.warn('getDoc nz id> Date', exc ) }
     } catch ( exc ) { log.warn('getDoc nz id> stringify JSON', exc ) }
 
     result.recId =  req.query.recId

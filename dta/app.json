@@ -197,6 +197,10 @@
             "type": "String",
             "filter": true
           },
+          "Customer": {
+            "type": "SelectRef",
+            "selectRef": "1000/device-inventory-app/1.0.0/Customer"
+          },
           "OrderDate": {
             "type": "Date"
           },
