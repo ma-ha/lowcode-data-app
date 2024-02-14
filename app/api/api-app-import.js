@@ -4,6 +4,7 @@ const log        = require( '../helper/log' ).logger
 const apiSec     = require( './api-sec' )
 const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
+const helper     = require( '../helper/helper' )
 const fileupload = require( 'express-fileupload' )
 
 exports: module.exports = { 
@@ -25,6 +26,7 @@ async function setupAPI( app ) {
   svc.get(  '/app/json/:scope/:id', guiAuthz, getAppJSON )
   svc.post( '/app/json', fileupload(),guiAuthz, uploadAppJSON )
   svc.get(  '/app/json/html', guiAuthz, getUploadAppResult )
+  svc.get(  '/app/import/:uid', guiAuthz, importApp )
 }
 
 // ============================================================================
@@ -87,12 +89,20 @@ async function uploadAppJSON( req, res ) {
   let user = await userDta.getUserInfoFromReq( gui, req )
   log.info( 'POST /app/json', user  ) // , req.files.file.data
   if ( ! user ) { return res.status(401).send( 'login required' ) }
-  if (!req.files || Object.keys(req.files).length === 0) {
+  if ( ! req.files || Object.keys( req.files ).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
   try {
     let newApps = JSON.parse( '' + req.files.file.data )
     let dbApps = await  dta.getAppList( user.scopeId, [], 'admin' )
+
+    let dbEntityMap = {}
+    for ( let appId in dbApps ) {
+      for ( let entityId in dbApps[ appId ].entity ) {
+        dbEntityMap[ entityId ] = { appId: appId }
+      }
+    }
+
     uploadResult = 'Parsed successfully'
     uploadOK     = true
     for ( let appId in newApps ) {
@@ -113,10 +123,23 @@ async function uploadAppJSON( req, res ) {
           uploadOK = false
         }
       }
+
+      for ( let entityId in app.entity ) {
+        if ( dbEntityMap[ entityId ] ) {
+          uploadResult += '<br> WARNING: Entity "'+entityId+'" already exists (in '+dbEntityMap[ entityId ].appId+')'
+        }
+      }
     }
+
     if ( uploadOK ) {
       for ( let appId in newApps ) {
-        uploadResult += '<p> TODO load to DB ' + appId
+        let importId = helper.uuidv4()
+        let appImp = {
+          apps    : newApps,
+          _expire : Date.now() + 1000*60*60*24
+        }
+        await dta.addDataObj( 'app-temp', importId, appImp )
+        uploadResult += '<p> Click to <a href="app/import/'+importId+'">IMPORT</a>'
       }
     } else {
       uploadResult += '<p> <b> UPLOAD FAILED! </b>'
@@ -131,6 +154,7 @@ async function uploadAppJSON( req, res ) {
   res.send( 'OK' )
 }
 
+
 async function getUploadAppResult( req, res ) {
   log.info( 'GET /app/json/html'  ) // , req.files.file.data
   let user = await userDta.getUserInfoFromReq( gui, req )
@@ -139,3 +163,21 @@ async function getUploadAppResult( req, res ) {
   uploadResult = '... '
 }
 
+
+async function importApp( req, res ) {
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  log.info( 'GET /app/import', req.params.uid  ) 
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.params.uid ) { return res.status(400).send( 'id required' ) }
+
+  let impDta = await dta.getDataById( 'app-temp', req.params.uid ) 
+  if ( ! impDta ) { return res.status(400).send( 'not found' ) }
+
+  for ( let appId in impDta.apps ) {
+    log.info( 'GET /app/import IMPORT >>', appId  ) 
+    await dta.addApp( user.rootScopeId +'/'+ appId, impDta.apps[ appId] )
+  }
+  await dta.delDataObj( 'app-temp', req.params.uid )
+
+  res.redirect( '../../index.html?layout=Customize' ) 
+}

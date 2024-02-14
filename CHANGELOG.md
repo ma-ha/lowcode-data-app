@@ -1,5 +1,8 @@
+# 0.7.2
+- App JSON import
+
 # 0.7.1
-- API managed properties can not be set bz GUI form
+- API managed properties can not be set by GUI form
 
 # 0.7.0
 - App JSON export

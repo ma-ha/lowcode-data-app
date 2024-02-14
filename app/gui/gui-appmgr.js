@@ -111,7 +111,8 @@ async function init( ) {
         actions : [ 
           { id: "AddFormBtn", actionName: "Add / Change",
             actionURL: 'app',   update: [{ resId:'CustomizeAppsTbl' }], 
-            target: "modal" }
+            target: "modal" },
+          { id: "ImportLink", link: 'Import JSON', linkURL: 'index.html?layout=UploadApp-nonav' }
         ]
       }
     }
@@ -308,7 +309,7 @@ function uploadAppForm() {
 
 function uploadAppOut() {
   return {
-    rowId: "AppUploadOut", title: "Upload Files", resourceURL: "app/json",
+    rowId: "AppUploadOut", title: "Import App", resourceURL: "app/json",
     height: '500px'
   }
 }

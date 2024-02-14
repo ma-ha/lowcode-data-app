@@ -305,7 +305,7 @@ async function syncTbl( tbl ) {
   log.debug( 'syncTbl', tbl )
   let dbFile = fileName( tbl )
   if ( ! fs.existsSync( dbFile ) ) {
-    await writeFile( dbFilee, '{}' )
+    await writeFile( dbFile, '{}' )
   }
   if ( ! data[ tbl ] ) {
     log.info('>> readFile', dbFile )

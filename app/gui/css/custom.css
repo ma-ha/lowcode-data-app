@@ -513,6 +513,10 @@
 #AppEntitiesAddContentstartDiv label {
   width: unset;
 }
+
+#CustomizeAddAppContentLnkImportLink {
+  margin-left: 30px;
+}
  /* ==================================================== */
 
  .decor-tm-title,
