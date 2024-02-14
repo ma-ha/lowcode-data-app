@@ -210,12 +210,12 @@
               "delivered"
             ]
           },
+          "Quantity": {
+            "type": "String"
+          },
           "ItemPrice": {
             "type": "String",
             "filter": true
-          },
-          "Taxes": {
-            "type": "String"
           },
           "TotalPrice": {
             "type": "String"
@@ -231,6 +231,7 @@
             ]
           },
           "ShipmentTracking": {
+            "label": "Tracking ID",
             "type": "String"
           },
           "Reorder": {

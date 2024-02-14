@@ -223,9 +223,9 @@ function genTblColsConfig( entityId, entity ) {
       case 'Boolean':
         cols.push({ id: propId, label : label, cellType: 'checkbox', width:width })
         break 
-      case 'Date':
-        cols.push({ id: propId, label : label, cellType: 'date', width:width }) 
-        break 
+      // case 'Date':
+      //   cols.push({ id: propId, label : label, cellType: 'date', width:width }) 
+      //   break 
       case 'JSON':
         break 
       default:  // String, Number, Select, Event, Link, RefArray, Ref, DocMap, SelectRef
