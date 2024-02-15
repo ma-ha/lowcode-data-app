@@ -10,6 +10,7 @@ const appGUI    = require( './gui/gui' )
 const appSec    = require( './gui/app-sec' )
 const appData   = require( './persistence/app-dta' )
 const appAPI    = require( './api/api-entity' )
+const appAdapter= require( './api/api-adapter' )
 const apiSec    = require( './api/api-sec' )
 const userAPI   = require( './api/api-user' )
 const appMgrAPI = require( './api/api-appmgr' )
@@ -40,6 +41,7 @@ async function init( lowCodeConfig ) {
   }
 
   await appAPI.setupAPI( app, cfg.OICD )
+  await appAdapter.setupAPI( app, cfg.OICD )
   await appMgrAPI.setupAPI( app )
   await userAPI.setupAPI( app )
 

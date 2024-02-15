@@ -54,10 +54,19 @@ function apiAppAuthz( theGUI ) {
     log.info( 'apiAppAuthz', appId, appPw )
     let appScopes = await userDta.getApiAppScopes( appId, appPw )
     if ( appScopes ) { 
+      if ( req.params.scopeId && ! appScopes.indexOf( req.params.scopeId ) >= 0 ) {
+        log.warn( 'call scope is not authorized', req.headers )
+        return next( new UnauthorizedError(
+          'Not authorized for scope', 
+          { message: 'Not authorized for scope' }
+        ))
+      }
+  
       req.appId     = appId
       req.appScopes = appScopes
+  
     } else {
-      log.info( 'call is not authorized', req.headers )
+      log.warn( 'call is not authorized', req.headers )
       return next( new UnauthorizedError(
         'Not authorized', 
         { message: 'Not authorized' }
