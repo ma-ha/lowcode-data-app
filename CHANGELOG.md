@@ -1,9 +1,9 @@
-# 0.7.4
-- MultiSelectRef handling
-- Fixes
 
 # 0.7.2
+- ext. data API
 - App JSON import
+- MultiSelectRef handling
+- Fixes
 
 # 0.7.1
 - API managed properties can not be set by GUI form
