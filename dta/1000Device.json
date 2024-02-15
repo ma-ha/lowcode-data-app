@@ -6,8 +6,10 @@
     "Hardware": "",
     "Description": "test",
     "ConnType": "COAP",
-    "Tags": "",
-    "scopeId": "1000/DE"
+    "Tags": [],
+    "scopeId": "1000/DE",
+    "_cre": 1708015534212,
+    "_upd": 1708015534212
   },
   "x1": {
     "id": "x1",
@@ -36,9 +38,13 @@
     "Hardware": "Raspi5",
     "Description": "abc",
     "ConnType": "LW-M2M",
-    "Tags": "EH-DEV",
+    "Tags[]": "EH-DEV",
     "scopeId": "1000/DE",
-    "_upd": 1706465075631
+    "Tags": [
+      "EH-DEV"
+    ],
+    "_cre": 1708015525274,
+    "_upd": 1708015525274
   },
   "a1": {
     "id": "a1",
@@ -47,10 +53,13 @@
     "Hardware": "Raspi5",
     "Description": "abc",
     "ConnType": "LW-M2M",
-    "Tags": "EH-DEV",
+    "Tags[]": "EH-DEV",
     "scopeId": "1000/DE",
+    "Tags": [
+      "EH-DEV"
+    ],
     "_cre": 1706465357198,
-    "_upd": 1706465357198
+    "_upd": 1708015505877
   },
   "a2": {
     "id": "a2",
@@ -59,10 +68,17 @@
     "Hardware": "Raspi5",
     "Description": "abc",
     "ConnType": "LW-M2M",
-    "Tags": "EH-DEV",
+    "Tags[]": [
+      "EH-PRD",
+      "EH-DEV"
+    ],
     "scopeId": "1000/DE",
+    "Tags": [
+      "EH-PRD",
+      "EH-DEV"
+    ],
     "_cre": 1706465346153,
-    "_upd": 1706465699879
+    "_upd": 1708015196450
   },
   "b1": {
     "id": "b1",
@@ -71,9 +87,10 @@
     "Hardware": "Raspi5",
     "Description": "",
     "ConnType": "COAP",
-    "Tags": "EH-PRD",
+    "Tags[]": "EH-PRD",
     "scopeId": "1000/DE",
+    "Tags": "EH-PRD",
     "_cre": 1707503066825,
-    "_upd": 1707504038829
+    "_upd": 1708015184495
   }
 }

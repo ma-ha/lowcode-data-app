@@ -298,7 +298,7 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
         } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
         break 
       case 'MultiSelectRef':
-        fld = { id: propId, label: lbl, type: 'select', options: [] }
+        fld = { id: propId, label: lbl, type: 'select', options: [], multiple: true }
         try {
           let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
           for ( let recId in opdTbl ) { 

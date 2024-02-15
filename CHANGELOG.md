@@ -1,4 +1,5 @@
 # 0.7.4
+- MultiSelectRef handling
 - Fixes
 
 # 0.7.2

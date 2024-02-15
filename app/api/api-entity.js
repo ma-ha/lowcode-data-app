@@ -296,6 +296,7 @@ async function addDoc( req, res )  {
 
   // JSOM input must be parsed to obj tree
   for ( let propId in entity.properties ) try {
+
     if (entity.properties[ propId ].type == 'JSON' ) { 
       try {
         log.debug( 'JSON', propId, req.body[ propId ], req.body )
@@ -308,7 +309,24 @@ async function addDoc( req, res )  {
         log.warn( 'addDoc: Parse JSON', exc ) 
         req.body[ propId ] = {}
       }
+    
+    } else if (entity.properties[ propId ].type == 'MultiSelectRef' ) { 
+      try {
+        log.info( 'MultiSelectRef', propId, req.body[ propId ], req.body )
+        req.body[ propId ] = []
+        if ( req.body[ propId+'[]' ] ) {
+          if ( Array.isArray( req.body[ propId+'[]' ] ) ) {
+            req.body[ propId ] = req.body[ propId+'[]' ]
+          } else {
+            req.body[ propId ].push( req.body[ propId+'[]' ] )
+          }
+        } 
+      } catch ( exc ) { 
+        log.warn( 'addDoc: Parse JSON', exc ) 
+        req.body[ propId ] = {}
+      }
     }
+
   } catch ( exc ) { log.warn( 'addDoc: Parse JSON', exc ) }
   
  
