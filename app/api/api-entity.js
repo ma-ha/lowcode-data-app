@@ -6,6 +6,7 @@ const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
 const bodyParser = require( 'body-parser' )
 const helper     = require( '../helper/helper' )
+const propHandler = require( '../data/propertyHandler' )
 
 exports: module.exports = { 
   setupAPI  
@@ -146,15 +147,7 @@ async function getDoc( req, res ) {
     log.info( 'GET entity q/id', req.query.recId )
 
     if ( req.query.recId == '_empty' ) {
-      let rec = {}
-      for ( let propId in entity.properties ) {
-        if ( entity.properties[propId].type != 'Select' ) {
-          rec[ propId ] = ''
-        } else {
-          rec[ propId ] =  entity.properties[propId].options[0]
-        }
-      }
-      return res.send( rec )
+      return res.send( propHandler.genEmptyDataReturn( entity ) )
     }
 
     let doc = await dta.getDataObjX( 
@@ -167,17 +160,7 @@ async function getDoc( req, res ) {
     )
     log.debug( 'GET entity doc', doc )
     let result = JSON.parse( JSON.stringify( doc ) )
-
-    // make JSONs to Strings for GUI inputs
-    for ( let propId in entity.properties )  try {
-      if ( entity.properties[ propId ].type == 'JSON' ) try {
-        log.debug( 'result[ propId ]',propId,result[ propId ] )
-        result[ propId ] = ( result[ propId ] ? JSON.stringify( result[ propId ], null, ' ' ) : '{}' )
-      } catch ( exc ) { log.warn('getDoc nz id> stringify JSON', exc ) }
-      if ( entity.properties[ propId ].type == 'Date'  ) try {
-        result[ propId ] = new Date( result[ propId ] ).getTime()
-      } catch ( exc ) { log.warn('getDoc nz id> Date', exc ) }
-    } catch ( exc ) { log.warn('getDoc nz id> stringify JSON', exc ) }
+    propHandler.reformatDataReturn( entity, result )
 
     result.recId =  req.query.recId
     log.debug( 'GET entity q/id', result )
@@ -191,76 +174,9 @@ async function getDoc( req, res ) {
 
   let result = []
   for ( let rec of dataArr ) {
-    let tblRec = { recId: rec.id }
-    log.debug( 'getDoc rec', rec )
-    for ( let propId in entity.properties ) {
-      let prop = entity.properties[ propId ]
-      let label = ( prop.label ? prop.label : propId )
-      log.debug( 'getDoc', propId, prop.type )
-
-      switch ( prop.type ) {
-        case 'SelectRef':
-          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
-          break 
-        case 'DocMap':
-          let params = prop.docMap.split('/')
-          let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ params[4] +'='+ rec.id
-          tblRec[ propId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
-          break 
-        case 'Ref':
-          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
-          break 
-        case 'RefArray':
-          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
-          break 
-        case 'Link': 
-          if ( prop.link ) {
-            let href = prop.link
-            href = href.replaceAll( '${id}', rec[ 'id' ] )
-            href = href.replaceAll( '${scopeId}', rec[ 'scopeId' ] )
-            for ( let replaceId in entity.properties ) {
-              href = href.replaceAll( '${'+replaceId+'}', rec[ replaceId ] )
-            }
-            tblRec[ propId ] = '<a href="'+href+'" target="_blank">'+label+'</a>'
-          } else { tblRec[ propId ] = '' }
-          break 
-        case 'JSON': 
-          tblRec[ propId ] = ( rec[ propId ] ? JSON.stringify( rec[ propId ], null, ' ' ) : '{}' )
-          break 
-        case 'Event': 
-          let p = req.params
-          let url =  'guiapp/'+p.tenantId+'/'+p.appId+'/'+p.appVersion+'/entity/'+p.entityId+'/'+rec.id+'/'+propId
-          let eventLnk = '<a href="'+url+'">'+( prop.label ? prop.label : propId ) +'</a>'
-          if ( rec.eventArr &&  rec.eventArr.indexOf(propId) >= 0 ) {
-            eventLnk = 'Pending...'
-          } else if ( prop.event && prop.event.indexOf('==') > 0 ) {
-            let cnd = prop.event.split('==')
-            let cndProp = cnd[0].trim()
-            let cndValArr = cnd[1].split(',')
-            for ( let cndVal of cndValArr ) {
-              if ( rec[ cndProp ]  &&  rec[ cndProp ] != cndVal.trim() ) {
-                eventLnk = ''
-              }
-            }
-          } else if ( prop.event && prop.event.indexOf('!=') > 0 ) {
-            let cnd = prop.event.split('!=')
-            let cndProp = cnd[0].trim()
-            let cndValArr = cnd[1].split(',')
-            for ( let cndVal of cndValArr ) {
-              if ( rec[ cndProp ]  &&  rec[ cndProp ] == cndVal.trim() ) {
-                eventLnk = ''
-              }
-            }
-          } 
-
-          tblRec[ propId ] = eventLnk //rec[ propId ].event
-          break 
-        default:   // String, Number, Select
-          tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
-          break 
-      }
-    }
-    result.push( tblRec )
+    let p =  req.params 
+    let url =  'guiapp/'+p.tenantId+'/'+p.appId+'/'+p.appVersion+'/entity/'+p.entityId+'/'+rec.id
+    result.push( propHandler.reformatDataTableReturn( entity, rec, url )  )
   }
   // log.info( 'GET entity data', result )
   res.send( result )
@@ -277,60 +193,21 @@ async function addDoc( req, res )  {
   if ( ! app ) { return res.send( 'ERROR: App not found') }
   let entity = app.entity[ req.params.entityId ]
 
-  if ( ! req.body.id ) {
-    if ( entity.properties[ 'id' ]  &&  entity.properties[ 'id' ].type == 'UUID' ) {
-      req.body.id = helper.uuidv4()
-    } else {
-      return res.send( 'ERROR: id required')
-    }
-  }
-
   let dtaColl = user.rootScopeId + req.params.entityId
   
   // let existRec = await dta.idExists( dtaColl, req.body.id )  
   // if ( existRec && existRec.scopeId != user.scopeId ) {
   //   return  res.send( 'ID '+  req.body.id +' already used in scope'+  existRec.scopeId )
   // }
-  let obj = req.body
-  obj.scopeId = user.scopeId 
-
-  // JSOM input must be parsed to obj tree
-  for ( let propId in entity.properties ) try {
-
-    if (entity.properties[ propId ].type == 'JSON' ) { 
-      try {
-        log.debug( 'JSON', propId, req.body[ propId ], req.body )
-        if ( req.body[ propId ] ) {
-          req.body[ propId ] = JSON.parse( req.body[ propId ] )
-        } else {
-          req.body[ propId ] = {}
-        }
-      } catch ( exc ) { 
-        log.warn( 'addDoc: Parse JSON', exc ) 
-        req.body[ propId ] = {}
-      }
-    
-    } else if (entity.properties[ propId ].type == 'MultiSelectRef' ) { 
-      try {
-        log.info( 'MultiSelectRef', propId, req.body[ propId ], req.body )
-        req.body[ propId ] = []
-        if ( req.body[ propId+'[]' ] ) {
-          if ( Array.isArray( req.body[ propId+'[]' ] ) ) {
-            req.body[ propId ] = req.body[ propId+'[]' ]
-          } else {
-            req.body[ propId ].push( req.body[ propId+'[]' ] )
-          }
-        } 
-      } catch ( exc ) { 
-        log.warn( 'addDoc: Parse JSON', exc ) 
-        req.body[ propId ] = {}
-      }
-    }
-
-  } catch ( exc ) { log.warn( 'addDoc: Parse JSON', exc ) }
+  let rec = req.body
+  rec.scopeId = user.scopeId
   
- 
-  let result = await dta.addDataObj( dtaColl, req.body.id, req.body )
+  let parse = propHandler.reformatDataUpdateInput( entity, rec )
+  if ( parse.err ) {
+    return res.status(400).send( parse.err )
+  }
+
+  let result = await dta.addDataObj( dtaColl, rec.id, rec )
   // TODO check entity
   res.send( 'OK' )
 }

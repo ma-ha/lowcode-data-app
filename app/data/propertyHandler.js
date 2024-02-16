@@ -1,10 +1,16 @@
 const log     = require( '../helper/log' ).logger
 const dta     = require( '../persistence/app-dta' )
 
+// All property type specific handling is done here
+
 exports: module.exports = {
   genGuiTableFilterDef,
   genGuiTableColsDef,
-  genGuiFormFieldsDef
+  genGuiFormFieldsDef,
+  reformatDataReturn,
+  genEmptyDataReturn,
+  reformatDataTableReturn,
+  reformatDataUpdateInput
 }
 
 // ============================================================================
@@ -153,3 +159,159 @@ async function genGuiFormFieldsDef( entity, filter, user ) {
 }
 
 // ============================================================================
+
+function reformatDataReturn( entity, result  ) {
+  for ( let propId in entity.properties )  {
+    try {
+      
+      if ( entity.properties[ propId ].type == 'JSON' ) {
+      
+        try {
+          log.debug( 'result[ propId ]',propId,result[ propId ] )
+          result[ propId ] = ( result[ propId ] ? JSON.stringify( result[ propId ], null, ' ' ) : '{}' )
+        } catch ( exc ) { log.warn('getDoc nz id> stringify JSON', exc ) }
+      
+      } else if ( entity.properties[ propId ].type == 'Date'  ) {
+        
+        try {
+          result[ propId ] = new Date( result[ propId ] ).getTime()
+        } catch ( exc ) { log.warn('getDoc nz id> Date', exc ) }
+
+      }
+    } catch ( exc ) { log.warn('getDoc nz id> stringify JSON', exc ) }
+  }
+}
+
+
+function genEmptyDataReturn( entity ) {
+  let rec = {}
+  for ( let propId in entity.properties ) {
+    if ( entity.properties[propId].type != 'Select' ) {
+      rec[ propId ] = ''
+    } else {
+      rec[ propId ] =  entity.properties[propId].options[0]
+    }
+  }
+  return rec
+}
+
+
+function reformatDataTableReturn( entity, rec, url  ) {
+  let tblRec = { recId: rec.id }
+  log.debug( 'getDoc rec', rec )
+  for ( let propId in entity.properties ) {
+    let prop = entity.properties[ propId ]
+    let label = ( prop.label ? prop.label : propId )
+    log.debug( 'getDoc', propId, prop.type )
+
+    switch ( prop.type ) {
+      case 'SelectRef':
+        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+        break 
+      case 'DocMap':
+        let params = prop.docMap.split('/')
+        let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ params[4] +'='+ rec.id
+        tblRec[ propId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
+        break 
+      case 'Ref':
+        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+        break 
+      case 'RefArray':
+        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+        break 
+      case 'Link': 
+        if ( prop.link ) {
+          let href = prop.link
+          href = href.replaceAll( '${id}', rec[ 'id' ] )
+          href = href.replaceAll( '${scopeId}', rec[ 'scopeId' ] )
+          for ( let replaceId in entity.properties ) {
+            href = href.replaceAll( '${'+replaceId+'}', rec[ replaceId ] )
+          }
+          tblRec[ propId ] = '<a href="'+href+'" target="_blank">'+label+'</a>'
+        } else { tblRec[ propId ] = '' }
+        break 
+      case 'JSON': 
+        tblRec[ propId ] = ( rec[ propId ] ? JSON.stringify( rec[ propId ], null, ' ' ) : '{}' )
+        break 
+      case 'Event': 
+        let eventLnk = '<a href="'+url+'/'+propId+'">'+( prop.label ? prop.label : propId ) +'</a>'
+        if ( rec.eventArr &&  rec.eventArr.indexOf(propId) >= 0 ) {
+          eventLnk = 'Pending...'
+        } else if ( prop.event && prop.event.indexOf('==') > 0 ) {
+          let cnd = prop.event.split('==')
+          let cndProp = cnd[0].trim()
+          let cndValArr = cnd[1].split(',')
+          for ( let cndVal of cndValArr ) {
+            if ( rec[ cndProp ]  &&  rec[ cndProp ] != cndVal.trim() ) {
+              eventLnk = ''
+            }
+          }
+        } else if ( prop.event && prop.event.indexOf('!=') > 0 ) {
+          let cnd = prop.event.split('!=')
+          let cndProp = cnd[0].trim()
+          let cndValArr = cnd[1].split(',')
+          for ( let cndVal of cndValArr ) {
+            if ( rec[ cndProp ]  &&  rec[ cndProp ] == cndVal.trim() ) {
+              eventLnk = ''
+            }
+          }
+        } 
+
+        tblRec[ propId ] = eventLnk //rec[ propId ].event
+        break 
+      default:   // String, Number, Select
+        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
+        break 
+    }
+  }
+  return tblRec
+}
+
+
+function reformatDataUpdateInput( entity, rec ) {
+  if ( ! rec.id ) {
+    if ( entity.properties[ 'id' ]  &&  entity.properties[ 'id' ].type == 'UUID' ) {
+      rec.id = helper.uuidv4()
+    } else {
+      return { err: 'ERROR: id required' }
+    }
+  }
+
+  for ( let propId in entity.properties ) try {
+
+    // JSOM input must be parsed to obj tree
+    if (entity.properties[ propId ].type == 'JSON' ) { 
+
+      try {
+        log.debug( 'JSON', propId, rec[ propId ], rec )
+        if ( rec[ propId ] ) {
+          rec[ propId ] = JSON.parse( rec[ propId ] )
+        } else {
+          rec[ propId ] = {}
+        }
+      } catch ( exc ) { 
+        log.warn( 'addDoc: Parse JSON', exc ) 
+        rec[ propId ] = {}
+      }
+    
+    } else if ( entity.properties[ propId ].type == 'MultiSelectRef' ) { 
+
+      try {
+        log.info( 'MultiSelectRef', propId, rec[ propId ], rec )
+        rec[ propId ] = []
+        if ( rec[ propId+'[]' ] ) {
+          if ( Array.isArray( rec[ propId+'[]' ] ) ) {
+            rec[ propId ] = rec[ propId+'[]' ]
+          } else {
+            rec[ propId ].push( rec[ propId+'[]' ] )
+          }
+        } 
+      } catch ( exc ) { 
+        log.warn( 'addDoc: Parse MultiSelectRef', exc ) 
+        rec[ propId ] = {}
+      }
+    }
+
+  } catch ( exc ) { log.warn( 'reformatDataUpdateInput', exc ) }
+  return {}
+}
