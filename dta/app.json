@@ -305,12 +305,41 @@
           "appUser"
         ],
         "properties": {}
+      },
+      "Ticket": {
+        "title": "",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "Task": {
+            "type": "String",
+            "filter": true
+          },
+          "Description": {
+            "type": "String"
+          },
+          "Assignee": {
+            "type": "String",
+            "filter": true
+          },
+          "Resolution": {
+            "type": "String"
+          },
+          "Approval": {
+            "type": "String"
+          }
+        },
+        "noEdit": true,
+        "stateModel": "Ticket"
       }
     },
     "startPage": [
       "DeviceOrder",
       "Invoice",
-      "Customer"
+      "Customer",
+      "Ticket"
     ],
     "role": [
       "appUser"

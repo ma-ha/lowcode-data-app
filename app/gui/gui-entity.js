@@ -4,7 +4,7 @@ const gui     = require( 'easy-web-app' )
 
 const log     = require( '../helper/log' ).logger
 const dta     = require( '../persistence/app-dta' )
-const userDta  = require( '../persistence/app-dta-user' )
+const userDta = require( '../persistence/app-dta-user' )
 
 const propHandler = require( '../data/propertyHandler' )
 

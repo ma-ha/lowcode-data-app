@@ -1,0 +1,61 @@
+{
+  "1000/Ticket": {
+    "scopeId": "1000",
+    "state":{
+      "null" : {
+        "actions" : {
+          "Create": {
+            "to": "Open"
+          }
+        }
+      },
+      "Open": {
+        "actions" : {
+          "StartProgress": {
+            "to": "In Progress"
+          },
+          "Reject": {
+            "to": "Closed"
+          },
+          "Blocked": {
+            "to": "Blocked"
+          }
+        }
+      },
+      "InProgress" : {
+        "actions" : {
+          "Reopen": {
+            "to": "Open"
+          },
+          "SetBlocked": {
+            "to": "Blocked"
+          }
+        }
+      },
+      "Blocked" : {
+        "actions" : {
+          "Unblock": {
+            "to": "Open"
+          },
+          "StartProgress": {
+            "to": "In Progress"
+          }
+        }
+      },
+      "Review" : {
+        "actions" : {
+          "Reopen": {
+            "to": "Open"
+          }
+        }
+      },
+      "Closed" : {
+        "actions" : {
+          "Reopen": {
+            "to": "Open"
+          }
+        }
+      }
+    }
+  }
+}

@@ -30,7 +30,6 @@ async function setupAPI( app, oauthCfg ) {
   apiSec.init( oauthCfg )
   //const myJWTcheck = apiSec.initJWTcheck()
   const guiAuthz = apiSec.userTenantAuthz( gui )
-
  
   // --------------------------------------------------------------------------
   svc.get( '/setscope',  guiAuthz,  setScope )
@@ -44,23 +43,8 @@ async function setupAPI( app, oauthCfg ) {
   svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, addDoc )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/:recId/:event', guiAuthz, docEvent )
   svc.delete( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, delDoc )
-
-  //---------------------------------------------------------------------------
-  // const apiAuthz = apiSec.apiAppAuthz( app )
-
-  // svc.get(  '/adapter/app/:scopeId', apiAuthz, TODO )
-  // svc.get(  '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, TODO )
-  // svc.post( '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, TODO )
-  // svc.get(  '/adapter/entity/:scopeId/entity', apiAuthz, TODO )
-  // svc.get(  '/adapter/entity/:scopeId/:appId/:appVersion/entity', apiAuthz, TODO )
-  // svc.get(  '/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId', apiAuthz, TODO )
-  // svc.post( '/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId', apiAuthz, TODO )
-
 }
 
-async function TODO( req, res ) {
-  res.send( 'TODO' )
-}
 // --------------------------------------------------------------------------
 
 async function setScope ( req, res ) {

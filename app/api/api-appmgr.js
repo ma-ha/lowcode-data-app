@@ -40,6 +40,7 @@ async function setupAPI( app ) {
   svc.get(    '/app/entity/property', guiAuthz, getProperty )
   svc.post(   '/app/entity/property',  guiAuthz, addProperty )
   svc.delete( '/app/entity/property', guiAuthz, delProperty )
+  svc.get(    '/app/entity/property/status-change', guiAuthz, getPropertyStatus )
 
   svc.get(  '/erm', getERM )
   svc.post( '/erm', saveERM )
@@ -381,7 +382,7 @@ async function getEntity( req, res )  {
   if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send([]) }
   if ( ! app.startPage ) { app.startPage = [] }
 
-  if (  req.query.appId &&  req.query.entityId && ! req.query.title  ) { // get by id 
+  if (  req.query.appId &&  req.query.entityId && ! req.query.scope  ) { // get by id 
   
     if ( app.entity[ req.query.entityId ] ) {
       let entity = app.entity[ req.query.entityId ]
@@ -392,6 +393,7 @@ async function getEntity( req, res )  {
         scope      : entity.scope,
         maintainer : entity.maintainer,
         start      : ( app.startPage.indexOf( req.query.entityId ) < 0 ? false : 'start' ),
+        stateModel : ( entity.stateModel ? entity.stateModel : '' ),
         noEdit     : ( entity.noEdit === true ? true : false )
       }) 
 
@@ -402,6 +404,12 @@ async function getEntity( req, res )  {
     let entityArr = []
     for ( let entityId in app.entity ) {
       let entity = app.entity[ entityId ]
+
+      let stateModel = ''
+      if ( entity.stateModel ) {
+        stateModel = '<a href="index.html?layout=AppEntityStatus-nonav&id='+appId+','+entityId+'">'+ entity.stateModel+'</a>'
+      }
+
       entityArr.push({
         entityId   : entityId,
         appId      : appId,
@@ -409,6 +417,7 @@ async function getEntity( req, res )  {
         scope      : entity.scope,
         startPage  : ( app.startPage.indexOf( entityId ) < 0 ? '': 'yes' ),
         editForm   : ( entity.noEdit === true ? 'hide' : '' ),
+        stateModel : stateModel,
         maintainer : entity.maintainer,
         propLnk :'<a href="index.html?layout=AppEntityProperties-nonav&id='+appId+','+entityId+'">Manage Properties</a>'
       })
@@ -447,6 +456,12 @@ async function addEntity( req, res ) {
     newEntity.noEdit = true
   } else {
     delete newEntity.noEdit
+  }
+
+  if ( req.body.stateModel &&  req.body.stateModel != '' ) {
+    newEntity.stateModel = req.body.stateModel 
+  } else {
+    delete newEntity.stateModel
   }
 
   log.info( 'POST app', newEntity )
@@ -577,6 +592,52 @@ async function getProperty( req, res ) {
   }
   res.send( propArr )
 }
+
+
+async function getPropertyStatus( req, res ) {
+  log.debug( 'GET /app/entity/property', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  let appId = ( req.query.appId ? req.query.appId : req.query.id.split(',')[0] )
+  if ( ! appId ) { return res.status(400).send([]) }
+  let entityId = ( req.query.entityId ? req.query.entityId : req.query.id.split(',')[1] )
+  let app = await dta.getAppById( appId )
+  // log.info( 'GET /app/entity/property', appId, entityId, app )
+  if ( ! app ) { log.warn('GET entity: /app/entity/property not found'); return res.status(400).send([]) }
+  if ( ! app.entity ) { app.entity = {} }
+  if ( ! app.entity[ entityId ] ) {  log.warn('GET /app/entity/property: app entity not found'); return res.status(400).send([]) }
+
+  let stateModelId = app.entity[ entityId ].stateModel
+  if ( ! stateModelId ) {  log.warn('GET /app/entity/property: app entity has no stateModel'); return res.status(400).send([]) }
+
+  let states = await dta. getData( 'state', user.rootScopeId )
+  if ( ! states || ! states[ user.rootScopeId +'/'+ stateModelId ] ) {  log.warn('GET /app/entity/property: stateModel not found'); return res.status(400).send([]) }
+  
+  let properties =  app.entity[ entityId ].properties
+  let stateModel = states[ user.rootScopeId +'/'+ stateModelId ].state
+
+  let propArr = []
+  for ( let propId in properties ) {
+    let propRow = { propId: propId }
+    let prop = properties[ propId ]
+    // log.info( ' >>', propId )
+    if ( ! prop.stateTransition ) { prop.stateTransition = {} }
+    for ( let statesId in stateModel ) try {
+      // log.info( ' >>>', statesId )
+      for ( let transitionId in stateModel[ statesId ].actions ) {
+        // log.info( ' >>>>', transitionId, prop.stateTransition[ statesId +'_'+ transitionId ] )
+        if ( prop.stateTransition[ statesId +'_'+ transitionId ] ) {
+          propRow[ statesId +'_'+transitionId ] = prop.stateTransition[ statesId +'_'+ transitionId ]
+        } else {
+          propRow[ statesId +'_'+transitionId ] = '-'
+        }
+      }
+    } catch (exc) { log.warn( 'getPropertyStatus loop', exc )}
+    propArr.push( propRow )
+  }
+  res.send( propArr )
+}
+
 
 function genLink( page, id ) {
   let param = getRefId( id )

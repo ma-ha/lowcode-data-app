@@ -5,6 +5,7 @@ const log     = require( '../helper/log' ).logger
 const pjson   = require( '../package.json' )
 
 const dta     = require( '../persistence/app-dta' )
+const userDta = require( '../persistence/app-dta-user' )
 
 exports: module.exports = {
   init
@@ -126,7 +127,10 @@ async function init( ) {
   appEntitiesPage.dynamicRow( async ( staticRows, req, pageName ) => {
     let appId = req.query.id
     if ( ! appId ) { return [] }
+    let user = await userDta.getUserInfoFromReq( gui, req )
+    if ( ! user ) { return [] }
     let app = await dta.getAppById( appId )
+
     if ( ! app ) { return [] }
     let rows = [{ 
       id: 'AppEntitiesAppInfo', rowId: 'AppEntitiesAppInfo', title: 'App',  height: '80px', 
@@ -152,11 +156,12 @@ async function init( ) {
         cols: [
           { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AppEntitiesAdd' } ] } ,
-          { id: "entityId",   label: "Id",         width: "20%", cellType: "text" },
-          { id: "title",      label: "Title",      width: "20%", cellType: "text" },
+          { id: "entityId",   label: "Id",         width: "10%", cellType: "text" },
+          { id: "title",      label: "Title",      width: "10%", cellType: "text" },
           { id: "scope",      label: "Scope",      width: "10%", cellType: "text" },
           { id: "startPage",  label: "Start Page", width: "10%", cellType: "text" },
           { id: "editForm",   label: "Edit Form",  width: "10%", cellType: "text" },
+          { id: "stateModel", label: "State Model",width: "10%", cellType: "text" },
           { id: "propLnk",    label: "Properties", width: "10%", cellType: "text" },
           { id: "maintainer", label: "Maintainer", width: "10%", cellType: "text" },
           { id: 'Del', label: "&nbsp;", cellType: "button", width :'7%', icon: 'ui-icon-trash', 
@@ -164,6 +169,13 @@ async function init( ) {
         ]
       }
     })
+
+    let stateModels = [{ option: '' }]
+    let states = await dta. getData( 'state', user.rootScopeId )
+    log.info( 'sates', states)
+    for ( let statesId in states ) {
+      stateModels.push({ option: statesId.split('/')[1] })
+    }
 
     rows.push({ 
       id: 'AppEntitiesAdd', rowId: 'AppEntitiesAdd', title: 'Add / Update Entity',  height: '150px', 
@@ -186,6 +198,9 @@ async function init( ) {
           { formFields: [
             { id: "start", label: "Start Page", type: "checkbox" },
             { id: "noEdit", label: "Hide Add/Edit Form", type: "checkbox" }
+          ]},
+          { formFields: [
+            { id: "stateModel", label: "State Model", type: "select", options: stateModels }
           ]}
         ] }],
         actions : [ 
@@ -298,6 +313,71 @@ async function init( ) {
   uploadAppPage.addView( uploadAppForm() )
   uploadAppPage.addView( uploadAppOut() )
 
+
+
+  // --------------------------------------------------------------------------
+  let entityStatusPage = gui.addPage( 'AppEntityStatus-nonav' ) 
+  entityStatusPage.title    = 'App Entity Status'
+  entityStatusPage.setPageWidth( '90%' )
+
+  entityStatusPage.dynamicRow( async ( staticRows, req, pageName ) => {
+    let ids = req.query.id
+
+    let user = await userDta.getUserInfoFromReq( gui, req )
+    if ( ! user ) { return [] }
+
+    if ( ! ids ) { return [] }
+    let appId = ids.split(',')[0]
+    log.info( appId )
+    if ( ! appId ) { return [] }
+    let app = await dta.getAppById( appId )
+    if ( ! app ) { return [] }
+    let entityId = ids.split(',')[1]
+    
+    // Entity info:
+    let rows = [{ 
+      id: 'pApEntityInfo', rowId: 'AppEntityInfo', title: 'Entity',  height: '80px', 
+      type : 'pong-form', resourceURL: 'app', decor: 'decor',
+      moduleConfig : {
+        description: "AppEntityInfo",
+        id: 'AppEntityInfoForm',
+        fieldGroups:[{ columns: [
+          { formFields: [{ id: "appId", label: "App Id",   type: "text", defaultVal: appId,  readonly: true } ]},
+          // { formFields: [{ id: "name", label: "Name", type: "text", defaultVal: app.title, readonly: true } ]},
+          { formFields: [{ id: "name", label: "Entity Id", type: "text", defaultVal: entityId, readonly: true } ]},
+          { formFields: [{ id: "title", label: "Entity Title", type: "text", defaultVal: entityId, readonly: true } ]},
+          { formFields: [{ id: "lnk", label: "", linkText:"Back to Entities", type: "link", defaultVal: "index.html?layout=AppEntities-nonav&id="+appId } ]},
+          { formFields: [{ id: "ermLnk", linkText:"Show Data Model", type: "link", defaultVal: 'index.html?layout=ERM-nonav' }] }
+        ] }]
+      }
+    }]
+
+    let cols = [ { id: "propId", label: "Property", width: "20%", cellType: "text" } ]
+
+    let states = await dta.getData( 'state', user.rootScopeId )
+    let stateModel = states[ user.rootScopeId +'/'+ entityId ].state
+    log.info( 'states', user.rootScopeId +'/'+ entityId, states, stateModel )
+    let cnt = 0
+    for ( let statesId in stateModel ) {
+      for ( let transitionId in stateModel[ statesId ].actions ) {
+        cols.push({ id: statesId+'_'+transitionId,  label: statesId+'/'+transitionId, width: "20%", cellType: "text" })
+        cnt ++
+      }
+    }
+
+    rows.push({
+      id: 'AppEntityStatus', rowId: 'AppEntityStatus', title: 'App Entity Status',  height: '650px', 
+      type : 'pong-table', resourceURL: 'app/entity/property/status-change', decor: 'decor', 
+      moduleConfig : {
+        dataURL: "",
+        rowId: [ 'appId', 'entityId', 'propId' ],
+        cols: cols
+      }
+    })
+
+    return rows
+  })
+  
 }
 
 // ============================================================================
