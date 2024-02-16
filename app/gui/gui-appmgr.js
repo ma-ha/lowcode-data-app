@@ -156,6 +156,7 @@ async function init( ) {
           { id: "title",      label: "Title",      width: "20%", cellType: "text" },
           { id: "scope",      label: "Scope",      width: "10%", cellType: "text" },
           { id: "startPage",  label: "Start Page", width: "10%", cellType: "text" },
+          { id: "editForm",   label: "Edit Form",  width: "10%", cellType: "text" },
           { id: "propLnk",    label: "Properties", width: "10%", cellType: "text" },
           { id: "maintainer", label: "Maintainer", width: "10%", cellType: "text" },
           { id: 'Del', label: "&nbsp;", cellType: "button", width :'7%', icon: 'ui-icon-trash', 
@@ -178,8 +179,9 @@ async function init( ) {
           { formFields: [{ id: "scope", label: "Scope", type: "select",
             options: addOptions([ "inherit", "inherit-readonly", 'no-inherit' ]) } ]} ,
           { formFields: [{ id: "maintainer", label: "Maintainer", type: "select",
-            options: addOptions([ "appUser", 'admin', 'dev' ]) } ]} ,
-          { formFields: [{ id: "start", label: "Start Page", type: "checkbox" } ]}
+            options: addOptions([ "appUser", 'admin', 'dev' ]) } ]},
+          { formFields: [{ id: "start", label: "Start Page", type: "checkbox" } ]},
+          { formFields: [{ id: "noEdit", label: "Hide Add/Edit Form", type: "checkbox" } ]}
         ] }],
         actions : [ 
           { id: "AddFormBtn", actionName: "Add / Update", actionURL: 'app/entity', 

@@ -52,7 +52,7 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
       // multiple tabs per entity in array
       let tabRow = {
         rowId  : 'Tabs' + appIdX,
-        height : "780px",
+        height : "830px",
         tabs   : [] 
       }
       for ( let entityId of app.startPage ) {
@@ -105,28 +105,33 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
     })
   }
 
+  let tblHeight = ( entity.noEdit ? '780px' : '550px' )
+  
   if ( entity.divs ) {
-    rows.push( genListTable( app, appId, entityId, entity, user ) )
+    rows.push( genListTable( app, appId, entityId, entity, user, tblHeight ) )
   } else {
-    rows.push( genDataTable( app, appId, entityId, entity, user ) )
+    rows.push( genDataTable( app, appId, entityId, entity, user, tblHeight ) )
   }
 
-  rows.push( 
-    await genAddDataForm( 
-      appId,
-      entityId, 
-      entity,
-      [{ resId: 'EntityList'+ entityId }],
-      filter,
-      user
+  if ( ! entity.noEdit ) {
+    rows.push( 
+      await genAddDataForm( 
+        appId,
+        entityId, 
+        entity,
+        [{ resId: 'EntityList'+ entityId }],
+        filter,
+        user
+      )
     )
-  )
+  }
+  
   
   return rows
 }
 
 // ============================================================================
-function genListTable( app, appId, entityId, entity, user ) {
+function genListTable( app, appId, entityId, entity, user, tblHeight ) {
   log.info( 'genListTable',  app, appId, entityId, entity, user )
   if ( entity.divs ) {
 
@@ -135,7 +140,7 @@ function genListTable( app, appId, entityId, entity, user ) {
       title  : entity.title,
       decor  : "decor",
       type   : 'pong-list',
-      height : '500px',
+      height : tblHeight,
       resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
       moduleConfig :  { 
         rowId   : ['id'], 
@@ -150,7 +155,7 @@ function genListTable( app, appId, entityId, entity, user ) {
    return lstDef 
    
   } else { // fallback
-    return genDataTable( app, appId, entityId, entity, user )  
+    return genDataTable( app, appId, entityId, entity, user, tblHeight )  
   }
 }
 
@@ -174,7 +179,7 @@ function genDivs( divArr, properties ) { // recursive
 
 // ============================================================================
 
-function genDataTable( app, appId, entityId, entity, user ) {
+function genDataTable( app, appId, entityId, entity, user, tblHeight ) {
   log.debug( 'genDataTable', appId, entityId, entity, user )
   
   let tblDef = { 
@@ -182,7 +187,7 @@ function genDataTable( app, appId, entityId, entity, user ) {
     title       : entity.title,
     decor       : "decor",
     type        : 'pong-table',
-    height      : '500px',
+    height      : tblHeight,
     resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
     moduleConfig : genTblColsConfig( entityId, entity )
   }

@@ -391,7 +391,8 @@ async function getEntity( req, res )  {
         title      : entity.title,
         scope      : entity.scope,
         maintainer : entity.maintainer,
-        start      : ( app.startPage.indexOf( req.query.entityId ) < 0 ? false : 'start' )
+        start      : ( app.startPage.indexOf( req.query.entityId ) < 0 ? false : 'start' ),
+        noEdit     : ( entity.noEdit === true ? true : false )
       }) 
 
     } else { return res.send( null )  } // id not in scopes
@@ -406,7 +407,8 @@ async function getEntity( req, res )  {
         appId      : appId,
         title      : entity.title,
         scope      : entity.scope,
-        startPage  : ( app.startPage.indexOf( entityId ) < 0 ? '': 'Y' ),
+        startPage  : ( app.startPage.indexOf( entityId ) < 0 ? '': 'yes' ),
+        editForm   : ( entity.noEdit === true ? 'hide' : '' ),
         maintainer : entity.maintainer,
         propLnk :'<a href="index.html?layout=AppEntityProperties-nonav&id='+appId+','+entityId+'">Manage Properties</a>'
       })
@@ -439,6 +441,12 @@ async function addEntity( req, res ) {
     if ( app.startPage.indexOf( req.body.entityId ) >= 0 ) {
       app.startPage.splice( app.startPage.indexOf( req.body.entityId ), 1 )
     }
+  }
+
+  if ( req.body.noEdit == 'noEdit' ) {
+    newEntity.noEdit = true
+  } else {
+    delete newEntity.noEdit
   }
 
   log.info( 'POST app', newEntity )

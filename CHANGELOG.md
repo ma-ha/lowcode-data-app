@@ -1,3 +1,6 @@
+# 0.8.0
+- Option to hide edit dialog for entity
+- Refactor API/GUI: centralize property handling
 
 # 0.7.2
 - ext. data API

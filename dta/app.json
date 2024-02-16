@@ -192,84 +192,7 @@
         "maintainer": [
           "appUser"
         ],
-        "properties": {
-          "OderNo": {
-            "type": "String",
-            "filter": true
-          },
-          "Customer": {
-            "type": "SelectRef",
-            "selectRef": "1000/device-inventory-app/1.0.0/Customer"
-          },
-          "OrderDate": {
-            "type": "Date"
-          },
-          "OrderStatus": {
-            "type": "Select",
-            "filter": true,
-            "options": [
-              "open",
-              "in progress",
-              "shipped",
-              "delivered"
-            ]
-          },
-          "Quantity": {
-            "type": "String"
-          },
-          "ItemPrice": {
-            "type": "String",
-            "filter": true
-          },
-          "TotalPrice": {
-            "type": "String"
-          },
-          "Shipping": {
-            "label": "Shipping Method",
-            "type": "Select",
-            "filter": true,
-            "options": [
-              "Standard",
-              " Express",
-              " Collect"
-            ]
-          },
-          "ShipmentTracking": {
-            "label": "Tracking ID",
-            "type": "String"
-          },
-          "Reorder": {
-            "type": "Action"
-          },
-          "Invoice": {
-            "type": "SelectRef",
-            "selectRef": "1000/device-inventory-app/1.0.0/Invoice"
-          },
-          "Devices": {
-            "type": "SelectRef",
-            "selectRef": "1000/device-mgr-app/1.0.0/DeviceHardware"
-          },
-          "InProgress": {
-            "label": "Start Progress",
-            "type": "Event",
-            "event": "OrderStatus == open"
-          },
-          "Shipped": {
-            "label": "Start Shipping",
-            "type": "Event",
-            "event": "OrderStatus == in progress"
-          },
-          "Cancel": {
-            "label": "Cancel",
-            "type": "Event",
-            "event": "OrderStatus != shipped,delivered"
-          },
-          "ActiveStatus": {
-            "label": "Active",
-            "type": "String",
-            "apiManaged": true
-          }
-        }
+        "properties": {}
       },
       "Invoice": {
         "title": "Invoice",
@@ -277,26 +200,8 @@
         "maintainer": [
           "appUser"
         ],
-        "properties": {
-          "Customer": {
-            "label": "Customer",
-            "type": "String"
-          },
-          "InvoiceId": {
-            "label": "Invoice Id",
-            "type": "String"
-          },
-          "Approve": {
-            "type": "Event",
-            "event": "Approve"
-          },
-          "id": {
-            "type": "UUID"
-          }
-        },
-        "Customer": {
-          "type": "String"
-        }
+        "properties": {},
+        "noEdit": true
       },
       "Customer": {
         "title": "Customer",
