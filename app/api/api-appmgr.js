@@ -430,7 +430,7 @@ async function addEntity( req, res ) {
     title : req.body.title,
     scope : req.body.scope,
     maintainer : [req.body.maintainer],
-    properties : {}
+    properties : ( app.entity[ req.body.entityId ] ? app.entity[ req.body.entityId ].properties : {} )
   }
 
   if ( req.body.start ) {
