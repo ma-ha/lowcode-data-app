@@ -507,10 +507,14 @@
   width: 80px;
  }
 
-#AppEntitiesAddContentstart {
+#AppEntitiesAddContentstart,
+#AppEntitiesAddContentnoEdit
+ {
   width: unset;
 }
-#AppEntitiesAddContentstartDiv label {
+#AppEntitiesAddContentstartDiv label,
+#AppEntitiesAddContentnoEditDiv label
+ {
   width: unset;
 }
 

@@ -173,15 +173,20 @@ async function init( ) {
         id: 'AppEntitiesAddForm',
         fieldGroups:[{ columns: [
           { formFields: [{ id: "appId", label: "App", type: "text", defaultVal: appId, readonly: true } ]},
-          { formFields: [{ id: "entityId",   label: "Id", type: "text",
-            descr: 'Define wisely! You cannot change this (easily)!' } ]},
-          { formFields: [{ id: "title", label: "Title", type: "text" } ]},
-          { formFields: [{ id: "scope", label: "Scope", type: "select",
-            options: addOptions([ "inherit", "inherit-readonly", 'no-inherit' ]) } ]} ,
-          { formFields: [{ id: "maintainer", label: "Maintainer", type: "select",
-            options: addOptions([ "appUser", 'admin', 'dev' ]) } ]},
-          { formFields: [{ id: "start", label: "Start Page", type: "checkbox" } ]},
-          { formFields: [{ id: "noEdit", label: "Hide Add/Edit Form", type: "checkbox" } ]}
+          { formFields: [
+            { id: "entityId",   label: "Id", type: "text",descr: 'Define wisely! You cannot change this (easily)!' } ,
+            { id: "title", label: "Title", type: "text" }
+          ]},
+          { formFields: [
+            { id: "scope", label: "Scope", type: "select",
+              options: addOptions([ "inherit", "inherit-readonly", 'no-inherit' ]) },
+            { id: "maintainer", label: "Maintainer", type: "select",
+              options: addOptions([ "appUser", 'admin', 'dev' ]) }
+          ]},
+          { formFields: [
+            { id: "start", label: "Start Page", type: "checkbox" },
+            { id: "noEdit", label: "Hide Add/Edit Form", type: "checkbox" }
+          ]}
         ] }],
         actions : [ 
           { id: "AddFormBtn", actionName: "Add / Update", actionURL: 'app/entity', 
