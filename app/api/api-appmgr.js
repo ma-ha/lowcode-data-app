@@ -343,7 +343,10 @@ async function addApp( req, res ) {
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   let appId = req.body.appId
   if ( ! appId.startsWith( user.rootScopeId ) ) {
-    appId =  user.scopeId +'/'+ appId
+    appId =  user.rootScopeId +'/'+ appId
+  }
+  if ( appId.split('/').length != 3 ) {
+    return res.status(401).send( 'ID must be scope/name/version or name/version' )
   }
   log.info( 'POST /app', req.body )
   let app = await dta.getAppById( appId )
