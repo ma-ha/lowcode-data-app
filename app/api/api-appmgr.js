@@ -91,13 +91,20 @@ async function getERM( req, res )  {
             x = 100
             y += 150
           }
-         }
+        }
+        let title =  entity.title
+        if ( ! title || title == '' ) {
+          title = entityId
+        }
+        if ( entity.stateModel ) {
+          title += '\n<i>&lt;'+ entity.stateModel +'&gt;</i>'
+        }
         let e = {
           appId    : appId,
           appName  : app.title,
           entityId : appId+'/'+entityId,
           id       : entityId,
-          name     : entity.title,
+          name     : title,
           x : xp,
           y : yp,
           color : cols[i],
@@ -870,7 +877,7 @@ async function checkUserAppEntity( req, res ) {
     return { allOK: false, user: user, app: null, appId: appId, entity: null, entityId: entityId }
   }
   if ( req.query.entityId ) { 
-    entityId = req.query.appId 
+    entityId = req.query.entityId 
   } else if ( req.query.id ) {
     entityId = req.query.id.split(',')[1] 
   } else if ( req.body.entityId ) {
@@ -880,15 +887,15 @@ async function checkUserAppEntity( req, res ) {
   let app = await dta.getAppById( appId )
   // log.info( 'GET /app/entity/property', appId, entityId, app )
   if ( ! app ) { 
-    log.warn('GET entity: /app/entity/property not found')
-    res.status(400).send([]) 
+    log.warn( 'app not found', appId, app )
+    res.status(400).send('app not found') 
     return { allOK: false, user: user, app: null, appId: appId, entity: null, entityId: entityId }
   }
   if ( ! app.startPage ) { app.startPage = [] }
   if ( ! app.entity ) { app.entity = {} }
   if ( ! app.entity[ entityId ] ) {  
-    log.warn('GET /app/entity/property: app entity not found')
-    res.status(400).send([]) 
+    log.warn( 'app entity not found', entityId )
+    res.status(400).send('app entity not found') 
     return { allOK: false, user: user, app: app, entity: null }
   }
   return { allOK: true, user: user, app: app, appId: appId, entity: app.entity[ entityId ], entityId: entityId }
