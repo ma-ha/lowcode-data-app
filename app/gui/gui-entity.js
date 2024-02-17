@@ -26,6 +26,11 @@ function init(  ) {
   appEntityPropPage.setPageWidth( "90%")
   appEntityPropPage.dynamicRow( renderDynEntityPrpRows )
 
+  let appEntityActionPage = gui.addPage( 'AppEntityAction-nonav' ) 
+  appEntityActionPage.title = "App"
+  appEntityActionPage.setPageWidth( "90%")
+  appEntityActionPage.dynamicRow( renderDynEntityActionRows )
+  
 }
 
 // ==========================================================================++
@@ -90,14 +95,8 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
     let initState = stateModel.state[ 'null' ]
     if ( ! initState || ! initState.actions ) { log.warn('renderEntityRows: stateModel not found'); return [] }
     for ( let actionId in initState.actions ) {
-      let actionFields = await propHandler.genGuiFormFieldsDef( entity, null, user, 'null_'+actionId  )
-      // for ( let propId in entity.properties ) {
-      //   let prp =  entity.properties[ propId ]
-      //   if ( prp.stateTransition && prp.stateTransition[ 'null_'+actionId ]) { // prop should be included in form
-      //     actionFields.push( { formFields: [{ id: propId, label: ( prp.label ? prp.label : propId ), type: "text"}] } )
-      //   }
-      // }
-      actionFields.push( { formFields: [{ id: '_state', type: "text", value: initState.actions[actionId].to , hidden: true }] } )
+      let actionFields = await propHandler.genGuiFormFieldsDef( entity, null, user, 'null_'+actionId )
+      actionFields.push({ formFields: [{ id: '_state', type: "text", value: initState.actions[actionId].to, hidden: true }] } )
 
       rows.push({ 
         title  : 'New ' + entityId,
@@ -239,19 +238,24 @@ function genTblColsConfig( entityId, entity ) {
     cols.push({ id: 'Edit', label: "&nbsp;", cellType: "button", method: "GET", width :'5%', 
     icon: 'ui-icon-pencil', setData: [ { resId : 'Add' + entityId } ] })
   }
-
-  cols.push({ id: 'recId', label: "Id",  cellType: "text", width:'10%' })
   
   if ( entity.stateModel ) {
     cols.push({ id: '_state', label: "State",  cellType: "text", width:'10%' })
   }
-  
+
+  cols.push({ id: 'recId', label: "Id",  cellType: "text", width:'10%' })
+
   cols = cols.concat( propHandler.genGuiTableColsDef( appEntityPropMap ) )
-  
+
+  if ( entity.stateModel ) {
+    cols.push({ id: '_stateBtn', label: "",  cellType: "text", width:'10%' })
+  }
+
   if ( ! entity.noEdit ) {
     cols.push({ id: 'Del', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-trash', 
               method: "DELETE", update: [ { resId : 'EntityList'+entityId } ], target: "modal" })
   }
+
   let tblCfg = { 
     rowId   : [ 'recId' ], 
     dataURL : '',
@@ -265,6 +269,7 @@ function genTblColsConfig( entityId, entity ) {
       dataReqParamsSrc : 'Form'
     }
   }
+
   return tblCfg
 }
 
@@ -298,6 +303,54 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
   return addFormView
 }
 // ==========================================================================++
+async function renderDynEntityActionRows( staticRows, req, pageName ) {
+  let idRef = req.query.id.split('/')
+  let rootScopeId = idRef[1]
+  let appId       = idRef[1] +'/'+  idRef[2] +'/'+  idRef[3]
+  let entityId    = idRef[5]
+  let recId       = idRef[6]
+  let stateAction = idRef[7]
+  let stateId     = idRef[7].split('_')[0]
+  let actionId    = idRef[7].split('_')[1]
+
+  log.debug( 'stateId/actionId', stateId, actionId )
+
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  let app  = await dta.getAppById( appId )
+  let entity =  app.entity[ entityId ]
+  let stateModel = await dta.getStateModelById( rootScopeId, entity.stateModel  )
+  let rec = await dta.getDataById( rootScopeId + entityId, recId )
+  log.info( 'rec', rec )
+  if ( ! app || ! user || !entity || ! stateModel ) { 
+    log.info( 'idRef', idRef )
+    log.warn( 'renderDynEntityActionRows not found',  app, user, app.entity[ entityId ], stateModel )
+    return [] 
+  }
+
+  let formCols = await propHandler.genGuiFormStateChangeDef( entity , null, user, stateAction, rec, stateModel )
+
+  let stateActionForm = { 
+    id: 'ChangeState' + entityId, rowId: 'ChangeState' + entityId, 
+    type : 'pong-form',
+    title: ( entity.title ? entity.title : entityId ),  
+    height: 'auto',  decor  : "decor",
+    resourceURL: 'guiapp/'+appId+'/entity/'+entityId, 
+
+    moduleConfig : {
+      // label:'Add '+viewId,
+      // description: "Add",
+      id: 'StateActionForm',
+      fieldGroups:[{ columns: formCols }],
+      actions : [ 
+        { id: "AddEntityBtn", actionName: actionId,
+          actionURL: 'guiapp/'+appId+'/entity/'+entityId+'/'+recId+'/changeState',
+          target: "_parent" }
+      ]
+    }
+  }
+
+  return [ stateActionForm ]
+}
 
 async function renderDynEntityPrpRows( staticRows, req, pageName ) {
   if ( ! req.query.id  ) { log.warn('require param: id'); return [] }

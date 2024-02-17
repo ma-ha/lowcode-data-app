@@ -368,21 +368,6 @@ async function init( ) {
     }
     cols[ cols.length - 1 ].width = w +'%'
 
-    // let states = await dta.getData( 'state', user.rootScopeId )
-    // let stateModel = states[ user.rootScopeId +'/'+ entityId ].state
-    // log.info( 'states', user.rootScopeId +'/'+ entityId, states, stateModel )
-    // let cnt = 0
-    // for ( let statesId in stateModel ) {
-    //   for ( let transitionId in stateModel[ statesId ].actions ) {
-    //     cols.push({ 
-    //       id: statesId+'_'+transitionId,  
-    //       label: ( statesId == 'null' ? transitionId : statesId+'>'+transitionId ),
-    //        width: "20%", cellType: "checkbox", editable: true
-    //       })
-    //     cnt ++
-    //   }
-    // }
-
     rows.push({
       id: 'AppEntityStatus', rowId: 'AppEntityStatus', title: 'App Entity Status',  height: '650px', 
       type : 'pong-table', resourceURL: 'app/entity/property/status-change', decor: 'decor', 

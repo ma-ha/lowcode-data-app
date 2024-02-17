@@ -12,7 +12,8 @@
       "Open": {
         "actions" : {
           "StartProgress": {
-            "to": "In Progress"
+            "label":"Start Progress",
+            "to": "InProgress"
           },
           "Reject": {
             "to": "Closed"
@@ -37,11 +38,11 @@
       },
       "Blocked" : {
         "actions" : {
+          "StartProgress": {
+            "to": "InProgress"
+          },
           "Unblock": {
             "to": "Open"
-          },
-          "StartProgress": {
-            "to": "In Progress"
           }
         }
       },

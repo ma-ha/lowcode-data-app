@@ -526,7 +526,11 @@
   width: fit-content;
   float: left;
 }
- /* ==================================================== */
+
+.StatusActionLink {
+  padding-right: 5px;
+}
+/* ==================================================== */
 
  .decor-tm-title,
  .ui-widget {

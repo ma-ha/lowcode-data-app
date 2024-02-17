@@ -7,6 +7,7 @@ const userDta    = require( '../persistence/app-dta-user' )
 const bodyParser = require( 'body-parser' )
 const helper     = require( '../helper/helper' )
 const propHandler = require( '../data/propertyHandler' )
+const { appRoot } = require( 'easy-web-app' )
 
 exports: module.exports = { 
   setupAPI  
@@ -41,6 +42,7 @@ async function setupAPI( app, oauthCfg ) {
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity', guiAuthz, getDocArr )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, getDoc )
   svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, addDoc )
+  svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/:recId/:actionId', guiAuthz, docStateChange )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/:recId/:event', guiAuthz, docEvent )
   svc.delete( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, delDoc )
 }
@@ -155,12 +157,16 @@ async function getDoc( req, res ) {
   let filter = extractFilter( req.query.dataFilter )
 
   let dataArr = await dta.getDataObjX( user.rootScopeId,  req.params.appId, req.params.appVersion, req.params.entityId, user.scopeId, null, filter )
+  let stateModel = null
+  if ( entity.stateModel ) {
+    stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
+  }
 
   let result = []
   for ( let rec of dataArr ) {
     let p =  req.params 
     let url =  'guiapp/'+p.tenantId+'/'+p.appId+'/'+p.appVersion+'/entity/'+p.entityId+'/'+rec.id
-    result.push( propHandler.reformatDataTableReturn( entity, rec, url )  )
+    result.push( propHandler.reformatDataTableReturn( entity, rec, url, stateModel )  )
   }
   // log.info( 'GET entity data', result )
   res.send( result )
@@ -194,6 +200,27 @@ async function addDoc( req, res )  {
   let result = await dta.addDataObj( dtaColl, rec.id, rec )
   // TODO check entity
   res.send( 'OK' )
+}
+
+
+async function docStateChange( req, res ) {
+  log.info( 'Add entity', req.params.tenantId, req.params.entityId, req.params.actionId, req.body.id  )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+
+  let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
+  let app = await dta.getAppById( appId )
+  if ( ! app ) { return res.send( 'ERROR: App not found') }
+  let entity = app.entity[ req.params.entityId ]
+  if ( ! entity ) { return res.send( 'ERROR: Entity not found') }
+
+  await dta.addDataObj( req.params.tenantId + req.params.entityId, req.body.id, req.body )
+
+  let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
+
+  let tabSel = '&Tabs'+ appIdX +'=Tab'+ req.params.entityId
+  let id = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
+  res.send( 'index.html?layout=AppEntity-nonav&id=' + id + tabSel )
 }
 
 

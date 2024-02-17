@@ -7,6 +7,7 @@ exports: module.exports = {
   genGuiTableFilterDef,
   genGuiTableColsDef,
   genGuiFormFieldsDef,
+  genGuiFormStateChangeDef,
   reformatDataReturn,
   genEmptyDataReturn,
   reformatDataTableReturn,
@@ -164,6 +165,110 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
   return cols
 }
 
+
+
+async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, rec, stateModel ) {
+  let fields = []
+
+  fields.push({ id: "id", label: "Id", type: "text", readonly: true, value: rec.id })
+  let stateId = stateTransition.split('_')[0] 
+  let actionId = stateTransition.split('_')[1] 
+  let newState = stateModel.state[ stateId ].actions[ actionId ].to
+  fields.push({ id: "_state", label: "New State", type: "text", readonly: true, value: newState})
+  fields.push({ id: "scopeId", label: "New State", type: "text", hidden: true, value: rec.scopeId })
+
+  for ( let propId in entity.properties ) {
+    if ( propId == 'id' ) { continue }
+    let prop = entity.properties[ propId ]
+    if ( prop.apiManaged ){ 
+      fields.push({ id: propId, label: lbl, type: "text", readonly: true, value: rec[ propId ] })
+      continue 
+    } 
+    let lbl  = ( prop.label ? prop.label : propId )
+    // console.log( 'LBL', lbl)
+
+    if ( stateTransition ) {
+      if ( ! prop.stateTransition || ! prop.stateTransition[ stateTransition ] ) {
+        if ( rec[ propId ] ) {
+          fields.push({ id: propId, label: lbl, type: "text", readonly: true, value: rec[ propId ] })
+        }
+        continue
+      }
+    }
+
+    let fld = null
+
+    switch ( prop.type ) {
+      case 'Boolean':
+        fld = { id: propId, label: lbl, type: 'checkbox', value: rec[ propId ] }
+        break 
+      case 'Date':
+        fld = { id: propId, label: lbl, type: 'date', value: rec[ propId ] }
+        break 
+      case 'Select':
+        fld = { id: propId, label: lbl, type: 'select', options: [] }
+        for ( let val of prop.options ) { fld.options.push({ option: val }) }
+        break 
+      case 'SelectRef':
+        fld = { id: propId, label: lbl, type: 'select', options: [] }
+        try {
+          let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
+          for ( let recId in opdTbl ) { 
+            fld.options.push({ option: recId }) 
+          }
+        } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
+        break 
+      case 'MultiSelectRef':
+        fld = { id: propId, label: lbl, type: 'select', options: [], multiple: true }
+        try {
+          let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
+          for ( let recId in opdTbl ) { 
+            fld.options.push({ option: recId }) 
+          }
+        } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
+        break 
+      case 'Ref': 
+        // TODO
+        break 
+      case 'RefArray':
+        // TODO
+        break 
+      case 'UUID':
+        fld = { id: propId, label: lbl, type: 'text', readonly: true }
+        break 
+      case 'Link': 
+        // do nothing
+        break 
+      case 'DocMap':
+        // do nothing
+        break 
+      case 'Event':
+        // do nothing
+        break 
+      case 'Metrics':
+        // do nothing
+        break 
+      case 'JSON':
+        fld = { id: propId, label: lbl, type: 'text', rows: 5, value: rec[ propId ] }
+        break 
+      default:   // String, Number
+        fld = { id: propId, label: lbl, type: 'text', value: rec[ propId ] }
+        break 
+    }
+
+    if ( filter && filter.field == propId ) {
+      fld.defaultVal = filter.value
+      fld.readonly   = "true" 
+    }
+    
+    if ( fld ) {
+      // cols.push({ formFields: [ fld ] })
+      fields.push( fld )
+    }
+  }
+  return [ { formFields: fields } ]
+}
+
 // ============================================================================
 
 function reformatDataReturn( entity, result  ) {
@@ -202,11 +307,32 @@ function genEmptyDataReturn( entity ) {
 }
 
 
-function reformatDataTableReturn( entity, rec, url  ) {
+function reformatDataTableReturn( entity, rec, url, stateModel  ) {
   let tblRec = { recId: rec.id }
-  log.debug( 'getDoc rec', rec )
-  if ( entity.stateModel ) {
-    tblRec[ '_state' ] = rec[ '_state' ]
+  log.debug( 'getDoc rec', rec, stateModel )
+  if ( stateModel ) {
+    tblRec[ '_state' ]= rec[ '_state' ]
+    let actions = []
+    let state = stateModel.state[ rec[ '_state' ] ]
+    if ( state ) {
+      for ( let actionId in state.actions ) {
+        let action =  state.actions[ actionId ]
+        let lnkTxt = ( action.label ? action.label : actionId ) +''
+        lnkTxt = lnkTxt.replaceAll( ' ', '&nbsp;' )
+        // TODO change to button
+        if ( action.icon ) {
+          let navId = url +'/'+ rec[ '_state' ] +'_'+ actionId
+          let lnk = '<span class="StatusActionLink"><a href="index.html?layout=AppEntityAction-nonav&id='+navId+'">'+ lnkTxt + '</a></span>'
+          actions.push( lnk )
+        } else {
+          let navId = url +'/'+ rec[ '_state' ] +'_'+ actionId
+          let lnk = '<span class="StatusActionLink"><a href="index.html?layout=AppEntityAction-nonav&id='+navId+'">'+ lnkTxt + '</a></span>'
+          actions.push( lnk )
+        }
+        
+      }
+    }
+    tblRec[ '_stateBtn' ] = actions.join( '' )
   }
 
   for ( let propId in entity.properties ) {

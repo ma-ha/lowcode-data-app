@@ -304,97 +304,22 @@
         "maintainer": [
           "appUser"
         ],
-        "properties": {}
-      },
-      "Ticket": {
-        "title": "",
-        "scope": "inherit",
-        "maintainer": [
-          "appUser"
-        ],
         "properties": {
-          "Task": {
+          "Name": {
             "type": "String",
-            "filter": true,
-            "stateTransition": {
-              "null_Create": true,
-              "Open_StartProgress": true,
-              "Open_Reject": true,
-              "Open_Blocked": true,
-              "InProgress_StopProgress": true,
-              "InProgress_SetBlocked": true,
-              "Blocked_Unblock": true,
-              "Blocked_StartProgress": true,
-              "Review_Reopen": true,
-              "Closed_Reopen": true
-            }
+            "filter": true
           },
-          "Description": {
+          "Address": {
             "type": "String",
-            "stateTransition": {
-              "null_Create": true,
-              "Open_StartProgress": true,
-              "Open_Reject": true,
-              "Open_Blocked": true,
-              "InProgress_Done": true,
-              "InProgress_StopProgress": true,
-              "InProgress_SetBlocked": true,
-              "Blocked_Unblock": true,
-              "Blocked_StartProgress": true,
-              "Closed_Reopen": true
-            }
-          },
-          "Assignee": {
-            "type": "String",
-            "filter": true,
-            "stateTransition": {
-              "null_Create": true,
-              "Open_StartProgress": true,
-              "Open_Reject": true,
-              "Open_Blocked": true,
-              "InProgress_Done": true,
-              "InProgress_StopProgress": true,
-              "InProgress_SetBlocked": true,
-              "Blocked_Unblock": true,
-              "Blocked_StartProgress": true,
-              "Review_Reopen": true,
-              "Review_Close": true,
-              "Closed_Reopen": true
-            }
-          },
-          "Resolution": {
-            "type": "String",
-            "stateTransition": {
-              "null_Create": false,
-              "Open_StartProgress": false,
-              "InProgress_Resolve": true,
-              "InProgress_Done": true,
-              "Review_Reopen": true,
-              "InProgress_SetBlocked": true,
-              "InProgress_StopProgress": true,
-              "Blocked_Unblock": true,
-              "Blocked_StartProgress": true,
-              "Closed_Reopen": true
-            }
-          },
-          "Approval": {
-            "type": "String",
-            "stateTransition": {
-              "null_Create": false,
-              "Review_Close": true,
-              "Closed_Reopen": true
-            }
+            "filter": true
           }
-        },
-        "noEdit": true,
-        "stateModel": "Ticket"
+        }
       }
     },
     "startPage": [
       "DeviceOrder",
       "Invoice",
-      "Customer",
-      "Ticket"
+      "Customer"
     ],
     "role": [
       "appUser"
@@ -697,6 +622,112 @@
       "appUser"
     ],
     "scope": {
+      "#city": {
+        "role": [
+          "appUser"
+        ]
+      }
+    }
+  },
+  "1000/ticket-mgr/1.0.0": {
+    "require": {},
+    "entity": {
+      "Ticket": {
+        "title": "Ticket",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "Task": {
+            "type": "String",
+            "filter": true,
+            "stateTransition": {
+              "null_Create": true,
+              "Open_Reject": true,
+              "Open_Blocked": true,
+              "InProgress_StopProgress": true,
+              "InProgress_SetBlocked": true,
+              "Blocked_Unblock": true,
+              "Blocked_StartProgress": true,
+              "Review_Reopen": true,
+              "Closed_Reopen": true
+            }
+          },
+          "Description": {
+            "type": "String",
+            "stateTransition": {
+              "null_Create": true,
+              "Open_StartProgress": true,
+              "Open_Reject": true,
+              "Open_Blocked": true,
+              "InProgress_Done": true,
+              "InProgress_StopProgress": true,
+              "InProgress_SetBlocked": true,
+              "Blocked_Unblock": true,
+              "Blocked_StartProgress": true,
+              "Closed_Reopen": true
+            }
+          },
+          "Assignee": {
+            "type": "String",
+            "filter": true,
+            "stateTransition": {
+              "null_Create": true,
+              "Open_StartProgress": true,
+              "Open_Reject": true,
+              "Open_Blocked": true,
+              "InProgress_Done": true,
+              "InProgress_StopProgress": true,
+              "InProgress_SetBlocked": true,
+              "Blocked_Unblock": true,
+              "Blocked_StartProgress": true,
+              "Review_Reopen": true,
+              "Review_Close": true,
+              "Closed_Reopen": true
+            }
+          },
+          "Resolution": {
+            "type": "String",
+            "stateTransition": {
+              "null_Create": false,
+              "InProgress_Resolve": true,
+              "InProgress_Done": true,
+              "Review_Reopen": true,
+              "InProgress_SetBlocked": true,
+              "InProgress_StopProgress": true,
+              "Blocked_Unblock": true,
+              "Blocked_StartProgress": true,
+              "Closed_Reopen": true
+            }
+          },
+          "Approval": {
+            "type": "String",
+            "stateTransition": {
+              "null_Create": false,
+              "Review_Close": true,
+              "Closed_Reopen": true
+            }
+          }
+        },
+        "stateModel": "Ticket"
+      }
+    },
+    "page": {},
+    "startPage": [
+      "Ticket"
+    ],
+    "scopeId": null,
+    "title": "Ticket Manager",
+    "role": [
+      "appUser"
+    ],
+    "scope": {
+      "#region": {
+        "role": [
+          "appUser"
+        ]
+      },
       "#city": {
         "role": [
           "appUser"

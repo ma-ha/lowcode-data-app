@@ -312,15 +312,9 @@ async function getAppForCustomize( req, res )  {
   log.debug( 'GET app/customize' )
   let { allOK, user, app, appId } = await checkUserApp( req, res )
   if ( ! allOK ) { return }
-  // let user = await userDta.getUserInfoFromReq( gui, req )
-  // if ( ! user ) { return res.status(401).send( 'login required' ) }
-  // if ( ! req.query.id ) { return res.status(400).send( 'id required' ) }
-  // let app = await dta.getAppById( req.query.id )
-  // if ( ! app ) { return res.status(400).send( 'for found' ) }
-  // let appId = req.query.id
 
   let cApp = {
-    appId : appId.substring( appId.indexOf('/') + 1 ),
+    appId : appId,  // appId.substring( appId.indexOf('/') + 1 ),
     name  : app.title,
     scope : ( app.scopeId ? app.scopeId : '-' ),
     tags  : getTagsCSV( app.scope ),
@@ -346,7 +340,10 @@ function getTagsCSV( scope ) {
 async function addApp( req, res ) {
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
-  let appId =  user.scopeId +'/'+ req.body.appId
+  let appId = req.body.appId
+  if ( ! appId.startsWith( user.rootScopeId ) ) {
+    appId =  user.scopeId +'/'+ appId
+  }
   log.info( 'POST /app', req.body )
   let app = await dta.getAppById( appId )
   if ( ! app ) {
@@ -386,13 +383,7 @@ async function getEntity( req, res )  {
   log.info( 'GET entity',  req.query )
   let { allOK, user, app, appId } = await checkUserApp( req, res )
   if ( ! allOK ) { return }
-  // let user = await userDta.getUserInfoFromReq( gui, req )
-  // if ( ! user ) { return res.status(401).send( 'login required' ) }
-
-  // let appId = ( req.query.appId ? req.query.appId : req.query.id )
-  // let app = await dta.getAppById( appId )
-  // if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send([]) }
-
+ 
   if (  req.query.appId &&  req.query.entityId && ! req.query.scope  ) { // get by id 
   
     if ( app.entity[ req.query.entityId ] ) {
@@ -442,11 +433,6 @@ async function addEntity( req, res ) {
   let { allOK, user, app, appId } = await checkUserApp( req, res )
   if ( ! allOK ) { return }
 
-  // let user = await userDta.getUserInfoFromReq( gui, req )
-  // if ( ! user ) { return res.status(401).send( 'login required' ) }
-
-  // let app = await dta.getAppById( req.body.appId )
-  // if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send("App Id not found") }
   if ( ! app.startPage ) { app.startPage = [] }
 
   let newEntity = {
@@ -492,19 +478,10 @@ async function delEntity( req, res ) {
   let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
   if ( ! allOK ) { return }
 
-  // let user = await userDta.getUserInfoFromReq( gui, req )
-  // if ( ! user ) { return res.status(401).send( 'login required' ) }
-  // if ( ! req.query.appId || ! req.query.entityId ) { return res.status(401).send( 'appId and entityId required' ) }
-
-  // let app = await dta.getAppById( req.query.appId )
-  // if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send("App not found") }
-  // if ( app.entity[ req.query.entityId ] ) {
   delete app.entity[ entityId ]
   await dta.saveApp( appId, app )
   res.send( 'Entity deleted!')
-  // } else { 
-  //   return res.status(401).send( 'Entity not found' )
-  // }
+  
 }
 
 // --------------------------------------------------------------------------
@@ -514,14 +491,6 @@ async function getProperty( req, res ) {
   let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
   if ( ! allOK ) { return }
 
-  // let appId = ( req.query.appId ? req.query.appId : req.query.id.split(',')[0] )
-  // if ( ! appId ) { return res.status(400).send([]) }
-  // let entityId = ( req.query.entityId ? req.query.entityId : req.query.id.split(',')[1] )
-  // let app = await dta.getAppById( appId )
-  // // log.info( 'GET /app/entity/property', appId, entityId, app )
-  // if ( ! app ) { log.warn('GET entity: /app/entity/property not found'); return res.status(400).send([]) }
-  // if ( ! app.entity ) { app.entity = {} }
-  // if ( ! app.entity[ entityId ] ) {  log.warn('GET /app/entity/property: app entity not found'); return res.status(400).send([]) }
   if ( req.query.propId && ! req.query.id ) { // property by id
     let dbProp = app.entity[ entityId ].properties[ req.query.propId ]
     if ( ! dbProp ) { return res.send( null ) }
@@ -794,15 +763,6 @@ async function delProperty( req, res ) {
   let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
   if ( ! allOK ) { return }
 
-  // let user = await userDta.getUserInfoFromReq( gui, req )
-  // if ( ! user ) { return res.status(401).send( 'login required' ) }
-  // if ( ! req.query.appId || ! req.query.entityId || ! req.query.propId ) { 
-  //   return res.status(401).send( 'appId and entityId required' ) 
-  // }
-
-  // let app = await dta.getAppById( appId )
-  // if ( ! app ) { log.warn('GET entity: app not found'); return res.status(400).send("App not found") }
-  // if ( app.entity[ req.query.entityId ] ) {
   if ( entity.properties[ req.query.propId ] ) {
     delete entity.properties[ req.query.propId ]
     await dta.saveApp( appId, app )
@@ -810,9 +770,6 @@ async function delProperty( req, res ) {
   }  else { 
     return res.status(401).send( 'Property not found' )
   }
-  // } else { 
-  //   return res.status(401).send( 'Entity not found' )
-  // }
 }
 
 // ============================================================================

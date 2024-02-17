@@ -9,6 +9,10 @@ It starts with a generic, secure **web gui**.
 **Entities** can be **defined on-the-fly**, as well as their relationship.
 Web forms and lists are generated to maintain data (documents) of this entities.
 
+THe entities can be attached to powerful **State Model** (see "Ticket" example). 
+For all state transitions an "Action" and all data fields fot the transition form can
+be defined. 
+
 All data, users and authorizations are within **hierarchical scopes** (like tenants).
 Entity definitions and data can be inherited to lower hierarchy scopes.
 A web gui user can switch the scope in the gui.
@@ -101,6 +105,8 @@ So relations are
 - **1:n** = `DocMap`
 - **n:1** = `SelectRef`
 - **n:m** = `MultiSelectRef`
+
+Entities can be attached to a "State Model". 
 
 Property features:
 - you can select a property for the data table filter
