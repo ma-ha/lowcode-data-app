@@ -5,6 +5,7 @@ const apiSec     = require( './api-sec' )
 const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
 const appImport  = require( './api-app-import' )
+const propHandler= require( '../data/propertyHandler' )
 
 exports: module.exports = { 
   setupAPI
@@ -501,35 +502,11 @@ async function getProperty( req, res ) {
       type     :  dbProp.type,
       label    : ( dbProp.label ? dbProp.label : '' ),
       filter   : ( dbProp.filter ? true : false ),
+      noEdit     : ( dbProp.noEdit  === true ? true : false ),
+      noTable    : ( dbProp.noTable === true ? true : false ),
       apiManaged : ( dbProp.apiManaged ? true : false ),
     }
-    switch ( dbProp.type ) {
-      case 'Select':
-        prop.ref = dbProp.options.join()
-        break 
-      case 'SelectRef':
-        prop.ref  = dbProp.selectRef
-        break 
-      case 'MultiSelectRef':
-        prop.ref  = dbProp.multiSelectRef
-        break 
-      case 'DocMap':
-        prop.ref  = dbProp.docMap
-        break 
-      case 'Ref':
-        prop.ref  = dbProp.ref
-        break 
-      case 'RefArray':
-        prop.ref  = dbProp.refArray
-        break 
-      case 'Link':
-        prop.ref  = dbProp.link
-        break 
-      case 'Event':
-        prop.ref  = dbProp.event
-        break 
-      default: break 
-    }
+    propHandler.setPropRef( prop, dbProp )
 
     return res.send( prop )
   } 
@@ -539,35 +516,9 @@ async function getProperty( req, res ) {
   let propArr = []
   for ( let propId in app.entity[ entityId ].properties ) {
     let prop = app.entity[ entityId ].properties[ propId ]
-    let pType = ( prop.type ? prop.type : "?" )
-    
-    switch ( pType ) {
-      case 'Select':
-        pType = "Select: ["+prop.options.join()+']'
-        break 
-      case 'SelectRef':
-        pType = "SelectRef: " + genLink( 'AppEntityProperties-nonav', prop.selectRef ) 
-        break 
-      case 'MultiSelectRef':
-        pType = "MultiSelectRef: " + genLink( 'AppEntityProperties-nonav', prop.multiSelectRef ) 
-        break 
-      case 'DocMap':
-        pType = "DocMap: " + genLink( 'AppEntityProperties-nonav',  prop.docMap )
-        break 
-      case 'Ref':
-        pType = "Ref: "+ + genLink( 'AppEntityProperties-nonav', prop.ref ) 
-        break 
-      case 'RefArray':
-        pType = "RefArray: "+prop.refArray
-        break 
-      case 'Link':
-        pType = "Link: "+prop.link
-        break 
-      case 'Event':
-        pType = 'Event: '+prop.event
-        break 
-      default: break 
-    }
+   
+    let pType = propHandler.getpropTypeDef( prop )
+   
     propArr.push({
       appId    : appId,
       entityId : entityId,
@@ -576,7 +527,8 @@ async function getProperty( req, res ) {
       type     : pType,
       filter   : ( prop.filter   ? true : false ),
       api      : ( prop.apiManaged ? true : false ),
-
+      noEdit   : ( prop.noEdit  ? true : false ),
+      noTable  : ( prop.noTable ? true : false )
     })
   }
   res.send( propArr )
@@ -668,7 +620,10 @@ async function addProperty ( req, res ) {
   let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
   if ( ! allOK ) { return }
 
-  entity.properties[ id ] = { }
+  if ( !  entity.properties[ id ] )  {
+    entity.properties[ id ] = {}
+  }
+ 
   if ( req.body.label ) { entity.properties[ id ].label = req.body.label }
   entity.properties[ id ].type = req.body.type 
 
@@ -684,73 +639,19 @@ async function addProperty ( req, res ) {
     delete entity.properties[ id ].apiManaged
   }
 
-  // special types need additional info
-  if ( req.body.type == 'Select' ) {
-
-    entity.properties[ id ].options = req.body.ref.split(',')
-
-  } else   if ( req.body.type == 'Link' ) {
-
-    entity.properties[ id ].link = req.body.ref
-
-  } else   if ( req.body.type == 'Event' ) {
-
-    entity.properties[ id ].event = req.body.ref
-
-  } else if ( ['DocMap','SelectRef','MultiSelectRef','RefArray','Ref'].includes(  req.body.type ) ) {
-
-    if ( ! req.body.ref ) {
-      return res.status(400).send( '"ref" is required' ) 
-    }
-    let p = req.body.ref.split('/')
-    if ( req.body.type == 'DocMap'  ) { 
-      if ( p.length != 5 ) {
-        return res.status(400).send( '"ref" format must be like  "scope/app/version/entity/prop"' ) 
-      }
-    } else if ( p.length != 4 ) { // shpuld be  scope/app/version/entity
-      return res.status(400).send( '"ref" format must be like  "scope/app/version/entity"' ) 
-    }
-    let refAppId    = p[0] +'/'+ p[1] +'/'+ p[2]
-    let refEntityId = p[3]
-    let refApp =  await dta.getAppById( refAppId )
-    if ( ! refApp ) {
-      return res.status(400).send( '"ref" app "'+refAppId+'" not found' ) 
-    }
-    if ( ! refApp.entity[ refEntityId] ) {
-      refApp.entity[ refEntityId ] = {
-        title : refEntityId,
-        scope : 'inherited',
-        maintainer : ['appUser'],
-        properties : {}
-      }
-      addResultTxt += ', created new entity "'+ req.body.ref + '"'
-    }
-    switch ( req.body.type ) {
-      case 'DocMap':
-        let refPropertyId = p[4]
-        if ( ! refApp.entity[ refEntityId ].properties[ refPropertyId ] ) {
-          refApp.entity[ refEntityId ].properties[ refPropertyId ] = {
-            type: "String"
-          }
-          addResultTxt += ', created property "'+ refPropertyId + '"'
-        }
-        entity.properties[ id ].docMap = req.body.ref
-        break
-      case 'SelectRef':
-        entity.properties[ id ].selectRef = req.body.ref
-        break
-      case 'MultiSelectRef':
-        entity.properties[ id ].multiSelectRef = req.body.ref
-        break
-      case 'RefArray':
-        entity.properties[ id ].refArray = req.body.ref
-        break
-      case 'Ref':
-        entity.properties[ id ].ref = req.body.ref
-        break
-      default: break
-    }
+  if ( req.body.noEdit  ) { 
+    entity.properties[ id ].noEdit = true 
+  } else {
+    delete entity.properties[ id ].noEdit
   }
+  if ( req.body.noTable ) { 
+    entity.properties[ id ].noTable = true 
+  } else {
+    delete entity.properties[ id ].noTable
+  }
+
+  await propHandler.addNewPropertyDef( entity.properties[ id ], req.body.type, req.body.ref )
+ 
   log.info( 'addProperty e', entity.properties[ id ] )
 
   await dta.saveApp( req.body.appId, app )

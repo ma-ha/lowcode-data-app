@@ -9,6 +9,8 @@ let lowCodeApp = require( './index' )
 lowCodeApp.init({
   // file based persistence goes into this folder
   DATA_DIR : '../dta/',
+  
+  //CSS_PATH : '/var/www/custom-css'
 
   // in stand alone mode you should set this three params
   GUI_URL  : 'http://localhost:8888/app/',

@@ -4,6 +4,9 @@ const dta     = require( '../persistence/app-dta' )
 // All property type specific handling is done here
 
 exports: module.exports = {
+  setPropRef,
+  getpropTypeDef,
+  addNewPropertyDef,
   genGuiTableFilterDef,
   genGuiTableColsDef,
   genGuiFormFieldsDef,
@@ -12,6 +15,144 @@ exports: module.exports = {
   genEmptyDataReturn,
   reformatDataTableReturn,
   reformatDataUpdateInput
+}
+
+// ============================================================================
+
+
+function setPropRef( prop, dbProp ) {
+  switch ( dbProp.type ) {
+    case 'Select':
+      prop.ref = dbProp.options.join()
+      break 
+    case 'SelectRef':
+      prop.ref  = dbProp.selectRef
+      break 
+    case 'MultiSelectRef':
+      prop.ref  = dbProp.multiSelectRef
+      break 
+    case 'DocMap':
+      prop.ref  = dbProp.docMap
+      break 
+    case 'Ref':
+      prop.ref  = dbProp.ref
+      break 
+    case 'RefArray':
+      prop.ref  = dbProp.refArray
+      break 
+    case 'Link':
+      prop.ref  = dbProp.link
+      break 
+    case 'Event':
+      prop.ref  = dbProp.event
+      break 
+    default: break 
+  }
+}
+
+
+function getpropTypeDef( prop ) {
+  let pType = ( prop.type ? prop.type : "?" )
+  switch ( pType ) {
+    case 'Select':
+      pType = "Select: ["+prop.options.join()+']'
+      break 
+    case 'SelectRef':
+      pType = "SelectRef: " + genLink( 'AppEntityProperties-nonav', prop.selectRef ) 
+      break 
+    case 'MultiSelectRef':
+      pType = "MultiSelectRef: " + genLink( 'AppEntityProperties-nonav', prop.multiSelectRef ) 
+      break 
+    case 'DocMap':
+      pType = "DocMap: " + genLink( 'AppEntityProperties-nonav',  prop.docMap )
+      break 
+    case 'Ref':
+      pType = "Ref: "+ + genLink( 'AppEntityProperties-nonav', prop.ref ) 
+      break 
+    case 'RefArray':
+      pType = "RefArray: "+prop.refArray
+      break 
+    case 'Link':
+      pType = "Link: "+prop.link
+      break 
+    case 'Event':
+      pType = 'Event: '+prop.event
+      break 
+    default: break 
+  }
+  return pType
+}
+
+
+async function addNewPropertyDef( prop, type, ref  ) {
+
+  // special types need additional info
+  if ( type == 'Select' ) {
+
+    prop.options = ref.split(',')
+
+  } else   if ( type == 'Link' ) {
+
+    prop.link = ref
+
+  } else   if ( type == 'Event' ) {
+
+    prop.event = ref
+
+  } else if ( ['DocMap','SelectRef','MultiSelectRef','RefArray','Ref'].includes(  type ) ) {
+
+    if ( ! ref ) {
+      return res.status(400).send( '"ref" is required' ) 
+    }
+    let p = ref.split('/')
+    if ( type == 'DocMap'  ) { 
+      if ( p.length != 5 ) {
+        return res.status(400).send( '"ref" format must be like  "scope/app/version/entity/prop"' ) 
+      }
+    } else if ( p.length != 4 ) { // shpuld be  scope/app/version/entity
+      return res.status(400).send( '"ref" format must be like  "scope/app/version/entity"' ) 
+    }
+    let refAppId    = p[0] +'/'+ p[1] +'/'+ p[2]
+    let refEntityId = p[3]
+    let refApp =  await dta.getAppById( refAppId )
+    if ( ! refApp ) {
+      return res.status(400).send( '"ref" app "'+refAppId+'" not found' ) 
+    }
+    if ( ! refApp.entity[ refEntityId] ) {
+      refApp.entity[ refEntityId ] = {
+        title : refEntityId,
+        scope : 'inherited',
+        maintainer : ['appUser'],
+        properties : {}
+      }
+      addResultTxt += ', created new entity "'+ ref + '"'
+    }
+    switch ( type ) {
+      case 'DocMap':
+        let refPropertyId = p[4]
+        if ( ! refApp.entity[ refEntityId ].properties[ refPropertyId ] ) {
+          refApp.entity[ refEntityId ].properties[ refPropertyId ] = {
+            type: "String"
+          }
+          addResultTxt += ', created property "'+ refPropertyId + '"'
+        }
+        prop.docMap = ref
+        break
+      case 'SelectRef':
+        prop.selectRef = ref
+        break
+      case 'MultiSelectRef':
+        prop.multiSelectRef = ref
+        break
+      case 'RefArray':
+        prop.refArray = ref
+        break
+      case 'Ref':
+        prop.ref = ref
+        break
+      default: break
+    }
+  }
 }
 
 // ============================================================================
@@ -45,6 +186,7 @@ function genGuiTableColsDef( entityMap ) {
   let cols = []
   for ( let propId in entityMap ) {
     let prop =  entityMap[ propId ]
+    if ( prop.noTable ) { continue }
     let label = ( prop.label ? prop.label : propId )
 
     if ( propId == 'id' ) { continue }
@@ -83,7 +225,8 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
-    if ( prop.apiManaged ){ continue } 
+    if ( prop.apiManaged ) { continue } 
+    if ( prop.noEdit     ) { continue }
     let lbl  = ( prop.label ? prop.label : propId )
     // console.log( 'LBL', lbl)
 

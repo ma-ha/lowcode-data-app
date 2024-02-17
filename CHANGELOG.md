@@ -2,6 +2,7 @@
 - State model for entities
 - Option to hide edit dialog for entity
 - Refactor API/GUI: centralize property handling
+- Exclude properties from from or  table
 
 # 0.7.2
 - ext. data API

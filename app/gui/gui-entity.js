@@ -251,7 +251,7 @@ function genTblColsConfig( entityId, entity ) {
     cols.push({ id: '_stateBtn', label: "",  cellType: "text", width:'10%' })
   }
 
-  if ( ! entity.noEdit ) {
+  if ( ! entity.noEdit && ! entity.stateModel ) {
     cols.push({ id: 'Del', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-trash', 
               method: "DELETE", update: [ { resId : 'EntityList'+entityId } ], target: "modal" })
   }

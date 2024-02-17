@@ -224,7 +224,7 @@ async function init( ) {
     let appId = ids.split(',')[0]
     log.info( appId )
     if ( ! appId ) { return [] }
-    let app = await dta.getAppById( appId )
+    let app = await dta.getAppById( appId ) 
     if ( ! app ) { return [] }
     
     let entityId = ids.split(',')[1]
@@ -260,8 +260,10 @@ async function init( ) {
           { id: "propId",  label: "Id",       width: "20%", cellType: "text" },
           { id: "label",   label: "Label",    width: "20%", cellType: "text" },
           { id: "type",    label: "Type",     width: "40%", cellType: "text" },
-          { id: "filter",  label: "Filter",   width: "5%",  cellType: "checkbox" },
-          { id: "api",     label: "API Managed",   width: "5%",  cellType: "checkbox" },
+          { id: "filter",  label: "Filter",     width: "5%",  cellType: "checkbox" },
+          { id: "api",     label: "API Managed",width: "5%", cellType: "checkbox" },
+          { id: "noTable", label: "No Table",   width: "5%", cellType: "checkbox" },
+          { id: "noEdit",  label: "No Edit",    width: "5%", cellType: "checkbox" },
           { id: 'Del', label: "&nbsp;", cellType: "button", width :'8%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" }
         ]
@@ -291,9 +293,12 @@ async function init( ) {
             { id: "ref", label: "Ref", type: "text", options: refOptions } ]},
           { formFields: [ { id: "filter",  label: "Filter", type: "checkbox" },
                           { id: "apiManaged",  label: "API managed", type: "checkbox",
-                            descr: "will not appear in the GUI form" }
-          ]}
-          ] }],
+                            descr: "will not appear in the GUI form" } ]},
+          { formFields: [ { id: "noTable",  label: "No Table", type: "checkbox",
+                            descr: "Will not appear in the Table." },
+                          { id: "noEdit",  label: "No Edit", type: "checkbox",
+                            descr: "Will not appear in the GUI form." } ]} 
+        ] }],
         actions : [ 
           { id: "AddFormBtn", actionName: "Add / Update", actionURL: 'app/entity/property', 
             update: [{ resId:'AppEntityProp' }], target: "modal" }

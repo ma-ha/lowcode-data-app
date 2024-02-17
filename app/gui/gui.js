@@ -32,7 +32,11 @@ function init( appConfig ) {
 
   // api.initAPI( gui.getExpress() )
 
-  gui.getExpress().use( '/css-custom', express.static( __dirname + '/css' ) )
+  if ( cfg.CSS_PATH ) {
+    gui.getExpress().use( '/css-custom', express.static( cfg.CSS_PATH  ) )
+  } else {
+    gui.getExpress().use( '/css-custom', express.static( __dirname + '/css' ) )
+  }
   gui.getExpress().use( '/ext-module', express.static( __dirname + '/ext-module' ) )
 
   // gui.getExpress().use( '/content', express.static( __dirname + '/serve-html' ) )

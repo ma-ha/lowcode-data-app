@@ -9,9 +9,9 @@ It starts with a generic, secure **web gui**.
 **Entities** can be **defined on-the-fly**, as well as their relationship.
 Web forms and lists are generated to maintain data (documents) of this entities.
 
-THe entities can be attached to powerful **State Model** (see "Ticket" example). 
-For all state transitions an "Action" and all data fields fot the transition form can
-be defined. 
+A powerful **State Model** can optionally be attached to a entities (see "Task List" example). 
+For the state transitions an "Action" is defined, e.g. "Start Progress". 
+Relevant data fields for each state transition form can be selected. 
 
 All data, users and authorizations are within **hierarchical scopes** (like tenants).
 Entity definitions and data can be inherited to lower hierarchy scopes.
@@ -170,3 +170,4 @@ Simple color scheme changes can be done easily, just focus on the 1st 15 lines i
 - [ ] Event filter
 - [ ] toggle rec delete button
 - [ ] Metrics field type
+- [ ] State model editor and JSON import/export

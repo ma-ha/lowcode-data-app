@@ -310,6 +310,7 @@
             "filter": true
           },
           "Address": {
+            "label": "Address",
             "type": "String",
             "filter": true
           }
@@ -689,6 +690,7 @@
           },
           "Resolution": {
             "type": "String",
+            "noEdit": true,
             "stateTransition": {
               "null_Create": false,
               "InProgress_Resolve": true,
@@ -703,11 +705,13 @@
           },
           "Approval": {
             "type": "String",
+            "noTable": true,
             "stateTransition": {
               "null_Create": false,
               "Review_Close": true,
               "Closed_Reopen": true
-            }
+            },
+            "noEdit": true
           }
         },
         "stateModel": "Ticket"
@@ -718,7 +722,7 @@
       "Ticket"
     ],
     "scopeId": null,
-    "title": "Ticket Manager",
+    "title": "Task List",
     "role": [
       "appUser"
     ],

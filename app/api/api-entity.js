@@ -196,6 +196,19 @@ async function addDoc( req, res )  {
   if ( parse.err ) {
     return res.status(400).send( parse.err )
   }
+  // remove API managed properties
+  for ( let propId in entity.properties ) {
+    if ( entity.properties[ propId ].apiManaged  && rec[ propId ] ) {
+      delete rec[ propId ]
+    }
+  }
+  // complete data set with property data from DB
+  let dbRec = await  dta.getDataById( dtaColl, rec.id ) 
+  for ( let propId in dbRec ) {
+    if ( ! rec[ propId ] ) {
+      rec[ propId ] = dbRec[ propId ]
+    }
+  }
 
   let result = await dta.addDataObj( dtaColl, rec.id, rec )
   // TODO check entity
