@@ -1,4 +1,4 @@
-# 0.8.0
+# 0.8.0/1
 - State model for entities
 - Option to hide edit dialog for entity
 - Refactor API/GUI: centralize property handling

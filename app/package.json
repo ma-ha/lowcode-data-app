@@ -1,6 +1,6 @@
 {
   "name": "lowcode-data-app",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "LowCode App Environment",
   "main": "app.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "axios": "^0.21.4",
     "body-parser": "^1.19.0",
     "bunyan": "^1.8.15",
-    "easy-web-app": "^2.9.12",
+    "easy-web-app": "^2.9.13",
     "express-fileupload": "^1.4.3",
     "jsonwebtoken": "^9.0.2"
   },
@@ -22,17 +22,19 @@
     "url": "https://github.com/ma-ha/lowcode-data-app.git"
   },
   "keywords": [
+    "API",
+    "Entity Relationship Model",
+    "Engine",
+    "ERM",
+    "Event Hub",
+    "data",
     "GUI",
     "lowcode",
     "low code",
-    "data",
-    "ERM",
-    "Entity Relationship Model",
-    "REST",
-    "RESTful",
-    "API",
-    "Event Hub",
     "OpenID Connect",
-    "OICD"
+    "OICD",
+    "Platform",
+    "REST",
+    "RESTful"
   ]
 }
