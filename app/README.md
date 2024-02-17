@@ -7,6 +7,10 @@ It starts with a generic, secure **web gui**.
 **Entities** can be **defined on-the-fly**, as well as their relationship.
 Web forms and lists are generated to maintain data (documents) of this entities.
 
+A powerful **State Model** can optionally be attached to a entities (see "Task List" example). 
+For the state transitions an "Action" is defined, e.g. "Start Progress". 
+Relevant data fields for each state transition form can be selected. 
+
 All data, users and authorizations are within **hierarchical scopes** (like tenants).
 Entity definitions and data can be inherited to lower hierarchy scopes.
 A web gui user can switch the scope in the gui.
@@ -31,11 +35,13 @@ All **operations are exposed as API**, e.g. for the adapters.
 
 Open http://localhost:8888/app/index.html
 
-Login with user `demo` and password `demo`
+Login with user `demo` and password `demo`. 
+
+A sample "database" is initialized already, so you should see already some apps, entities and data.
 
 # Sample code 
 
-Standalone mode:
+Standalone mode using it as npm package: https://www.npmjs.com/package/lowcode-data-app
 
     let lowCodeApp = require( 'lowcode-data-app' )
 
@@ -45,7 +51,7 @@ Standalone mode:
       URL_PATH : '/app',
       OIDC_SERVER : true
     })
-    
+
 ## Getting Started With Empty DB
 
 ### Create User
@@ -92,9 +98,16 @@ Data types (and their Web GUI mapping)
 - `Event` (link to send an event. Ref can have a simple condition to render the link, e.g. "status == ready" or "status != in progress,done")
 
 So relations are
-- **1:n** = `docMap`
-- **n:1**= `selectRef`
-- **n:m** = `multiSelectRef`
+- **1:n** = `DocMap`
+- **n:1** = `SelectRef`
+- **n:m** = `MultiSelectRef`
+
+Entities can be attached to a "State Model". 
+
+Property features:
+- you can select a property for the data table filter
+- you can define a property as "API managed", means zou will see it only in the table, 
+  but there is no input available in the add/change GUI form
 
 # Integration 
 
