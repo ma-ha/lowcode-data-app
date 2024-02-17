@@ -24,7 +24,10 @@
       },
       "InProgress" : {
         "actions" : {
-          "Reopen": {
+          "Done": {
+            "to": "Review"
+          },
+          "StopProgress": {
             "to": "Open"
           },
           "SetBlocked": {
@@ -46,6 +49,9 @@
         "actions" : {
           "Reopen": {
             "to": "Open"
+          },
+          "Close": {
+            "to": "Closed"
           }
         }
       },

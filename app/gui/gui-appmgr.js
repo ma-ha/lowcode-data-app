@@ -333,6 +333,8 @@ async function init( ) {
     let app = await dta.getAppById( appId )
     if ( ! app ) { return [] }
     let entityId = ids.split(',')[1]
+    let entity = app.entity[ entityId ]
+    if ( ! entity ) { return [] }
     
     // Entity info:
     let rows = [{ 
@@ -346,31 +348,47 @@ async function init( ) {
           // { formFields: [{ id: "name", label: "Name", type: "text", defaultVal: app.title, readonly: true } ]},
           { formFields: [{ id: "name", label: "Entity Id", type: "text", defaultVal: entityId, readonly: true } ]},
           { formFields: [{ id: "title", label: "Entity Title", type: "text", defaultVal: entityId, readonly: true } ]},
-          { formFields: [{ id: "lnk", label: "", linkText:"Back to Entities", type: "link", defaultVal: "index.html?layout=AppEntities-nonav&id="+appId } ]},
-          { formFields: [{ id: "ermLnk", linkText:"Show Data Model", type: "link", defaultVal: 'index.html?layout=ERM-nonav' }] }
+          { formFields: [{ id: "lnk", label: "", linkText:"Back to Entities", type: "link", defaultVal: "index.html?layout=AppEntities-nonav&id="+appId } ]}
         ] }]
       }
     }]
 
-    let cols = [ { id: "propId", label: "Property", width: "20%", cellType: "text" } ]
+    let cols = [ { id: "transition", label: "State Change", width: "15%", cellType: "text" } ]
 
-    let states = await dta.getData( 'state', user.rootScopeId )
-    let stateModel = states[ user.rootScopeId +'/'+ entityId ].state
-    log.info( 'states', user.rootScopeId +'/'+ entityId, states, stateModel )
-    let cnt = 0
-    for ( let statesId in stateModel ) {
-      for ( let transitionId in stateModel[ statesId ].actions ) {
-        cols.push({ id: statesId+'_'+transitionId,  label: statesId+'/'+transitionId, width: "20%", cellType: "text" })
-        cnt ++
-      }
+    let w = 85
+    for ( let propId in entity.properties ) {
+      let prop = entity.properties[ propId ]
+      cols.push({ 
+        id       : 'prop/' + propId,  
+        label    : ( prop.label ? prop.label : propId ),
+        width    : "5%", 
+        cellType : "checkbox", editable: true
+      })
+      w -= 5
     }
+    cols[ cols.length - 1 ].width = w +'%'
+
+    // let states = await dta.getData( 'state', user.rootScopeId )
+    // let stateModel = states[ user.rootScopeId +'/'+ entityId ].state
+    // log.info( 'states', user.rootScopeId +'/'+ entityId, states, stateModel )
+    // let cnt = 0
+    // for ( let statesId in stateModel ) {
+    //   for ( let transitionId in stateModel[ statesId ].actions ) {
+    //     cols.push({ 
+    //       id: statesId+'_'+transitionId,  
+    //       label: ( statesId == 'null' ? transitionId : statesId+'>'+transitionId ),
+    //        width: "20%", cellType: "checkbox", editable: true
+    //       })
+    //     cnt ++
+    //   }
+    // }
 
     rows.push({
       id: 'AppEntityStatus', rowId: 'AppEntityStatus', title: 'App Entity Status',  height: '650px', 
       type : 'pong-table', resourceURL: 'app/entity/property/status-change', decor: 'decor', 
       moduleConfig : {
         dataURL: "",
-        rowId: [ 'appId', 'entityId', 'propId' ],
+        rowId: [ 'appId', 'entityId', 'stateId', 'transitionId' ],
         cols: cols
       }
     })

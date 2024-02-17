@@ -41,6 +41,7 @@ async function setupAPI( app ) {
   svc.post(   '/app/entity/property',  guiAuthz, addProperty )
   svc.delete( '/app/entity/property', guiAuthz, delProperty )
   svc.get(    '/app/entity/property/status-change', guiAuthz, getPropertyStatus )
+  svc.post(   '/app/entity/property/status-change', guiAuthz, setPropertyStatus )
 
   svc.get(  '/erm', getERM )
   svc.post( '/erm', saveERM )
@@ -596,48 +597,121 @@ async function getProperty( req, res ) {
 
 async function getPropertyStatus( req, res ) {
   log.debug( 'GET /app/entity/property', req.query )
-  let user = await userDta.getUserInfoFromReq( gui, req )
-  if ( ! user ) { return res.status(401).send( 'login required' ) }
-  let appId = ( req.query.appId ? req.query.appId : req.query.id.split(',')[0] )
-  if ( ! appId ) { return res.status(400).send([]) }
-  let entityId = ( req.query.entityId ? req.query.entityId : req.query.id.split(',')[1] )
-  let app = await dta.getAppById( appId )
-  // log.info( 'GET /app/entity/property', appId, entityId, app )
-  if ( ! app ) { log.warn('GET entity: /app/entity/property not found'); return res.status(400).send([]) }
-  if ( ! app.entity ) { app.entity = {} }
-  if ( ! app.entity[ entityId ] ) {  log.warn('GET /app/entity/property: app entity not found'); return res.status(400).send([]) }
+  let { allOK, user, app, appId, entity, entityId } = await checkUserAooEntity( req, res )
+  if ( ! allOK ) { return }
 
-  let stateModelId = app.entity[ entityId ].stateModel
+  let stateModelId = entity.stateModel
   if ( ! stateModelId ) {  log.warn('GET /app/entity/property: app entity has no stateModel'); return res.status(400).send([]) }
 
   let states = await dta. getData( 'state', user.rootScopeId )
   if ( ! states || ! states[ user.rootScopeId +'/'+ stateModelId ] ) {  log.warn('GET /app/entity/property: stateModel not found'); return res.status(400).send([]) }
   
-  let properties =  app.entity[ entityId ].properties
   let stateModel = states[ user.rootScopeId +'/'+ stateModelId ].state
 
-  let propArr = []
-  for ( let propId in properties ) {
-    let propRow = { propId: propId }
-    let prop = properties[ propId ]
-    // log.info( ' >>', propId )
-    if ( ! prop.stateTransition ) { prop.stateTransition = {} }
-    for ( let statesId in stateModel ) try {
-      // log.info( ' >>>', statesId )
-      for ( let transitionId in stateModel[ statesId ].actions ) {
-        // log.info( ' >>>>', transitionId, prop.stateTransition[ statesId +'_'+ transitionId ] )
-        if ( prop.stateTransition[ statesId +'_'+ transitionId ] ) {
-          propRow[ statesId +'_'+transitionId ] = prop.stateTransition[ statesId +'_'+ transitionId ]
+  let propArr = [] 
+  // create matrix of properties (cols) and transition (rows)
+  for ( let statesId in stateModel ) try {
+    // log.info( ' >>>', statesId )
+    for ( let transitionId in stateModel[ statesId ].actions ) {
+      let propRow = { 
+        appId        : appId, 
+        entityId     : entityId, 
+        transitionId : statesId +'_'+ transitionId,
+        transition   : ( statesId === 'null' ? transitionId : statesId+' > '+transitionId )
+      }
+      for ( let propId in entity.properties ) {
+        let prop = entity.properties[ propId ]
+        // log.info( ' >>', propId )
+        if ( ! prop.stateTransition ) { // default: all fields
+          propRow[ 'prop/'+propId ] = true 
+        } else if (  prop.stateTransition[ statesId +'_'+ transitionId ] ) {
+          propRow[ 'prop/'+propId ] = true
         } else {
-          propRow[ statesId +'_'+transitionId ] = '-'
+          propRow[ 'prop/'+propId ] = false
         }
       }
-    } catch (exc) { log.warn( 'getPropertyStatus loop', exc )}
-    propArr.push( propRow )
-  }
+      propArr.push( propRow )
+    } 
+  }  catch (exc) { log.warn( 'getPropertyStatus loop', exc )}
+
   res.send( propArr )
 }
 
+async function setPropertyStatus( req, res ) {
+  log.debug( 'GET /app/entity/property', req.query )
+  let { allOK, user, app, appId, entity, entityId } = await checkUserAooEntity( req, res )
+  if ( ! allOK ) { return }
+  if ( ! req.body.transitionId ) { return res.status(400).send('transitionId missing') }
+  let propId = null
+  let inclProp = false
+  for ( let p in req.body ) {
+    if ( p.startsWith( 'prop/') ) {
+      propId = p.substring( 5 )
+      if ( req.body[ p ] == 'true' ) { inclProp = true }
+      break
+    } 
+  }
+  if ( ! propId ) { return res.status(400).send('propId missing') }
+  if ( ! entity.properties[ propId ] ){ return res.status(400).send('propId not found') }
+
+  if ( ! entity.properties[ propId ].stateTransition ) { entity.properties[ propId ].stateTransition = {} }
+
+  // finally all checks done
+  if ( inclProp ) {
+    entity.properties[ propId ].stateTransition[ req.body.transitionId ] = inclProp
+  } else {
+    if ( entity.properties[ propId ].stateTransition[ req.body.transitionId ] ) {
+      delete entity.properties[ propId ].stateTransition[ req.body.transitionId ]
+    }
+  }
+  await dta.saveApp( appId, app )
+
+  res.send( ( allOK ? 'OK' : 'Failed' ) )
+}
+
+
+async function checkUserAooEntity( req, res ) {
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { 
+    res.status(401).send( 'login required' ) 
+    return { allOK: false, user: null, app: null, entity: null }
+  }
+  let appId    = null 
+  let entityId = null 
+  if ( req.query.appId ) { 
+    appId = req.query.appId 
+  } else if ( req.query.id ) {
+    appId = req.query.id.split(',')[0] 
+  } else if ( req.body.appId ) {
+    appId = req.body.appId 
+  }
+  if ( ! appId ) { 
+    res.status(400).send([]) 
+    return { allOK: false, user: user, app: null, appId: appId, entity: null, entityId: entityId }
+  }
+  if ( req.query.entityId ) { 
+    entityId = req.query.appId 
+  } else if ( req.query.id ) {
+    entityId = req.query.id.split(',')[1] 
+  } else if ( req.body.entityId ) {
+    entityId = req.body.entityId 
+  }
+  // let entityId = ( req.query.entityId ? req.query.entityId : req.query.id.split(',')[1] )
+  let app = await dta.getAppById( appId )
+  // log.info( 'GET /app/entity/property', appId, entityId, app )
+  if ( ! app ) { 
+    log.warn('GET entity: /app/entity/property not found')
+    res.status(400).send([]) 
+    return { allOK: false, user: user, app: null, appId: appId, entity: null, entityId: entityId }
+  }
+  if ( ! app.entity ) { app.entity = {} }
+  if ( ! app.entity[ entityId ] ) {  
+    log.warn('GET /app/entity/property: app entity not found')
+    res.status(400).send([]) 
+    return { allOK: false, user: user, app: app, entity: null }
+  }
+  return { allOK: true, user: user, app: app, appId: appId, entity: app.entity[ entityId ], entityId: entityId }
+}
 
 function genLink( page, id ) {
   let param = getRefId( id )
