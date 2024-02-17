@@ -66,7 +66,7 @@ function genGuiTableColsDef( entityMap ) {
 }
 
 
-async function genGuiFormFieldsDef( entity, filter, user ) {
+async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
   let cols = []
 
   if ( entity.properties[ 'id' ] && entity.properties[ 'id' ].type == 'UUID' ) {
@@ -85,6 +85,12 @@ async function genGuiFormFieldsDef( entity, filter, user ) {
     if ( prop.apiManaged ){ continue } 
     let lbl  = ( prop.label ? prop.label : propId )
     // console.log( 'LBL', lbl)
+
+    if ( stateTransition ) {
+      if ( ! prop.stateTransition || ! prop.stateTransition[ stateTransition ] ) {
+        continue
+      }
+    }
 
     let fld = null
 
@@ -199,6 +205,10 @@ function genEmptyDataReturn( entity ) {
 function reformatDataTableReturn( entity, rec, url  ) {
   let tblRec = { recId: rec.id }
   log.debug( 'getDoc rec', rec )
+  if ( entity.stateModel ) {
+    tblRec[ '_state' ] = rec[ '_state' ]
+  }
+
   for ( let propId in entity.properties ) {
     let prop = entity.properties[ propId ]
     let label = ( prop.label ? prop.label : propId )
@@ -276,6 +286,7 @@ function reformatDataUpdateInput( entity, rec ) {
       return { err: 'ERROR: id required' }
     }
   }
+
 
   for ( let propId in entity.properties ) try {
 

@@ -521,6 +521,11 @@
 #CustomizeAddAppContentLnkImportLink {
   margin-left: 30px;
 }
+
+#EntityNewFrm .pongFormInputGrp0 {
+  width: fit-content;
+  float: left;
+}
  /* ==================================================== */
 
  .decor-tm-title,
@@ -574,11 +579,6 @@
    text-align: left;
  }
 
- /* Clusters --------------------------------------------- */
- .MonitoringContentC4 {
-   text-align: center;
- }
- 
  /* All Forms --------------------------------------------- */
  .pongFormField label {
    font-size: 0.9em;
@@ -1446,138 +1446,13 @@ code {
   display: unset;
 }
 
-/* Cluster List */
 
-#ClusterContentPongList .pongListRow {
-  width: 200px;
-  height: 170px;
-  float: left;
-  background-color: #f6f3f3;
-  margin: 5px;
-}
-#ClusterContentPongList .ClstDiv {
-  position: relative;
-}
-
-.pongListCellClstDashboardDiv {
-  width: 200px;
-  height: 110px;
-  /* background-color: royalblue; */
-  font-size: 1.5em;
-  text-align: center;
-}
-.plsConfigure {
-  background-image: url("../img/i-db-x.png");
-  background-repeat: no-repeat;
-  height: 115px;
-}
-
-.pongListCellClstNavDiv {
-  width: 200px;
-  height: 20px;
-  /* background-color:greenyellow; */
-}
-.pongListCellClstCfgDiv{
-  width: 50px;
-  height: 40px;
-  /* background-color:greenyellow; */
-}
 .pongListCellcfg {
   position: absolute;
   top: 0px;
   right: 0px;
 }
 
-
-#ClusterContentPongList .pongListCellname {
-  width: 200px;
-  height: 20px;
-}
-#ClusterContentPongList .pongListCelldashboard {
-  width: 200px;
-}
-
-#ClusterContentPongList .cellname {
-  width: 200px;
-  font-weight: bold;
-  font-size: 1.2em;
-  text-align: center;
-  display: block;
-  color: var(--theme-color);
-}
-
-#ClusterContentPongList .cellsub {
-  width: 200px;
-  font-size: 0.9em;
-  text-align: center;
-  display: block;
-}
-
-#ClusterContentPongList .pongListCellalarmCnt {
-  width: 30px;
-  height: 30px;
-  font-size: 0.9em;
-  position: absolute;
-}
-
-.db-alarm {
-  width: 30px;
-  height: 30px;
-  padding: 4px;
-  margin-left: 6px;
-  padding-top: 10px;
-  color: white;
-  font-weight: bold;
-  background-image: url("../img/warning-sign.png");
-  background-repeat: no-repeat;
-}
-
-.clst-icon {
-  height: 20px;
-  padding-left: 10px;
-}
-
-/* Availability */
-#AvailabilityContentPongList .pongListRow {
-  width: 350px;
-  height: 125px;
-  float: left;
-}
-.avaDiv, .pongListCellctlr, .pongListCellcheck {
-  width: 340px;
-  text-align: center;
-}
-.pongListCellctlr {
-  font-weight: bold;
-}
-
-.pongListCelltodayDiv,
-.pongListCellyesterdayDiv{
-  width: 100px;
-  height: 60px;
-}
-.pongListCellmonthDiv {
-  width: 110px;
-  height: 70px;
-}
-
-.pongListCelltodayN, 
-.pongListCellyesterdayN {
-  width: 80px;
-  height: 45px;
-}
-.pongListCellmonthN {
-  width: 100px;
-  height: 55px;
-}
-
-.pongListCelltodayLB,
-.pongListCellyesterdayLB,
-.pongListCellmonthLB {
-  width: 80px;
-  text-align: center;
-  color: dimgray;
-}
 
 /*  -------------------- Apps ----------------*/
 

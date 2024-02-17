@@ -13,6 +13,7 @@ exports: module.exports = {
   getAppById,
   addApp,
   saveApp,
+  getStateModelById,
   getData,
   getDataById,
   getDataObjX,
@@ -138,6 +139,18 @@ async function saveApp( fullAppId, app ) {
   data.app[ fullAppId ] = app
   await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
   eh.publishDataChgEvt( 'app.chg', fullAppId, APP_TBL, app )
+}
+
+// ============================================================================
+
+async function getStateModelById( rootScopeId, stateModelId ) {
+  log.info( 'getStateModelById', rootScopeId, stateModelId  )
+  await syncTbl( 'state' )
+  // log.info( 'data.state', data.state )
+  if ( data.state[ rootScopeId +'/'+ stateModelId ] ) {
+    return data.state[ rootScopeId +'/'+ stateModelId ]
+  }
+  return null
 }
 // ============================================================================
 
