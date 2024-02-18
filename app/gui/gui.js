@@ -86,7 +86,9 @@ async function initPages( ) {
   addHtmlPage( gui, 'imprint-en', 'Imprint', 'IMP' )
   
 
-  gui.pages['main'].footer.copyrightText = PRD_NAME + ' v'+pjson.version + ' &#169; ma-ha, 2023'
+  gui.pages['main'].footer.copyrightText = PRD_NAME + ' v'+pjson.version + ' &#169; ma-ha, 2023  ' 
+    + '<a href="https://github.com/ma-ha/lowcode-data-app" target="_blank">GitLab</a> / '
+    + '<a href="https://www.npmjs.com/package/lowcode-data-app" target="_blank">NPM</a>'
   gui.pages['main'].addFooterLink( 'Imprint',  getHtmlURL( 'imprint-en' )  )
   gui.pages['main'].addFooterLink( 'Privacy Policy',  getHtmlURL( 'privacy-en' ) ) 
   gui.pages['main'].addFooterLink( 'General Terms and Conditions',  getHtmlURL( 'gtc-en' ) )
