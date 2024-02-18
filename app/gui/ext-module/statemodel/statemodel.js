@@ -44,7 +44,7 @@ function statemodel_loadResourcesHtml( divId, resUrl, fparam ) {
 statemodelDta = {}
 function statemodelFn_reDraw( divId ) {
   console.log( "statemodelFn_reDraw",  "divId="+divId );
-  $.getJSON( "state-model", { id: statemodelFn_id } ).done( ( statemodel )  => {
+  $.getJSON( "state-model/diagram", { id: statemodelFn_id } ).done( ( statemodel )  => {
     statemodelDta = statemodel
     let html = [];
 

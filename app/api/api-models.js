@@ -26,11 +26,17 @@ async function setupAPI( app ) {
   svc.get( '/erm', guiAuthz, getERM )
   svc.post('/erm', guiAuthz, saveERM )
 
-  svc.get( '/state', guiAuthz, getState )
-  svc.post('/state', guiAuthz, addState )
-  svc.get( '/state/json', guiAuthz, getStateJSON )
+  svc.get( '/state-model', guiAuthz, getStateModels )
+  svc.post('/state-model', guiAuthz, addStateModel )
+  svc.get( '/state-model/json', guiAuthz, getStateJSON )
 
-  svc.get( '/state-model', guiAuthz, getStateModel )
+  svc.get( '/state-model/state', guiAuthz, getState )
+  svc.get( '/state-model/state/pong-form', guiAuthz, genStateFrm )
+  svc.post('/state-model/state', guiAuthz, udpState )
+  svc.get( '/state-model/transition', guiAuthz, getStateTransitions )
+  svc.get( '/state-model/transition/pong-form', guiAuthz, getStateTransFrm )
+
+  svc.get( '/state-model/diagram', guiAuthz, getStateModel )
 
   
 }
@@ -146,7 +152,7 @@ async function saveERM( req, res ) {
 
 // ============================================================================
 
-async function getState( req, res )  {
+async function getStateModels( req, res )  {
   log.info( 'getState', req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { 
@@ -155,18 +161,17 @@ async function getState( req, res )  {
   }
 
   let stateArr = []
-  let states = await dta.getData( 'state', user.rootScopeId )
-  for ( let stateId in states ) {
-    log.info( '>>>', stateId )
-    let st = states[ stateId ]
+  let stateModeMap = await dta.getData( 'state', user.rootScopeId )
+  for ( let stateModelId in stateModeMap ) {
+    let st = stateModeMap[ stateModelId ]
     let stateLst = []
     for ( let stId in st.state ) { if ( stId != 'null' ) { stateLst.push( stId ) } }
     stateArr.push({
-      stateId : stateId,
-      scope   : st.scopeId,
-      states  : stateLst.join(' / '),
-      editLnk : '<a href="index.html?layout=EditStatus-nonav&id='+stateId+'">Edit</a>',
-      expLnk  : '<a href="state/json?id='+stateId+'">Export</a>',
+      stateModelId : stateModelId,
+      scope        : st.scopeId,
+      states       : stateLst.join(' / '),
+      editLnk      : '<a href="index.html?layout=EditState-nonav&id='+stateModelId+'">Edit</a>',
+      expLnk       : '<a href="state-model/json?id='+stateModelId+'">Export</a>',
     })
   }
 
@@ -174,31 +179,31 @@ async function getState( req, res )  {
 }
 
 
-async function addState( req, res )  {
+async function addStateModel( req, res )  {
   log.info( 'addState', req.body )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { 
     log.warn( 'addState no user')
     return res.status(401).send( 'login required' ) 
   }
-  if ( ! req.body.stateId || ! req.body.scopeId ) {
+  if ( ! req.body.scopeId || ! req.body.stateModelId ) {
     return res.status(400).send( ) 
   }
-  if ( await dta.getDataById( 'state', req.body.stateId +'/'+ req.body.scopeId ) ) {
+  if ( await dta.getDataById( 'state', req.body.scopeId +'/'+ req.body.stateModelId ) ) {
     return res.status(400).send( 'exits' ) 
   }
 
-  let id =  req.body.scopeId
+  let id = req.body.stateModelId
   id = id.replaceAll( ' ', '_' )
 
   let newState = {
     id : id,
-    scopeId : req.body.stateId,
+    scopeId : req.body.scopeId,
     state : {
       null : { actions : { } }
     }
   }
-  let result = await dta.addDataObj( 'state', req.body.stateId +'/'+id, newState ) 
+  let result = await dta.addDataObj( 'state', req.body.scopeId +'/'+id, newState ) 
   res.send(( result ? 'OK' : 'FAILED!!' ))
 }
 
@@ -217,9 +222,114 @@ async function getStateJSON( req, res )  {
   }
 
   res.send( 'Error' ) 
-
 }
 
+async function genStateFrm( req, res )  {
+  log.info( 'getStateFrm', req.query )
+  res.send({
+    id: 'AddStateForm',
+    fieldGroups:[{ columns: [
+      { formFields: [
+        { id: "stateModelId", label: "Model Id", type: "text", hidden: true, value: req.query.id },
+        { id: "stateId", label: "State Id", type: "text" },
+        { id: "label",   label: "Label", type: "text" }
+      ]},
+      { formFields: [
+        { id: "x", label: "X", type: "text" },
+        { id: "y", label: "Y", type: "text" } 
+      ]}
+    ] }],
+    actions : [ 
+      { id: "AddStateBtn", actionName: "Add / Update", update: [{ resId:'StatusLst' }], 
+        actionURL: 'state-model/state', target: "modal" }
+    ]
+  })
+}
+
+async function getState( req, res )  {
+  log.info( 'getStateTrnsTbl', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { 
+    log.warn( 'getStateTrnsTbl no user')
+    return res.status(401).send( 'login required' ) 
+  }
+  if ( ! req.query.id ) { return res.status(400).send( 'id required' ) }
+  let stateModel = await dta.getDataById( 'state', req.query.id   ) 
+  if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
+
+  let stateArr = []
+  for ( let stateId in stateModel.state ) {
+    let state = stateModel.state[ stateId ]
+    stateArr.push({ 
+      stateId : stateId, 
+      label   : ( state.label ? state.label : '' ),
+      x       : ( state.x ? state.x : '' ),
+      y       : ( state.y ? state.y : '' ),
+    })
+  }
+  res.send( stateArr )
+}
+
+async function udpState( req, res )  {
+  log.info( 'udpState', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { 
+    log.warn( 'udpState no user')
+    return res.status(401).send( 'login required' ) 
+  }
+  res.send( 'TODO' )  
+}
+
+async function getStateTransFrm( req, res )  {
+  res.send({
+    id: 'AddStateTransitionForm',
+    fieldGroups:[{ columns: [
+      { formFields: [
+        { id: "stateModelId", label: "Model Id", type: "text", hidden: true, value: req.query.id },
+        { id: "stateIdFrom", label: "From State", type: "text" },
+        { id: "stateIdTo",   label: "To State", type: "text" }
+      ]},
+      { formFields: [
+        { id: "actionId",    label: "Action ID", type: "text" },
+        { id: "actionName",  label: "Action Name", type: "text" }
+      ]}
+    ] }],
+    actions : [ 
+      { id: "AddStateBtn", actionName: "Add / Update", update: [{ resId:'StatusLst' }], 
+        actionURL: 'state-model/state', target: "modal" }
+    ]
+  })  
+}
+  
+
+async function getStateTransitions( req, res )  {
+  log.info( 'getStateTrnsTbl', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { 
+    log.warn( 'getStateTrnsTbl no user')
+    return res.status(401).send( 'login required' ) 
+  }
+  if ( ! req.query.id ) { return res.status(400).send( 'id required' ) }
+  let stateModel = await dta.getDataById( 'state', req.query.id   ) 
+  if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
+
+  let tbl = []
+  for ( let stateId in stateModel.state ) {
+    let state = stateModel.state[ stateId ]
+    for ( let actionId in state.actions ) {
+      let action = state.actions[ actionId ]
+      let row = { 
+        transition  : stateId +'>'+ actionId,
+        stateIdFrom : stateId,
+        stateIdTo   : action.to,
+        actionId    : actionId,
+        actionName  : ( action.label ? action.label : '' )
+      }
+      tbl.push( row )
+    }
+  }
+  return res.send( tbl )  
+}
 
 // ============================================================================
 

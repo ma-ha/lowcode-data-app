@@ -396,18 +396,18 @@ async function init( ) {
   })
  
   // --------------------------------------------------------------------------
-  let admStatusPage = gui.addPage( 'StatusAdmin-nonav' ) 
+  let admStatusPage = gui.addPage( 'StateAdmin-nonav' ) 
   admStatusPage.title = 'Status Admin'
   admStatusPage.setPageWidth( '90%' )
 
-  admStatusPage.addView({ id: 'StatusLst', 
-    rowId: 'StatusLst', title: 'Status',  height: '650px', 
-    type : 'pong-table', resourceURL: 'state',
+  admStatusPage.addView({ id: 'StateLst', 
+    rowId: 'StateLst', title: 'State Models',  height: '650px', 
+    type : 'pong-table', resourceURL: 'state-model',
     moduleConfig : {
       dataURL: "",
-      rowId: "stateId",
+      rowId: "stateModelId",
       cols: [
-        { id: "stateId",     label: "Enabled",   width: "10%",  cellType: "text" },
+        { id: "stateModelId",label: "Model ID",  width: "10%",  cellType: "text" },
         { id: "scope",       label: "Scope",     width: "10%", cellType: "text" },
         { id: "editLnk",     label: "Edit",      width: "10%", cellType: "text" },
         { id: "expLnk",      label: "Export",    width: "10%", cellType: "text" },
@@ -415,32 +415,66 @@ async function init( ) {
       ]
     } 
   })
-  admStatusPage.addView({ id: 'AddStatusForm', 
+  admStatusPage.addView({ id: 'AddStateForm', 
     title: 'Add', height: '150px', 
-    type : 'pong-form', resourceURL: 'state',
+    type : 'pong-form', resourceURL: 'state-model',
     moduleConfig : {
-      id: 'AddStatusForm',
+      id: 'AddSscopeIdtateForm',
       fieldGroups:[{ columns: [
-        { formFields: [{ id: "stateId", label: "State Id", type: "text" } ]},
-        { formFields: [{ id: "scopeId", label: "Scope Id", type: "text" } ]}
+        { formFields: [{ id: "scopeId", label: "Scope Id", type: "text" } ]},
+        { formFields: [{ id: "stateModelId", label: "State Model Id", type: "text" } ]}
       ] }],
       actions : [ 
-        { id: "AddStatusBtn", actionName: "Add / Update", update: [{ resId:'StatusLst' }], 
-          actionURL: 'state', target: "modal" }
+        { id: "AddStatusBtn", actionName: "Add State", update: [{ resId:'StateLst' }], 
+          actionURL: 'state-model', target: "modal" }
       ]
     }
   })
 
+  // --------------------------------------------------------------------------
 
-  let editStatusPage = gui.addPage( 'EditStatus-nonav' ) 
-  editStatusPage.title = 'Edit Status'
+  let editStatusPage = gui.addPage( 'EditState-nonav' ) 
+  editStatusPage.title = 'Edit State'
   editStatusPage.setPageWidth( '90%' )
-  entityStatusPage.dynamicRow( async ( staticRows, req, pageName ) => {
-    let ids = req.query.id
 
-    let user = await userDta.getUserInfoFromReq( gui, req )
-    if ( ! user ) { return [] }
+  editStatusPage.addView({ id: 'StateLst', 
+    rowId: 'StateLst', title: 'States',  height: '300px', 
+    type : 'pong-table', resourceURL: 'state-model/state',
+    moduleConfig : {
+      dataURL: "",
+      rowId: ['stateModelId','stateId','actionId'],
+      cols: [
+        { id: "stateId", label: "State Id",width: "10%", cellType: "text" },
+        { id: "label",   label: "Label",   width: "10%", cellType: "text" },
+        { id: "x",       label: "X",       width: "10%", cellType: "text" },
+        { id: "y",       label: "y",       width: "70%", cellType: "text" }
+      ]
+    } 
   })
+
+  editStatusPage.addView({ id: 'AddStateForm', 
+    title: 'Add / Update State', height: 'auto', 
+    type : 'pong-form', resourceURL: 'state-model/state'
+  })
+  editStatusPage.addView({ id: 'StateTransitionLst', 
+    rowId: 'StateTransitionLst', title: 'State Transitions', height: '300px', 
+    type : 'pong-table', resourceURL: 'state-model/transition',
+    moduleConfig : {
+      dataURL: "",
+      rowId: ['stateIdFrom','stateIdTo','actionId'],
+      cols: [
+        { id: "transition",  label: "Transition",   width: "10%", cellType: "text" },
+        { id: "stateIdTo",   label: "To State",    width: "10%", cellType: "text" },
+        { id: "actionName",  label: "Action Name",  width: "80%", cellType: "text" }
+      ]
+    }
+  })
+
+  editStatusPage.addView({ id: 'AddStateTransitionForm', 
+    title: 'Add / Update Transition', height: 'auto', 
+    type : 'pong-form', resourceURL: 'state-model/transition'
+  })
+
 }
 
 // ============================================================================

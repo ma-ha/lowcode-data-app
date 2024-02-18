@@ -1,73 +1,153 @@
 {
   "1000/Ticket": {
+    "id": "Ticket",
     "scopeId": "1000",
-    "state":{
-      "null" : {
-        "actions" : {
+    "state": {
+      "null": {
+        "actions": {
           "Create": {
             "to": "Open"
           }
         },
-        "x": 100, 
+        "x": 100,
         "y": 70
       },
       "Open": {
-        "actions" : {
+        "actions": {
           "StartProgress": {
-            "label":"Start",
+            "label": "Start",
             "to": "InProgress"
           },
           "Reject": {
             "to": "Closed",
-            "line": [ { "x":300,"y":10 },{ "x":900,"y":10 }],
-            "labelPos": { "x":600,"y":30 }
+            "line": [
+              {
+                "x": 300,
+                "y": 10
+              },
+              {
+                "x": 900,
+                "y": 10
+              }
+            ],
+            "labelPos": {
+              "x": 600,
+              "y": 30
+            }
           },
           "Blocked": {
             "to": "Blocked",
-            "line": [ { "x":320,"y":70 },{ "x":320,"y":90 },{ "x":320,"y":150 },{ "x":350,"y":150 },{ "x":500,"y":150 } ],
-            "labelPos": { "x":330,"y":130 }
+            "line": [
+              {
+                "x": 320,
+                "y": 70
+              },
+              {
+                "x": 320,
+                "y": 90
+              },
+              {
+                "x": 320,
+                "y": 150
+              },
+              {
+                "x": 350,
+                "y": 150
+              },
+              {
+                "x": 500,
+                "y": 150
+              }
+            ],
+            "labelPos": {
+              "x": 330,
+              "y": 130
+            }
           }
         },
-        "x": 300, 
+        "x": 300,
         "y": 70
       },
-      "InProgress" : {
-        "actions" : {
+      "InProgress": {
+        "actions": {
           "Done": {
             "to": "Review"
           },
           "StopProgress": {
-            "label":"Stop",
+            "label": "Stop",
             "to": "Open",
-            "line": [ { "x":500,"y":30 },{ "x":320,"y":30 },{ "x":320,"y":70 } ],
-            "labelPos": { "x":430,"y":30 }
+            "line": [
+              {
+                "x": 500,
+                "y": 30
+              },
+              {
+                "x": 320,
+                "y": 30
+              },
+              {
+                "x": 320,
+                "y": 70
+              }
+            ],
+            "labelPos": {
+              "x": 430,
+              "y": 30
+            }
           },
           "SetBlocked": {
             "to": "Blocked",
-            "labelPos": { "x":420,"y":120 }
+            "labelPos": {
+              "x": 420,
+              "y": 120
+            }
           }
         },
-        "x": 500, 
+        "x": 500,
         "y": 70
       },
-      "Blocked" : {
-        "actions" : {
+      "Blocked": {
+        "actions": {
           "StartProgress": {
             "to": "InProgress",
-            "line": [ { "x":520,"y":150 },{ "x":520,"y":70 } ],
-            "labelPos": { "x":530,"y":120 }
+            "line": [
+              {
+                "x": 520,
+                "y": 150
+              },
+              {
+                "x": 520,
+                "y": 70
+              }
+            ],
+            "labelPos": {
+              "x": 530,
+              "y": 120
+            }
           },
           "Unblock": {
             "to": "Open",
-            "line": [ { "x":440,"y":170 },{ "x":300,"y":170 } ],
-            "labelPos": { "x":300,"y":190 }
+            "line": [
+              {
+                "x": 440,
+                "y": 170
+              },
+              {
+                "x": 300,
+                "y": 170
+              }
+            ],
+            "labelPos": {
+              "x": 300,
+              "y": 190
+            }
           }
         },
-        "x": 500, 
+        "x": 500,
         "y": 170
       },
-      "Review" : {
-        "actions" : {
+      "Review": {
+        "actions": {
           "Reopen": {
             "to": "Open"
           },
@@ -75,20 +155,47 @@
             "to": "Closed"
           }
         },
-        "x": 700, 
+        "x": 700,
         "y": 70
       },
-      "Closed" : {
-        "actions" : {
+      "Closed": {
+        "actions": {
           "Reopen": {
             "to": "Open",
-            "line": [ { "x":900,"y":210 },{ "x":280,"y":210 },{ "x":280,"y":70 } ],
-            "labelPos": { "x":650,"y":210 }
+            "line": [
+              {
+                "x": 900,
+                "y": 210
+              },
+              {
+                "x": 280,
+                "y": 210
+              },
+              {
+                "x": 280,
+                "y": 70
+              }
+            ],
+            "labelPos": {
+              "x": 650,
+              "y": 210
+            }
           }
         },
-        "x": 900, 
+        "x": 900,
         "y": 70
       }
     }
+  },
+  "1000/Bill": {
+    "id": "1000/Bill",
+    "scopeId": "1000",
+    "state": {
+      "null": {
+        "actions": {}
+      }
+    },
+    "_cre": 1708271764173,
+    "_upd": 1708271764173
   }
 }
