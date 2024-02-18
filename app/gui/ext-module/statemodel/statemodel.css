@@ -1,0 +1,384 @@
+/* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
+
+.lc-statemodel-main-div {
+  width: 100%;
+  height: 100%;;
+  background-color: white;
+}
+
+.lc-statemodel-name {
+  font-size: 0.85em;
+}
+
+.lc-statemodel-ns {
+  position: absolute;
+  z-index: 200;
+  border-radius:10px;
+	-webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  /* text */
+  vertical-align: top;  
+  text-align: left;
+  padding: 5px;
+  overflow:hidden;
+}
+.lc-statemodel-ns-lbl {
+  padding-left: 20px;
+}
+
+.lc-statemodel-features-div {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 360px;
+  height: 200px;
+  z-index: 300;
+  padding: 10px;
+  /* background-color: wheat; */
+  background-color: lightblue;
+}
+.lc-statemodel-features-div h2 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+}
+.lc-statemodel-ms {
+  position: absolute;
+  width: 100px;
+  height: 50px;
+  z-index: 300;
+  border-radius:6px;
+	-webkit-border-radius:6px;
+  -moz-border-radius:6px;
+  /* text */
+  vertical-align: top;  
+  text-align: center;
+  padding: 2px;
+}
+
+
+/* ================================= */
+
+.lc-statemodel-ms-lbl {
+  display: table-cell;
+  width: 100px;
+  height: 50px;
+  vertical-align: middle;
+}
+
+.lc-statemodel-ms-status {
+  position: absolute;
+  width: 104px;
+  height: auto;
+  min-height: 20px;
+  left: 0px;
+  top: 84px;
+  background-color: black;
+  color:white;
+  border-radius:6px;
+	-webkit-border-radius:6px;
+  -moz-border-radius:6px;
+  display:block;
+}
+
+.lc-statemodel-ms-status-light {
+  position: absolute;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius:5px; 
+	-webkit-border-radius:5px;
+  -moz-border-radius:5px;
+  border:1px solid gray;
+  /* display:block;
+  float: left; */
+}
+
+.lc-statemodel-ms-status-ava {
+  position: absolute;
+  top: 4px;
+  width: 13px;
+  height: 12px;
+  border-radius:5px; 
+	-webkit-border-radius:5px;
+  -moz-border-radius:5px;
+  border:1px solid gray;
+}
+
+.lc-statemodel-ms-pod-status {
+  position: relative;
+  float: left;
+  display:block;
+  height: 18px;
+}
+
+.lc-statemodel-conn {
+  position: absolute;
+  z-index: 250;
+}
+.lc-statemodel-conn-ns2ns {
+  position: absolute;
+  z-index: 150;
+}
+
+.k8s-bg-lblue {
+  color: #363699;
+  background-color: #a1c4d6;
+  background-image: linear-gradient(325deg, #a1c4d6 0%, #dbe9e7 100%);
+}
+
+.k8s-bg-lblue2 {
+  color: #363699;
+  background-color: #84bad5;
+  background-image: linear-gradient(325deg, #32a4dd 0%, #53c0b0 100%);
+}
+
+.k8s-bg-lblue3 {
+  color: #363699;
+  background-color: #6794aa;
+  background-image: linear-gradient(325deg, #32c1dd 0%, #2e9081 100%);
+}
+
+.k8s-bg-gray {
+  background: rgb(224,222,222);
+  background: linear-gradient(350deg, rgba(224,222,222,1) 0%, rgba(246,246,246,1) 35%, rgba(210,212,213,1) 100%); 
+  border: 1px solid white;
+  /*   
+  background-color: #dbdbdb;
+  background-image: linear-gradient(135deg, #f2f2f2 0%, #ddd 100%); */
+}
+
+.k8s-bg-blue {
+  background-color: #0093E9;
+  background-image: linear-gradient(351deg, rgb(110, 183, 224) 0%, #cff3ef 100%);
+}
+
+.k8s-bg-tk {
+  color: white;
+  background-color: #8EC5FC;
+  background-image:  linear-gradient(135deg, rgb(20, 103, 186) 0%, #E0C3FC 100%);
+}
+
+.k8s-bg-redgr {
+  color: #dbdbdb;
+  background-color: #64577a;
+  background-image: linear-gradient(161deg, #64577a 0%, #b1b1b3 100%);  
+}
+
+
+.k8s-bg-lblue-nos {
+  background-color: #a1c4d6;
+}
+
+.k8s-bg-gray-nos {
+  background-color: #dbdbdb;
+}
+
+.k8s-bg-blue-nos {
+  background-color: rgb(102, 216, 236);
+}
+
+.k8s-bg-tk-nos {
+  background-color: rgb(4, 20, 255);
+}
+
+.k8s-bg-redgr-nos {
+  background-color: #64577a;
+}
+
+.k8s-bg-red-nos {
+  background-color: #640000;
+}
+
+.ingress-ava {
+  left: -2.5px;
+  top: -3.5px;
+}
+
+.lc-statemodel-vol {
+  padding-top: 2px;
+  text-align: right;
+  width: 95px
+}
+
+/* ------ EDIT MODE ------ */
+
+.lc-statemodel_ns_select {
+  z-index: 500;
+  position: absolute;
+  top: 50px; 
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+.k8s-ns-sel-bt {  
+  z-index: 400;
+  position: absolute;
+  top: 0px; 
+  right: 0px;
+  width: 16px;
+  height: 16px;
+  margin: 0px;
+  padding: 0px;
+}
+.k8s-ns-sel-lst {
+  widows: 100%;
+  height: 100%;
+  overflow: auto;
+  font-size: 0.8em;
+}
+
+.lc-statemodel-ms-sel {
+  z-index: 600;
+  position: absolute;
+  top: 3px; 
+  right: 3px;
+  width: 24px;
+  height: 24px;
+  background-color: lightsteelblue;
+}
+
+.lc-statemodel-logs-e {
+  position: absolute;
+  bottom: 21px;
+  right: 5px;
+}
+
+.k8s-ms-sel-bt {
+  z-index: 500;
+  position: absolute;
+  top: 0px; 
+  right: 0px;
+  width: 16px;
+  height: 16px;
+  margin: 0px;
+  padding: 0px;
+}
+.lc-statemodel-ms-sel-lst {
+  widows: 100%;
+  height: 100%;
+  overflow: auto;
+  font-size: 0.8em;
+}
+
+.lc-statemodel-move-sel {
+  z-index: 500;
+  position: absolute;
+  top: 0px; 
+  left: 0px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+.lc-statemodel-resize-sel {
+  z-index: 500;
+  position: absolute;
+  bottom: 0px; 
+  right: 0px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+.lc-statemodel-from-sel {
+  z-index: 500;
+  position: absolute;
+  top: 95px; 
+  left: 40px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+.lc-statemodel-to-sel {
+  z-index: 500;
+  position: absolute;
+  top: -12px; 
+  left: 40px;
+  width: 20px;
+  height: 20px;
+  background-color: lightsteelblue;
+  overflow: auto;
+}
+
+#lc-statemodel-nodes-div { 
+  width: 100%;
+  height: auto;
+  position: absolute;
+  bottom: 0px;
+}
+
+.lc-statemodel-node { 
+  width: 100px;
+  height: 150px;
+  position: relative;
+  float: left;
+  display:block;
+  margin: 5px;
+}
+
+.lc-statemodel-nodename{
+  width: 100%;
+  overflow: hidden;
+  height: 30px;
+  font-size: 0.8em;
+  color: black;
+}
+
+.bg-grey {
+  color: black;
+  background-color: #dbdbdb;
+}
+
+.bg-red {
+  color: rgb(216, 14, 14);
+  background-color: #a06363;
+}
+
+.bg-outdated {
+  color: #aaa;
+  background-color: #eee;
+}
+.lc-statemodel-node-pods {
+  width: 100%;
+  height: 75px;
+  overflow-y: auto;
+}
+.lc-statemodel-node-pod {
+  width: 10px;
+  height: 10px;
+  margin-bottom: 1px;
+  margin-right: 1px;
+  position: relative;
+  float: left;
+  display:block;
+}
+
+.lc-statemodel-usage {
+  width: 100%;
+  height: 45px;
+  /* background-color:#555; */
+}
+
+.lc-statemodel-usage-pie {
+  width: 50px;
+  height: auto;
+  position: relative;
+  float: left;
+  display:block;
+}
+.k8s-pie-label {
+  width: 100%;
+  text-align: center;
+  font-size: 0.80em;
+}
+.undefined-nos {
+  background-color: rgb(94, 168, 104);
+}
+
+.succeded-nos {
+  background-color: #7a708b;
+}

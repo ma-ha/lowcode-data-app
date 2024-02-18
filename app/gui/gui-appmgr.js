@@ -48,7 +48,7 @@ async function init( ) {
   let ermPage = gui.addPage( 'ERM-nonav' ) 
   ermPage.title = 'ERM Model'
   ermPage.setPageWidth( '90%' )
-  ermPage.addView({ id: 'Scopes', 
+  ermPage.addView({ id: 'ERM', 
       rowId: 'ERM', title: 'ERM',  height: '650px', 
       type : 'erm', resourceURL: 'erm' 
     }, {}, 'ermPage'  // no view plug-in config 
@@ -172,7 +172,6 @@ async function init( ) {
 
     let stateModels = [{ option: '' }]
     let states = await dta. getData( 'state', user.rootScopeId )
-    log.info( 'sates', states)
     for ( let statesId in states ) {
       stateModels.push({ option: statesId.split('/')[1] })
     }
@@ -373,14 +372,24 @@ async function init( ) {
     }
     cols[ cols.length - 1 ].width = w +'%'
 
+
     rows.push({
-      id: 'AppEntityStatus', rowId: 'AppEntityStatus', title: 'App Entity Status',  height: '650px', 
+      id: 'AppEntityStatus', rowId: 'AppEntityStatus', title: ' State Action > Field Change',  height: '500px', 
       type : 'pong-table', resourceURL: 'app/entity/property/status-change', decor: 'decor', 
       moduleConfig : {
         dataURL: "",
         rowId: [ 'appId', 'entityId', 'stateId', 'transitionId' ],
         cols: cols
       }
+    })
+
+    rows.push({ 
+      id: 'StateModel', rowId: 'StateModel', 
+      title: 'State Model',
+      height: '300px', decor: 'decor',
+      type : 'statemodel', 
+      resourceURL: 'state-model',
+      moduleConfig : {}
     })
 
     return rows

@@ -1,3 +1,6 @@
+# 0.8.2
+- State model visualization
+
 # 0.8.0/1
 - State model for entities
 - Option to hide edit dialog for entity

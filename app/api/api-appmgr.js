@@ -6,6 +6,7 @@ const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
 const appImport  = require( './api-app-import' )
 const propHandler= require( '../data/propertyHandler' )
+const models     = require( './api-models' )
 
 exports: module.exports = { 
   setupAPI
@@ -44,10 +45,11 @@ async function setupAPI( app ) {
   svc.get(    '/app/entity/property/status-change', guiAuthz, getPropertyStatus )
   svc.post(   '/app/entity/property/status-change', guiAuthz, setPropertyStatus )
 
-  svc.get(  '/erm', getERM )
-  svc.post( '/erm', saveERM )
+  // svc.get(  '/erm', getERM )
+  // svc.post( '/erm', saveERM )
 
   appImport.setupAPI( app )
+  models.setupAPI( app )
 }
 // ============================================================================
 
@@ -58,113 +60,113 @@ async function getAppLnk( req, res )  {
   res.send( '<a href="index.html?layout=ERM-nonav" class="erm-link">Show Data Model</a>')
 }
 
-async function getERM( req, res )  {
-  log.info( 'GET erm' )
-  let user = await userDta.getUserInfoFromReq( gui, req )
-  if ( ! user ) { return res.status(401).send( 'login required' ) }
-  let appId = req.query.id
-  if ( appId ) {
-    let app = await dta.getAppById( appId )
-    res.send( app )
-  } else {
-    let ermCfg = await dta.getDataById( 'erm', user.rootScopeId )
-    if ( ! ermCfg ) { ermCfg = {} }
-    let appMap = await dta.getAppList( user.scopeId, [], 'admin' )
-    let erm = {
-      entity: {}
-    }
-    let x = 100
-    let y = 100
-    let i = 0 
-    let cols = [ 'k8s-bg-blue','k8s-bg-lblue', 'k8s-bg-gray','k8s-bg-tk', 'k8s-bg-redgr', 'k8s-bg-lblue2', 'k8s-bg-lblue3' ]
-    for ( let appId in appMap ) { try {
-      let app = appMap[ appId ]
-      for ( let entityId in app.entity ) {
-        let entity = app.entity [ entityId ]
-        let xp = x
-        let yp = y
-        if ( ermCfg[ appId+'/'+entityId ] ) {
-          xp = ermCfg[ appId+'/'+entityId ].x
-          yp = ermCfg[ appId+'/'+entityId ].y
-        } else {
-          x += 150
-          if ( x > 900 ) {
-            x = 100
-            y += 150
-          }
-        }
-        let title =  entity.title
-        if ( ! title || title == '' ) {
-          title = entityId
-        }
-        if ( entity.stateModel ) {
-          title += '\n<i>&lt;'+ entity.stateModel +'&gt;</i>'
-        }
-        let e = {
-          appId    : appId,
-          appName  : app.title,
-          entityId : appId+'/'+entityId,
-          id       : entityId,
-          name     : title,
-          x : xp,
-          y : yp,
-          color : cols[i],
-          rel : {}
-        }
-        for ( let prpId in entity.properties ) {
-          let prop = entity.properties[ prpId ]
-          if ( prop.type == 'SelectRef' ) {
-            e.rel[ prpId ] = {
-              toEntity : prop.selectRef,
-              mFrm     : 'n',
-              mTo      : '1'
-            }
-          } else if ( prop.type == 'DocMap' ) {
-            try {
-              let p = prop.docMap.split('/') // this is scope/app/ver/ent/prop
-              e.rel[ prpId ] = {
-                toEntity : p[0] +'/'+ p[1] +'/'+ p[2]  +'/'+ p[3], // this is scope/app/ver
-                mFrm     : '1',
-                mTo      : 'n'
-              }
-            } catch ( exc ) { log.warn( 'ERM rel', exc ) }
-          } else if ( prop.type == 'MultiSelectRef' ) {
-            e.rel[ prpId ] = {
-              toEntity : prop.multiSelectRef,
-              mFrm     : 'n',
-              mTo      : 'm'
-            }
-          }
-        }
+// async function getERM( req, res )  {
+//   log.info( 'GET erm' )
+//   let user = await userDta.getUserInfoFromReq( gui, req )
+//   if ( ! user ) { return res.status(401).send( 'login required' ) }
+//   let appId = req.query.id
+//   if ( appId ) {
+//     let app = await dta.getAppById( appId )
+//     res.send( app )
+//   } else {
+//     let ermCfg = await dta.getDataById( 'erm', user.rootScopeId )
+//     if ( ! ermCfg ) { ermCfg = {} }
+//     let appMap = await dta.getAppList( user.scopeId, [], 'admin' )
+//     let erm = {
+//       entity: {}
+//     }
+//     let x = 100
+//     let y = 100
+//     let i = 0 
+//     let cols = [ 'k8s-bg-blue','k8s-bg-lblue', 'k8s-bg-gray','k8s-bg-tk', 'k8s-bg-redgr', 'k8s-bg-lblue2', 'k8s-bg-lblue3' ]
+//     for ( let appId in appMap ) { try {
+//       let app = appMap[ appId ]
+//       for ( let entityId in app.entity ) {
+//         let entity = app.entity [ entityId ]
+//         let xp = x
+//         let yp = y
+//         if ( ermCfg[ appId+'/'+entityId ] ) {
+//           xp = ermCfg[ appId+'/'+entityId ].x
+//           yp = ermCfg[ appId+'/'+entityId ].y
+//         } else {
+//           x += 150
+//           if ( x > 900 ) {
+//             x = 100
+//             y += 150
+//           }
+//         }
+//         let title =  entity.title
+//         if ( ! title || title == '' ) {
+//           title = entityId
+//         }
+//         if ( entity.stateModel ) {
+//           title += '\n<i>&lt;'+ entity.stateModel +'&gt;</i>'
+//         }
+//         let e = {
+//           appId    : appId,
+//           appName  : app.title,
+//           entityId : appId+'/'+entityId,
+//           id       : entityId,
+//           name     : title,
+//           x : xp,
+//           y : yp,
+//           color : cols[i],
+//           rel : {}
+//         }
+//         for ( let prpId in entity.properties ) {
+//           let prop = entity.properties[ prpId ]
+//           if ( prop.type == 'SelectRef' ) {
+//             e.rel[ prpId ] = {
+//               toEntity : prop.selectRef,
+//               mFrm     : 'n',
+//               mTo      : '1'
+//             }
+//           } else if ( prop.type == 'DocMap' ) {
+//             try {
+//               let p = prop.docMap.split('/') // this is scope/app/ver/ent/prop
+//               e.rel[ prpId ] = {
+//                 toEntity : p[0] +'/'+ p[1] +'/'+ p[2]  +'/'+ p[3], // this is scope/app/ver
+//                 mFrm     : '1',
+//                 mTo      : 'n'
+//               }
+//             } catch ( exc ) { log.warn( 'ERM rel', exc ) }
+//           } else if ( prop.type == 'MultiSelectRef' ) {
+//             e.rel[ prpId ] = {
+//               toEntity : prop.multiSelectRef,
+//               mFrm     : 'n',
+//               mTo      : 'm'
+//             }
+//           }
+//         }
 
        
-        erm.entity[ appId+'/'+entityId ] = e 
-      }
+//         erm.entity[ appId+'/'+entityId ] = e 
+//       }
     
-      i++
-      if ( i == cols.length ) { i = 0 }
+//       i++
+//       if ( i == cols.length ) { i = 0 }
 
-    } catch ( exc ) { log.error( 'GET erm', exc)} }
-    res.send( erm )
-  }
-}
+//     } catch ( exc ) { log.error( 'GET erm', exc)} }
+//     res.send( erm )
+//   }
+// }
 
-async function saveERM( req, res ) {
-  try {
-    log.debug( 'POST erm' )
-    let user = await userDta.getUserInfoFromReq( gui, req )
-    if ( ! user ) { return res.status(401).send( 'login required' ) }
-    let ermCfg = {}
-    for ( let e in req.body.entity ) {
-      ermCfg[ e ] = {
-        x : req.body.entity[ e ].x,
-        y : req.body.entity[ e ].y
-      }
-    }
-    await dta.addDataObj( 'erm', user.rootScopeId, ermCfg )
-  } catch ( exc ) { log.error( 'POST erm', exc ) } 
-  res.send( {} )
-}
+// async function saveERM( req, res ) {
+//   try {
+//     log.debug( 'POST erm' )
+//     let user = await userDta.getUserInfoFromReq( gui, req )
+//     if ( ! user ) { return res.status(401).send( 'login required' ) }
+//     let ermCfg = {}
+//     for ( let e in req.body.entity ) {
+//       ermCfg[ e ] = {
+//         x : req.body.entity[ e ].x,
+//         y : req.body.entity[ e ].y
+//       }
+//     }
+//     await dta.addDataObj( 'erm', user.rootScopeId, ermCfg )
+//   } catch ( exc ) { log.error( 'POST erm', exc ) } 
+//   res.send( {} )
+// }
 
 // ============================================================================
 

@@ -130,6 +130,16 @@ Entities can refer to external GUI Apps using links. Placeholders in the links a
 
 The GUI framework is "easy-web-app" and the underlying api server is "express".
 
+## State Model
+
+State model can be added or customized to your needs.
+
+![sceenshot](doc/locode-statemodel.png)
+
+Currently the state model have to be provided in JSON. But format is simple, see [ticket example](dta/state.json). Following elements are optional: `label` (used in GUI if id is ugly), `line` (defines an array of intermediate points for the connections in the diagram), `labelPos`, `x` and `y`.
+
+The start stateId must be `null`. Currently only othe first action is used for `null`.
+
 ## Persistence
 
 The persistence uses simple files and a memory cache. 

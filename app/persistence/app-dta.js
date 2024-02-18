@@ -145,7 +145,7 @@ async function saveApp( fullAppId, app ) {
 
 async function getStateModelById( rootScopeId, stateModelId ) {
   log.info( 'getStateModelById', rootScopeId, stateModelId  )
-  await syncTbl( 'state' )
+  await syncTbl( 'state', true )
   // log.info( 'data.state', data.state )
   if ( data.state[ rootScopeId +'/'+ stateModelId ] ) {
     return data.state[ rootScopeId +'/'+ stateModelId ]
@@ -314,13 +314,13 @@ async function delDataObj( tbl, id, ) {
 }
 
 
-async function syncTbl( tbl ) {
+async function syncTbl( tbl, always ) {
   log.debug( 'syncTbl', tbl )
   let dbFile = fileName( tbl )
   if ( ! fs.existsSync( dbFile ) ) {
     await writeFile( dbFile, '{}' )
   }
-  if ( ! data[ tbl ] ) {
+  if ( ! data[ tbl ]  || always ) {
     log.info('>> readFile', dbFile )
     data[ tbl ] =  JSON.parse( await readFile( dbFile ) )
   } 
