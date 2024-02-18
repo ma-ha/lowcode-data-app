@@ -38,7 +38,7 @@ async function init( ) {
         { formFields: [{ id: "metaJSON", label: "Meta Data (JSON)", type: "text", rows: 6 } ]}
       ] }],
       actions : [ 
-        { id: "PropertyAddBtn", actionName: "Add / Update", update: [{ resId:'Scopes' }], 
+        { id: "AdScopeBtn", actionName: "Add / Update", update: [{ resId:'Scopes' }], 
           actionURL: 'scope', target: "modal" }
       ]
     }
@@ -394,7 +394,53 @@ async function init( ) {
 
     return rows
   })
-  
+ 
+  // --------------------------------------------------------------------------
+  let admStatusPage = gui.addPage( 'StatusAdmin-nonav' ) 
+  admStatusPage.title = 'Status Admin'
+  admStatusPage.setPageWidth( '90%' )
+
+  admStatusPage.addView({ id: 'StatusLst', 
+    rowId: 'StatusLst', title: 'Status',  height: '650px', 
+    type : 'pong-table', resourceURL: 'state',
+    moduleConfig : {
+      dataURL: "",
+      rowId: "stateId",
+      cols: [
+        { id: "stateId",     label: "Enabled",   width: "10%",  cellType: "text" },
+        { id: "scope",       label: "Scope",     width: "10%", cellType: "text" },
+        { id: "editLnk",     label: "Edit",      width: "10%", cellType: "text" },
+        { id: "expLnk",      label: "Export",    width: "10%", cellType: "text" },
+        { id: "states",      label: "States",    width: "60%", cellType: "text" }
+      ]
+    } 
+  })
+  admStatusPage.addView({ id: 'AddStatusForm', 
+    title: 'Add', height: '150px', 
+    type : 'pong-form', resourceURL: 'state',
+    moduleConfig : {
+      id: 'AddStatusForm',
+      fieldGroups:[{ columns: [
+        { formFields: [{ id: "stateId", label: "State Id", type: "text" } ]},
+        { formFields: [{ id: "scopeId", label: "Scope Id", type: "text" } ]}
+      ] }],
+      actions : [ 
+        { id: "AddStatusBtn", actionName: "Add / Update", update: [{ resId:'StatusLst' }], 
+          actionURL: 'state', target: "modal" }
+      ]
+    }
+  })
+
+
+  let editStatusPage = gui.addPage( 'EditStatus-nonav' ) 
+  editStatusPage.title = 'Edit Status'
+  editStatusPage.setPageWidth( '90%' )
+  entityStatusPage.dynamicRow( async ( staticRows, req, pageName ) => {
+    let ids = req.query.id
+
+    let user = await userDta.getUserInfoFromReq( gui, req )
+    if ( ! user ) { return [] }
+  })
 }
 
 // ============================================================================

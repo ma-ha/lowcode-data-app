@@ -26,6 +26,10 @@ async function setupAPI( app ) {
   svc.get( '/erm', guiAuthz, getERM )
   svc.post('/erm', guiAuthz, saveERM )
 
+  svc.get( '/state', guiAuthz, getState )
+  svc.post('/state', guiAuthz, addState )
+  svc.get( '/state/json', guiAuthz, getStateJSON )
+
   svc.get( '/state-model', guiAuthz, getStateModel )
 
   
@@ -142,6 +146,82 @@ async function saveERM( req, res ) {
 
 // ============================================================================
 
+async function getState( req, res )  {
+  log.info( 'getState', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { 
+    log.warn( 'getState no user')
+    return res.status(401).send( 'login required' ) 
+  }
+
+  let stateArr = []
+  let states = await dta.getData( 'state', user.rootScopeId )
+  for ( let stateId in states ) {
+    log.info( '>>>', stateId )
+    let st = states[ stateId ]
+    let stateLst = []
+    for ( let stId in st.state ) { if ( stId != 'null' ) { stateLst.push( stId ) } }
+    stateArr.push({
+      stateId : stateId,
+      scope   : st.scopeId,
+      states  : stateLst.join(' / '),
+      editLnk : '<a href="index.html?layout=EditStatus-nonav&id='+stateId+'">Edit</a>',
+      expLnk  : '<a href="state/json?id='+stateId+'">Export</a>',
+    })
+  }
+
+  res.send( stateArr )
+}
+
+
+async function addState( req, res )  {
+  log.info( 'addState', req.body )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { 
+    log.warn( 'addState no user')
+    return res.status(401).send( 'login required' ) 
+  }
+  if ( ! req.body.stateId || ! req.body.scopeId ) {
+    return res.status(400).send( ) 
+  }
+  if ( await dta.getDataById( 'state', req.body.stateId +'/'+ req.body.scopeId ) ) {
+    return res.status(400).send( 'exits' ) 
+  }
+
+  let id =  req.body.scopeId
+  id = id.replaceAll( ' ', '_' )
+
+  let newState = {
+    id : id,
+    scopeId : req.body.stateId,
+    state : {
+      null : { actions : { } }
+    }
+  }
+  let result = await dta.addDataObj( 'state', req.body.stateId +'/'+id, newState ) 
+  res.send(( result ? 'OK' : 'FAILED!!' ))
+}
+
+
+async function getStateJSON( req, res )  {
+  log.info( 'getStateJSON', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { 
+    log.warn( 'getState no user')
+    return res.status(401).send( 'login required' ) 
+  }
+
+  if ( req.query.id ) { // single one
+    let stateModel = await dta.getDataById( 'state', req.query.id   ) 
+    return res.json( stateModel )  
+  }
+
+  res.send( 'Error' ) 
+
+}
+
+
+// ============================================================================
 
 async function getStateModel( req, res )  {
   log.info( 'GET STM', req.query )
