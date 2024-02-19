@@ -701,23 +701,6 @@ function getAllTags( scopeArr ) {
   return tags
 }
 
-
-function genLink( page, id ) {
-  let param = getRefId( id )
-  let lnk = 'index.html?layout='+page+'&id='+param
-  let ref = '<a href="'+lnk+'">'+id+'</>'
-  return ref 
-}
-
-function getRefId( id ) {
-  let param = ''
-  try {
-    let p = id.split('/')
-    param = p[0] +'/'+ p[1] +'/'+ p[2] +','+ p[3]
-  } catch ( exc ) { log.warn( 'gen link failed', id, exc ) }
-  return param
-}
-
 // ============================================================================
 
 async function checkUserAppEntity( req, res ) {
