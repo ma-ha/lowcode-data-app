@@ -142,7 +142,8 @@ async function init( ) {
           { formFields: [{ id: "id",   label: "Id",  type: "text", defaultVal: appId,     readonly: true } ]},
           { formFields: [{ id: "name", label: "App", type: "text", defaultVal: app.title, readonly: true } ]},
           { formFields: [{ id: "lnk", label: "", linkText:"Back to Apps", type: "link", defaultVal: "index.html?layout=Customize" } ]},
-          { formFields: [{ id: "ermLnk", linkText:"Show Data Model", type: "link", defaultVal: 'index.html?layout=ERM-nonav' }] }
+          { formFields: [{ id: "ermLnk", linkText:"Show Data Model", type: "link", defaultVal: 'index.html?layout=ERM-nonav' }] },
+          { formFields: [{ id: "StateMgrLnk", linkText:"Manage State Models", type: "link", defaultVal: 'index.html?layout=StateAdmin-nonav' }] }
         ] }]
       }
     }]
@@ -388,7 +389,7 @@ async function init( ) {
       title: 'State Model',
       height: '300px', decor: 'decor',
       type : 'statemodel', 
-      resourceURL: 'state-model',
+      resourceURL: 'state-model/diagram',
       moduleConfig : {}
     })
 
@@ -433,45 +434,61 @@ async function init( ) {
 
   // --------------------------------------------------------------------------
 
-  let editStatusPage = gui.addPage( 'EditState-nonav' ) 
-  editStatusPage.title = 'Edit State'
-  editStatusPage.setPageWidth( '90%' )
+  let editStatePage = gui.addPage( 'EditState-nonav' ) 
+  editStatePage.title = 'Edit State'
+  editStatePage.setPageWidth( '90%' )
 
-  editStatusPage.addView({ id: 'StateLst', 
-    rowId: 'StateLst', title: 'States',  height: '300px', 
+  editStatePage.addView({ 
+    id: 'StateModel', rowId: 'StateModel', 
+    title: 'State Model',
+    height: '350px', decor: 'decor',
+    type : 'statemodel', 
+    resourceURL: 'state-model/diagram',
+    moduleConfig : {}
+  })
+
+  let editStatePageColumns = editStatePage.addColumnsRow( 'EditStatenRow', '620px' )
+
+  let editStatePageColumns1 = editStatePageColumns.addRowsColumn( 'Col1', '50%' )
+  editStatePageColumns1.addView({ id: 'StateLst', 
+    rowId: 'StateLst', title: 'States',  height: '430px', 
     type : 'pong-table', resourceURL: 'state-model/state',
     moduleConfig : {
       dataURL: "",
-      rowId: ['stateModelId','stateId','actionId'],
+      rowId: ['stateModelId','stateId'],
       cols: [
-        { id: "stateId", label: "State Id",width: "10%", cellType: "text" },
-        { id: "label",   label: "Label",   width: "10%", cellType: "text" },
+        { id: 'Edit', label: "&nbsp;", cellType: "button", width :'10%', icon: 'ui-icon-pencil', 
+          method: "GET", setData: [ { resId : 'AddStateForm' } ] },
+        { id: "stateId", label: "State Id",width: "20%", cellType: "text" },
+        { id: "label",   label: "Label",   width: "20%", cellType: "text" },
         { id: "x",       label: "X",       width: "10%", cellType: "text" },
-        { id: "y",       label: "y",       width: "70%", cellType: "text" }
+        { id: "y",       label: "y",       width: "40%", cellType: "text" }
       ]
     } 
   })
-
-  editStatusPage.addView({ id: 'AddStateForm', 
-    title: 'Add / Update State', height: 'auto', 
+  editStatePageColumns1.addView({ id: 'AddStateForm', 
+    title: 'Add / Update State', height: '185px', 
     type : 'pong-form', resourceURL: 'state-model/state'
   })
-  editStatusPage.addView({ id: 'StateTransitionLst', 
-    rowId: 'StateTransitionLst', title: 'State Transitions', height: '300px', 
+
+  let editStatePageColumns2 = editStatePageColumns.addRowsColumn( 'Col2', '50%' )
+  editStatePageColumns2.addView({ id: 'StateTransitionLst', 
+    rowId: 'StateTransitionLst', title: 'State Transitions', height: '430px', 
     type : 'pong-table', resourceURL: 'state-model/transition',
     moduleConfig : {
       dataURL: "",
-      rowId: ['stateIdFrom','stateIdTo','actionId'],
+      rowId: ['stateModelId','stateIdFrom','stateIdTo','actionId'],
       cols: [
-        { id: "transition",  label: "Transition",   width: "10%", cellType: "text" },
-        { id: "stateIdTo",   label: "To State",    width: "10%", cellType: "text" },
-        { id: "actionName",  label: "Action Name",  width: "80%", cellType: "text" }
+        { id: 'Edit', label: "&nbsp;", cellType: "button", width :'10%', icon: 'ui-icon-pencil', 
+          method: "GET", setData: [ { resId : 'AddStateTransitionForm' } ] },
+        { id: "transition",  label: "Transition",   width: "30%", cellType: "text" },
+        { id: "stateIdTo",   label: "To State",     width: "20%", cellType: "text" },
+        { id: "actionName",  label: "Action Name",  width: "50%", cellType: "text" }
       ]
     }
   })
-
-  editStatusPage.addView({ id: 'AddStateTransitionForm', 
-    title: 'Add / Update Transition', height: 'auto', 
+  editStatePageColumns2.addView({ id: 'AddStateTransitionForm', 
+    title: 'Add / Update Transition', height: '185px', 
     type : 'pong-form', resourceURL: 'state-model/transition'
   })
 

@@ -495,6 +495,7 @@
 
  #AppEntitiesAppInfoContentlnkDiv,
  #AppEntitiesAppInfoContentermLnkDiv,
+ #AppEntitiesAppInfoContentStateMgrLnkDiv,
  #AppEntityInfoContentlnkDiv,
  #AppEntityInfoContentermLnkDiv {
   padding-left: 30px;
@@ -502,6 +503,7 @@
  }
  #AppEntitiesAppInfoContentlnkDiv label,
  #AppEntitiesAppInfoContentermLnkDiv label,
+ #AppEntitiesAppInfoContentStateMgrLnkDiv label,
  #AppEntityInfoContentlnkDiv label,
  #AppEntityInfoContentermLnkDiv label {
   width: 80px;

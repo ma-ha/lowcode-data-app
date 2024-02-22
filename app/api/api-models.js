@@ -35,6 +35,7 @@ async function setupAPI( app ) {
   svc.post('/state-model/state', guiAuthz, udpState )
   svc.get( '/state-model/transition', guiAuthz, getStateTransitions )
   svc.get( '/state-model/transition/pong-form', guiAuthz, getStateTransFrm )
+  svc.post('/state-model/transition', guiAuthz, setStateTransitions )
 
   svc.get( '/state-model/diagram', guiAuthz, getStateModel )
 
@@ -240,7 +241,7 @@ async function genStateFrm( req, res )  {
       ]}
     ] }],
     actions : [ 
-      { id: "AddStateBtn", actionName: "Add / Update", update: [{ resId:'StatusLst' }], 
+      { id: "AddStateBtn", actionName: "Add / Update", update: [{ resId:'StateLst' }, { resId:'StateModel' }], 
         actionURL: 'state-model/state', target: "modal" }
     ]
   })
@@ -253,21 +254,42 @@ async function getState( req, res )  {
     log.warn( 'getStateTrnsTbl no user')
     return res.status(401).send( 'login required' ) 
   }
-  if ( ! req.query.id ) { return res.status(400).send( 'id required' ) }
-  let stateModel = await dta.getDataById( 'state', req.query.id   ) 
-  if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
 
-  let stateArr = []
-  for ( let stateId in stateModel.state ) {
-    let state = stateModel.state[ stateId ]
-    stateArr.push({ 
-      stateId : stateId, 
-      label   : ( state.label ? state.label : '' ),
-      x       : ( state.x ? state.x : '' ),
-      y       : ( state.y ? state.y : '' ),
-    })
+  if ( req.query.id ) {  // this is StateModel ID, so get list of states
+    let stateModel = await dta.getDataById( 'state', req.query.id ) 
+    if ( ! stateModel ) { return res.status(400).send( 'model not found' ) }
+  
+  
+    let stateArr = []
+    for ( let stateId in stateModel.state ) {
+      let state = stateModel.state[ stateId ]
+      stateArr.push({ 
+        stateModelId : req.query.id,
+        stateId : stateId, 
+        label   : ( state.label ? state.label : '' ),
+        x       : ( state.x ? state.x : '' ),
+        y       : ( state.y ? state.y : '' ),
+      })
+    }
+   return res.send( stateArr )
+  
+  } else 
+  if ( req.query.stateModelId && req.query.stateId ) {
+    // get data for edit form
+    let stateModel = await dta.getDataById( 'state', req.query.stateModelId ) 
+    if ( ! stateModel ) { return res.status(400).send( 'model not found' ) }
+    let state = stateModel.state[ req.query.stateId ]
+    if ( ! state ) { return res.status(400).send( 'state not found' ) }
+    return res.send({
+      stateModelId : req.query.stateModelId,
+      stateId      : req.query.stateId,
+      label        : ( state.label ? state.label : '' ),
+      x            : ( state.x ? state.x : '' ),
+      y            : ( state.y ? state.y : '' )
+    })  
   }
-  res.send( stateArr )
+
+  res.status(400).send( 'id od stateModelId required' )
 }
 
 async function udpState( req, res )  {
@@ -277,7 +299,32 @@ async function udpState( req, res )  {
     log.warn( 'udpState no user')
     return res.status(401).send( 'login required' ) 
   }
-  res.send( 'TODO' )  
+  if ( req.body.stateModelId && req.body.stateId ) {
+    // get data for edit form
+    let stateModel = await dta.getDataById( 'state', req.body.stateModelId ) 
+    if ( ! stateModel ) { return res.status(400).send( 'model not found' ) }
+    let state = stateModel.state[ req.body.stateId ]
+    if ( ! state ) {
+      log.info( 'udpState> ad new state' )
+      stateModel.state[ req.body.stateId ] = {
+        actions : {}
+      }
+      state = stateModel.state[ req.body.stateId ] 
+    } 
+    state.x  = getInt( state.x, req.body.x )
+    state.y =  getInt( state.y, req.body.y )
+
+    if ( req.body.label == '' &&  state.label ) {
+      delete state.label
+    } else {
+      state.label = req.body.label
+    }
+
+    await dta.addDataObj( 'state', req.body.stateModelId, stateModel ) 
+
+    return res.send( 'OK' )
+  }
+  res.send( 'Error, id required' )  
 }
 
 async function getStateTransFrm( req, res )  {
@@ -286,61 +333,172 @@ async function getStateTransFrm( req, res )  {
     fieldGroups:[{ columns: [
       { formFields: [
         { id: "stateModelId", label: "Model Id", type: "text", hidden: true, value: req.query.id },
-        { id: "stateIdFrom", label: "From State", type: "text" },
-        { id: "stateIdTo",   label: "To State", type: "text" }
-      ]},
+        { id: "actionId",     label: "Action ID", type: "text" },
+        { id: "stateIdFrom",  label: "From State", type: "text" },
+        { id: "line", label: "Line", type: "text", 
+          descr:'For non direct lines zou can add intermediate x,y points, like: 10,10;20,20' }  
+        ]},
       { formFields: [
-        { id: "actionId",    label: "Action ID", type: "text" },
-        { id: "actionName",  label: "Action Name", type: "text" }
+        { id: "actionName",   label: "Action Name", type: "text" },
+        { id: "stateIdTo",    label: "To State", type: "text" },
+        { id: "labelPosXY", label: "Label x,y", type: "text", 
+          descr: 'Action label x,z position, like: 20,30' }  
       ]}
-    ] }],
+    ] }
+    ],
     actions : [ 
-      { id: "AddStateBtn", actionName: "Add / Update", update: [{ resId:'StatusLst' }], 
-        actionURL: 'state-model/state', target: "modal" }
+      { id: "AddStateBtn", actionName: "Add / Update", update: [{ resId:'StateTransitionLst' }, { resId:'StateModel' }], 
+        actionURL: 'state-model/transition', target: "modal" }
     ]
   })  
 }
   
 
 async function getStateTransitions( req, res )  {
-  log.info( 'getStateTrnsTbl', req.query )
+  log.info( 'getStateTransitions  ', req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { 
     log.warn( 'getStateTrnsTbl no user')
     return res.status(401).send( 'login required' ) 
   }
-  if ( ! req.query.id ) { return res.status(400).send( 'id required' ) }
-  let stateModel = await dta.getDataById( 'state', req.query.id   ) 
-  if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
+  if ( req.query.id ) { 
+    let stateModel = await dta.getDataById( 'state', req.query.id   ) 
+    if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
 
-  let tbl = []
-  for ( let stateId in stateModel.state ) {
-    let state = stateModel.state[ stateId ]
-    for ( let actionId in state.actions ) {
-      let action = state.actions[ actionId ]
-      let row = { 
-        transition  : stateId +'>'+ actionId,
-        stateIdFrom : stateId,
-        stateIdTo   : action.to,
-        actionId    : actionId,
-        actionName  : ( action.label ? action.label : '' )
+    let tbl = []
+    for ( let stateId in stateModel.state ) {
+      let state = stateModel.state[ stateId ]
+      for ( let actionId in state.actions ) {
+        let action = state.actions[ actionId ]
+        let row = { 
+          stateModelId : req.query.id ,
+          transition  : stateId +' > '+ actionId,
+          stateIdFrom : stateId,
+          stateIdTo   : action.to,
+          actionId    : actionId,
+          actionName  : ( action.label ? action.label : '' )
+        }
+        tbl.push( row )
       }
-      tbl.push( row )
     }
+    return res.send( tbl )
+  } else if ( req.query.stateModelId && req.query.stateIdFrom && req.query.stateIdTo && req.query.actionId ) {
+    let stateModel = await dta.getDataById( 'state', req.query.stateModelId   ) 
+    if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
+    let stateFrom = stateModel.state[ req.query.stateIdFrom ]
+    let stateTo   = stateModel.state[ req.query.stateIdTo ]
+    if ( ! stateFrom || ! stateTo || ! stateFrom.actions[ req.query.actionId ]) { return res.status(400).send( 'not found' ) }
+    let lineStr = ''
+    let action = stateFrom.actions[ req.query.actionId ]
+    let line = action.line
+    if ( line ) {
+      let linestrArr = []
+      for ( let p of line ) {
+        linestrArr.push( p.x +','+ p.y )
+      }
+      lineStr = linestrArr.join(';')
+    }
+    let labelPosXY = ''
+    let labelPos = action.labelPos
+    if ( labelPos ) {
+      labelPosXY = labelPos.x + ',' + labelPos.y
+    }
+    return res.send({
+      stateModelId : req.query.stateModelId,
+      stateIdFrom  : req.query.stateIdFrom,
+      stateIdTo    : req.query.stateIdTo,
+      actionId     : req.query.actionId,
+      actionName   : ( action.label ? action.label : '' ),
+      line         : lineStr,
+      labelPosXY   : labelPosXY
+    })
   }
-  return res.send( tbl )  
+  res.status(400).send( 'id required' ) 
+}
+
+
+async function setStateTransitions( req, res )  {
+  log.info( 'setStateTransitions', req.body )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( req.body.stateModelId && req.body.stateIdFrom && req.body.stateIdTo && req.body.actionId ) {
+    let stateModel = await dta.getDataById( 'state', req.body.stateModelId ) 
+    if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
+    let stateFrom = stateModel.state[ req.body.stateIdFrom ]
+    let stateTo   = stateModel.state[ req.body.stateIdTo ]
+    if ( ! stateFrom || ! stateTo ) { return res.status(400).send( 'not found' ) }
+
+    let action = stateFrom.actions[ req.body.actionId ]
+    if ( ! action) {  // new action
+      action = {
+        to : req.body.stateIdTo
+      }
+      stateFrom.actions[ req.body.actionId ] = action
+    }
+
+    if ( req.body.actionName && req.body.actionName != '' ) {
+      action.label = req.body.actionName
+    } else if ( action.label) {
+      delete action.label
+    }
+    if ( req.body.line && req.body.line != '' ) {
+      let linePoints = req.body.line.split(';')
+      action.line = []
+      for ( let ptStr of linePoints ) {
+        let point = ptStr.split(',')
+        if ( point.length == 2 ) {
+          action.line.push({
+            x : getInt( 0, point[0] ),
+            y : getInt( 0, point[1] )
+          })  
+        }
+      }  
+    } else if ( action.line) {
+      delete action.line
+    }
+
+    if ( req.body.labelPosXY && req.body.labelPosXY != '' ) {
+      let pos = req.body.labelPosXY.split(',')
+      if ( pos.length == 2 ) {
+        action.labelPos = {
+          x : getInt( 0, pos[0] ),
+          y : getInt( 0, pos[1] )
+        }
+      }
+    } else if ( action.labelPos) {
+      delete action.labelPos
+    }
+    log.info( 'action', action )
+
+    await dta.addDataObj( 'state', req.body.stateModelId, stateModel ) 
+
+    return res.send( 'OK' )
+
+  }
+  res.status(400).send( ) 
 }
 
 // ============================================================================
 
 async function getStateModel( req, res )  {
   log.info( 'GET STM', req.query )
-  let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
-  if ( ! allOK ) { return }
+  let user = await userDta.getUserInfoFromReq( gui, req )
 
-  let stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
+  let modelId = null
+  if ( req.query.id.indexOf(',') > 0 ) {
+    let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
+    if ( ! allOK ) { return }
+    modelId = entity.stateModel
+  } else  if ( req.query.id ) {
+    let idSplt = req.query.id.split('/')
+    modelId = idSplt[ idSplt.length - 1 ]
+  } else {
+    return res.send({})
+  }
+
+  let stateModel = await dta.getStateModelById( user.rootScopeId, modelId )
   if ( ! stateModel ) { 
-    log.warn( 'stateModel no found', stateModel, entity.stateModel )
+    log.warn( 'stateModel no found', stateModel, modelId )
     return res.status(400).send( 'not found required' ) 
   }
   
@@ -350,9 +508,13 @@ async function getStateModel( req, res )  {
 
   for ( let stateId in stateModel.state ) {
     let state = stateModel.state[ stateId ]
+    let name = ( state.label ? state.label : stateId )
+    if ( stateId == 'null' ) {
+      name = '<span class="fontPlus1">'+modelId+'</span>'
+    }
     stm.state[ stateId ] = {
       id    : stateId,
-      name  : ( state.label ? state.label : stateId ),
+      name  : name,
       x     : ( state.x ? state.x : x ),
       y     : ( state.y ? state.y : 100 ), 
       color : 'k8s-bg-blue',
@@ -457,3 +619,14 @@ async function checkUserApp( req, res ) {
 }
 
 // ============================================================================
+
+
+
+function getInt( defaultVal, strVal ) {
+  let val = Number.parseInt( strVal, 10 )
+  if ( ! Number.isNaN( val ) ) {
+    log.info( 'val', val )
+    return val
+  }
+  return defaultVal
+}

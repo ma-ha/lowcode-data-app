@@ -1,6 +1,6 @@
 {
   "1000/Ticket": {
-    "id": "Ticket",
+    "id": "1000/Ticket",
     "scopeId": "1000",
     "state": {
       "null": {
@@ -62,11 +62,13 @@
             "labelPos": {
               "x": 330,
               "y": 130
-            }
+            },
+            "label": "Set Blocked"
           }
         },
         "x": 300,
-        "y": 70
+        "y": 70,
+        "label": ""
       },
       "InProgress": {
         "actions": {
@@ -100,7 +102,8 @@
             "labelPos": {
               "x": 420,
               "y": 120
-            }
+            },
+            "label": "Set Blocked"
           }
         },
         "x": 500,
@@ -123,7 +126,8 @@
             "labelPos": {
               "x": 530,
               "y": 120
-            }
+            },
+            "label": "Continue"
           },
           "Unblock": {
             "to": "Open",
@@ -185,7 +189,9 @@
         "x": 900,
         "y": 70
       }
-    }
+    },
+    "_cre": 1708619595503,
+    "_upd": 1708626060152
   },
   "1000/Bill": {
     "id": "1000/Bill",

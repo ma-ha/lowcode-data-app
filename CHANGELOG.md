@@ -1,3 +1,6 @@
+# 0.9.0
+- Edit state model
+
 # 0.8.2
 - State model visualization
 

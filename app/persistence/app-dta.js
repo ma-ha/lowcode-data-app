@@ -279,7 +279,7 @@ function scopeOK( userScope, recScope, inherit ) {
 
 
 async function addDataObj( tbl, id, obj ) {
-  log.debug( 'addDataObj', tbl, id, obj)
+  log.info( 'addDataObj', tbl, id )
   await syncTbl( tbl )
   let cre = null
   if ( data[ tbl ][ id.trim() ] ) { cre = data[ tbl ][ id.trim() ]._cre }

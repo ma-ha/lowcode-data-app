@@ -105,7 +105,7 @@ function loadEntityPg( evt, obj ) {
 function statemodelFn_drawAllConn( divId ) { try {
   let html = [];
   let htmlId = 'StateLines'
-  html.push( `<svg id="${htmlId}" width="2000" height="900" class="lc-statemodel-conn" style="top:30px;left:50px">` );
+  html.push( `<svg id="${htmlId}" width="1760" height="320" class="lc-statemodel-conn" style="top:30px;left:50px">` );
   html.push( '<style> .small { font: italic 12px sans-serif; }  </style>' );
   for ( let stateId in statemodelDta.state ) {
     let state1 = statemodelDta.state[ stateId ]
@@ -279,7 +279,9 @@ function getDragDrop( divId ) {
 
 // ----------------------------------------------------------------------------
 // empty must haves
-function statemodel_update( divId, paramsObj ) {}
+function statemodel_update( divId, paramsObj ) {
+  statemodelFn_reDraw( divId )
+}
 function statemodel_setData( id, modalName, resourceURL, paramObj ) {}
 function statemodel_CreModal( id, modalName, resourceURL, paramObj  ) {}
 
@@ -287,7 +289,7 @@ function statemodel_CreModal( id, modalName, resourceURL, paramObj  ) {}
 function statemodel_addActionBtn( id, modalName, resourceURL, paramObj ) {
 }
 
-//======= Code for "creModal" hook, requires "addActionBtn"  ================================================
+//======= Code for "creModal" hook, requires "addActionBtn"  ==========================
 function statemodel_CreModalFromMeta( id, modalName, resourceURL, paramObj  ) {
 }
 
