@@ -7,9 +7,9 @@ It starts with a generic, secure **web gui**.
 **Entities** can be **defined on-the-fly**, as well as their relationship.
 Web forms and lists are generated to maintain data (documents) of this entities.
 
-A powerful **State Model** can optionally be attached to a entities (see "Task List" example). 
-For the state transitions an "Action" is defined, e.g. "Start Progress". 
-Relevant data fields for each state transition form can be selected. 
+A powerful **State Model** can optionally be attached to entities (see "Task List" example). 
+You define **actions** for state changes, e.g. "Start Progress". 
+Selected data fields are displayed in the state change form. 
 
 All data, users and authorizations are within **hierarchical scopes** (like tenants).
 Entity definitions and data can be inherited to lower hierarchy scopes.
@@ -104,6 +104,8 @@ So relations are
 
 Entities can be attached to a "State Model". 
 
+![sceenshot](doc/locode-statemodel.png)
+
 Property features:
 - you can select a property for the data table filter
 - you can define a property as "API managed", means zou will see it only in the table, 
@@ -132,9 +134,9 @@ The GUI framework is "easy-web-app" and the underlying api server is "express".
 
 ## State Model
 
-State model can be added or customized to your needs.
+State models can be added or customized to your needs.
 
-![sceenshot](doc/locode-statemodel.png)
+![sceenshot](doc/locode-statemodel-admin.png)
 
 The start stateId is `null`. Currently only the first action is used for `null`.
 
