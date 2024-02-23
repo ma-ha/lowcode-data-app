@@ -12,14 +12,14 @@
   },
   "10": {
     "id": "10",
-    "_state": "Review",
-    "scopeId": "1000/DE",
     "Task": "Simple change",
     "Description": "Do somenting",
-    "Assignee": "",
+    "Assignee": "The Mighty Reviewer",
+    "scopeId": "1000/DE",
+    "_state": "Review",
     "Resolution": "",
     "_cre": 1708194576091,
-    "_upd": 1708668270568
+    "_upd": 1708709150107
   },
   "11": {
     "id": "11",

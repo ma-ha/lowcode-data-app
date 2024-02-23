@@ -64,7 +64,7 @@
         },
         "x": 300,
         "y": 70,
-        "img": "state_nnn.png"
+        "img": "state_3nnn.png"
       },
       "InProgress": {
         "actions": {
@@ -104,7 +104,7 @@
         },
         "x": 500,
         "y": 70,
-        "img": "state_gnn.png"
+        "img": "state_3gnn.png"
       },
       "Blocked": {
         "actions": {
@@ -146,7 +146,7 @@
         },
         "x": 500,
         "y": 170,
-        "img": "state_rnn.png"
+        "img": "state_3rnn.png"
       },
       "Review": {
         "actions": {
@@ -159,7 +159,7 @@
         },
         "x": 700,
         "y": 70,
-        "img": "state_ggn.png"
+        "img": "state_3ggn.png"
       },
       "Closed": {
         "actions": {
@@ -187,11 +187,11 @@
         },
         "x": 900,
         "y": 70,
-        "img": "state_ggg.png"
+        "img": "state_3ggg.png"
       }
     },
     "_cre": 1708619595503,
-    "_upd": 1708669389777
+    "_upd": 1708708762990
   },
   "1000/Bill": {
     "id": "1000/Bill",
