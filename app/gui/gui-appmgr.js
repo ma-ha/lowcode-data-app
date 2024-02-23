@@ -461,8 +461,10 @@ async function init( ) {
           method: "GET", setData: [ { resId : 'AddStateForm' } ] },
         { id: "stateId", label: "State Id",width: "20%", cellType: "text" },
         { id: "label",   label: "Label",   width: "20%", cellType: "text" },
+        { id: "img",     label: "Img",     width: "20%", cellType: "text" },
+        { id: "imgPic",  label: "",        width: "15%", cellType: "text" },
         { id: "x",       label: "X",       width: "10%", cellType: "text" },
-        { id: "y",       label: "y",       width: "40%", cellType: "text" }
+        { id: "y",       label: "y",       width: "10%", cellType: "text" }
       ]
     } 
   })

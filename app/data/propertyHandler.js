@@ -458,6 +458,10 @@ function reformatDataTableReturn( entity, rec, url, stateModel  ) {
     let actions = []
     let state = stateModel.state[ rec[ '_state' ] ]
     if ( state ) {
+      if ( state.img ) {
+        tblRec[ '_state' ] = '<img src="img/'+state.img+'" title="'+( state.label ? state.label : rec[ '_state' ] )+'"/>'
+      }
+
       for ( let actionId in state.actions ) {
         let action =  state.actions[ actionId ]
         let lnkTxt = ( action.label ? action.label : actionId ) +''

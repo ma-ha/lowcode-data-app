@@ -4,6 +4,7 @@ const log        = require( '../helper/log' ).logger
 const apiSec     = require( './api-sec' )
 const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
+const fs         = require( 'fs' )
 
 exports: module.exports = { 
   setupAPI
@@ -227,6 +228,19 @@ async function getStateJSON( req, res )  {
 
 async function genStateFrm( req, res )  {
   log.info( 'getStateFrm', req.query )
+  const fs = require('fs');
+
+  let imgOpts = []
+  try {
+    fs.readdirSync( './gui/img' ).forEach( file => {
+      // log.info( 'img', file, file.startsWith( 'state' ) , file.endsWith( '.png'))
+      if ( file.startsWith( 'state' ) && file.endsWith( '.png') ) {
+        log.info( 'img', file )
+        imgOpts.push({ value: file })
+      }
+    })
+  } catch ( exc ) { log.error( 'imgOpts', exc ) }
+
   res.send({
     id: 'AddStateForm',
     fieldGroups:[{ columns: [
@@ -236,8 +250,9 @@ async function genStateFrm( req, res )  {
         { id: "label",   label: "Label", type: "text" }
       ]},
       { formFields: [
-        { id: "x", label: "X", type: "text" },
-        { id: "y", label: "Y", type: "text" } 
+        { id: "posXY", label: "Position x,y", type: "text", 
+          descr: 'Box center x,z position, like: 20,30' },
+        { id: "img", label: "Image", type: "text", options: imgOpts }
       ]}
     ] }],
     actions : [ 
@@ -259,7 +274,6 @@ async function getState( req, res )  {
     let stateModel = await dta.getDataById( 'state', req.query.id ) 
     if ( ! stateModel ) { return res.status(400).send( 'model not found' ) }
   
-  
     let stateArr = []
     for ( let stateId in stateModel.state ) {
       let state = stateModel.state[ stateId ]
@@ -267,6 +281,8 @@ async function getState( req, res )  {
         stateModelId : req.query.id,
         stateId : stateId, 
         label   : ( state.label ? state.label : '' ),
+        img     : ( state.img ? state.img : '' ),
+        imgPic  : ( state.img ? '<img src="img/'+state.img+'"/>' : '' ),
         x       : ( state.x ? state.x : '' ),
         y       : ( state.y ? state.y : '' ),
       })
@@ -280,12 +296,14 @@ async function getState( req, res )  {
     if ( ! stateModel ) { return res.status(400).send( 'model not found' ) }
     let state = stateModel.state[ req.query.stateId ]
     if ( ! state ) { return res.status(400).send( 'state not found' ) }
+    posXY = ''
+    if (  state.x &&  state.y ) { posXY =  state.x +','+  state.y }
     return res.send({
       stateModelId : req.query.stateModelId,
       stateId      : req.query.stateId,
       label        : ( state.label ? state.label : '' ),
-      x            : ( state.x ? state.x : '' ),
-      y            : ( state.y ? state.y : '' )
+      img          : ( state.img ? state.img : '' ),
+      posXY        : posXY,
     })  
   }
 
@@ -311,11 +329,20 @@ async function udpState( req, res )  {
       }
       state = stateModel.state[ req.body.stateId ] 
     } 
-    state.x  = getInt( state.x, req.body.x )
-    state.y =  getInt( state.y, req.body.y )
+    if ( req.body.posXY  &&  req.body.posXY != '' ) {
+    let pos = req.body.posXY.split(',')
+      state.x = getInt( state.x, pos[0] )
+      state.y = getInt( state.x, pos[1] )
+    } 
 
-    if ( req.body.label == '' &&  state.label ) {
-      delete state.label
+    if ( req.body.img  &&  req.body.img != '' ) {
+      state.img = req.body.img
+    } else {
+      if ( req.body.img ) { delete req.body.img }
+    }
+    
+    if ( req.body.label == '' ) {
+      if ( Object.hasOwn( state, 'label') ) { delete state.label }
     } else {
       state.label = req.body.label
     }
