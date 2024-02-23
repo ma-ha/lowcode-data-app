@@ -39,7 +39,6 @@ async function setupAPI( app ) {
   svc.post('/state-model/transition', guiAuthz, setStateTransitions )
 
   svc.get( '/state-model/diagram', guiAuthz, getStateModel )
-
   
 }
 // ============================================================================
@@ -154,6 +153,10 @@ async function saveERM( req, res ) {
 
 // ============================================================================
 
+// n b3b3b7ff
+// g 1dec43ff
+// r cf4210ff
+
 async function getStateModels( req, res )  {
   log.info( 'getState', req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
@@ -228,14 +231,13 @@ async function getStateJSON( req, res )  {
 
 async function genStateFrm( req, res )  {
   log.info( 'getStateFrm', req.query )
-  const fs = require('fs');
 
   let imgOpts = []
   try {
     fs.readdirSync( './gui/img' ).forEach( file => {
       // log.info( 'img', file, file.startsWith( 'state' ) , file.endsWith( '.png'))
       if ( file.startsWith( 'state' ) && file.endsWith( '.png') ) {
-        log.info( 'img', file )
+        log.debug( 'img', file )
         imgOpts.push({ value: file })
       }
     })
@@ -338,7 +340,7 @@ async function udpState( req, res )  {
     if ( req.body.img  &&  req.body.img != '' ) {
       state.img = req.body.img
     } else {
-      if ( req.body.img ) { delete req.body.img }
+      if ( state.img ) { delete state.img }
     }
     
     if ( req.body.label == '' ) {
@@ -370,6 +372,9 @@ async function getStateTransFrm( req, res )  {
         { id: "stateIdTo",    label: "To State", type: "text" },
         { id: "labelPosXY", label: "Label x,y", type: "text", 
           descr: 'Action label x,z position, like: 20,30' }  
+      ]},
+      { formFields: [
+        { id: "apiManaged", label: "API Managed", type: "checkbox" }
       ]}
     ] }
     ],
@@ -382,13 +387,14 @@ async function getStateTransFrm( req, res )  {
   
 
 async function getStateTransitions( req, res )  {
-  log.info( 'getStateTransitions  ', req.query )
+  log.info( 'getStateTransitions', req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { 
     log.warn( 'getStateTrnsTbl no user')
     return res.status(401).send( 'login required' ) 
   }
-  if ( req.query.id ) { 
+  if ( req.query.id ) {  
+    // get array for stateModelId for table 
     let stateModel = await dta.getDataById( 'state', req.query.id   ) 
     if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
 
@@ -399,17 +405,19 @@ async function getStateTransitions( req, res )  {
         let action = state.actions[ actionId ]
         let row = { 
           stateModelId : req.query.id ,
-          transition  : stateId +' > '+ actionId,
-          stateIdFrom : stateId,
-          stateIdTo   : action.to,
-          actionId    : actionId,
-          actionName  : ( action.label ? action.label : '' )
+          transition   : stateId +' > '+ actionId,
+          stateIdFrom  : stateId,
+          stateIdTo    : action.to,
+          actionId     : actionId,
+          actionName   : ( action.label ? action.label : '' ),
+          apiManaged   : ( action.apiManaged ? true : false )
         }
         tbl.push( row )
       }
     }
     return res.send( tbl )
   } else if ( req.query.stateModelId && req.query.stateIdFrom && req.query.stateIdTo && req.query.actionId ) {
+    // get one rec for edit form
     let stateModel = await dta.getDataById( 'state', req.query.stateModelId   ) 
     if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
     let stateFrom = stateModel.state[ req.query.stateIdFrom ]
@@ -437,7 +445,8 @@ async function getStateTransitions( req, res )  {
       actionId     : req.query.actionId,
       actionName   : ( action.label ? action.label : '' ),
       line         : lineStr,
-      labelPosXY   : labelPosXY
+      labelPosXY   : labelPosXY,
+      apiManaged   : ( action.apiManaged ? true : false )
     })
   }
   res.status(400).send( 'id required' ) 
@@ -495,6 +504,14 @@ async function setStateTransitions( req, res )  {
     } else if ( action.labelPos) {
       delete action.labelPos
     }
+
+
+    if ( req.body.apiManaged  ) {
+      action.apiManaged = true
+    } else {
+      if ( action.apiManaged ) { delete action.apiManaged }
+    }
+
     log.info( 'action', action )
 
     await dta.addDataObj( 'state', req.body.stateModelId, stateModel ) 

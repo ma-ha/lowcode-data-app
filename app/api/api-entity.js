@@ -227,7 +227,7 @@ async function docStateChange( req, res ) {
   let entity = app.entity[ req.params.entityId ]
   if ( ! entity ) { return res.send( 'ERROR: Entity not found') }
 
-  await dta.addDataObj( req.params.tenantId + req.params.entityId, req.body.id, req.body )
+  await dta.addDataObj( req.params.tenantId + req.params.entityId, req.body.id, req.body, 'dta.stateUpdate' )
 
   let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
 
@@ -235,7 +235,6 @@ async function docStateChange( req, res ) {
   let id = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
   res.send( 'index.html?layout=AppEntity-nonav&id=' + id + tabSel )
 }
-
 
 async function delDoc( req, res )  {
   log.info( 'Del entity', req.params, req.query  )

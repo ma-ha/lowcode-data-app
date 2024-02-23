@@ -485,7 +485,8 @@ async function init( ) {
           method: "GET", setData: [ { resId : 'AddStateTransitionForm' } ] },
         { id: "transition",  label: "Transition",   width: "30%", cellType: "text" },
         { id: "stateIdTo",   label: "To State",     width: "20%", cellType: "text" },
-        { id: "actionName",  label: "Action Name",  width: "50%", cellType: "text" }
+        { id: "actionName",  label: "Action Name",  width: "50%", cellType: "text" },
+        { id: "apiManaged",  label: "API Managed",  width: "50%", cellType: "checkbox" }
       ]
     }
   })

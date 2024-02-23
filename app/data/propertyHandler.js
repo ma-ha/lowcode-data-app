@@ -464,6 +464,7 @@ function reformatDataTableReturn( entity, rec, url, stateModel  ) {
 
       for ( let actionId in state.actions ) {
         let action =  state.actions[ actionId ]
+        if ( action.apiManaged ) { continue }
         let lnkTxt = ( action.label ? action.label : actionId ) +''
         lnkTxt = lnkTxt.replaceAll( ' ', '&nbsp;' )
         // TODO change to button

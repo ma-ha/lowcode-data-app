@@ -510,13 +510,15 @@
  }
 
 #AppEntitiesAddContentstart,
-#AppEntitiesAddContentnoEdit
+#AppEntitiesAddContentnoEdit,
+#AddStateTransitionFormContentapiManaged
  {
   width: unset;
 }
 #AppEntitiesAddContentstartDiv label,
-#AppEntitiesAddContentnoEditDiv label
- {
+#AppEntitiesAddContentnoEditDiv label,
+#AddStateTransitionFormContentapiManaged label
+{
   width: unset;
 }
 
@@ -531,6 +533,9 @@
 
 .StatusActionLink {
   padding-right: 5px;
+}
+.pongFormInputAddStateTransitionFormContentGrp0Col2 {
+  width: 150px;
 }
 /* ==================================================== */
 

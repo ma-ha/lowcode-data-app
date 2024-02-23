@@ -278,11 +278,15 @@ function scopeOK( userScope, recScope, inherit ) {
 }
 
 
-async function addDataObj( tbl, id, obj ) {
+async function addDataObj( tbl, id, obj, evt ) {
   log.info( 'addDataObj', tbl, id )
   await syncTbl( tbl )
   let cre = null
-  if ( data[ tbl ][ id.trim() ] ) { cre = data[ tbl ][ id.trim() ]._cre }
+  let dtaEvt = 'dta.add'
+  if ( data[ tbl ][ id.trim() ] ) {
+    cre = data[ tbl ][ id.trim() ]._cre 
+    dtaEvt = 'dta.update'
+  }
   data[ tbl ][ id.trim() ] = obj
   data[ tbl ][ id.trim() ].id  = id.trim()
   if ( cre ) {
@@ -294,7 +298,7 @@ async function addDataObj( tbl, id, obj ) {
   let dbFile = fileName( tbl )
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
   
-  eh.publishDataChgEvt( 'dta.add', id, tbl, obj )
+  eh.publishDataChgEvt( ( evt ? evt : dtaEvt ), id, tbl, obj )
   return true
 }
 

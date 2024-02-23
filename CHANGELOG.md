@@ -1,3 +1,6 @@
+# 0.9.1
+- State model: API managed action 
+
 # 0.9.0
 - Edit state model
 
