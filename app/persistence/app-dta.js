@@ -19,12 +19,16 @@ exports: module.exports = {
   getDataObjX,
   idExists,
   addDataObj,
-  delDataObj
+  delDataObj,
+  delRootScope
 }
 
 // ============================================================================
 let DB_DIR = null
-let APP_TBL = 'app' 
+const APP_TBL = 'app' 
+const STATE_TBL = 'state' 
+const ERM_TBL = 'erm'
+const EH_SUB_TBL = 'erm'
 
 async function init( dbDir, fakeLogin ) {
   DB_DIR  = dbDir 
@@ -317,6 +321,26 @@ async function delDataObj( tbl, id, ) {
   return "Deleted"
 }
 
+// ============================================================================
+async function delRootScope( scopeId ) {
+  cleanUpScopeInTbl( APP_TBL, scopeId )
+  cleanUpScopeInTbl( STATE_TBL, scopeId )
+  cleanUpScopeInTbl( ERM_TBL, scopeId )
+  cleanUpScopeInTbl( EH_SUB_TBL, scopeId )
+   return 'OK'
+}
+
+async function cleanUpScopeInTbl( tbl, scopeId ) {
+  await syncTbl( tbl )
+  for ( let id in data[ tbl ] ) {
+    if ( id.startsWith( scopeId ) ) {
+      delete data[ tbl ][ appId ]
+    }
+  }
+  await writeFile( fileName( tbl ), JSON.stringify( data[ tbl ], null, '  ' ) )
+
+}
+// ============================================================================
 
 async function syncTbl( tbl, always ) {
   log.debug( 'syncTbl', tbl )

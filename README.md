@@ -173,13 +173,3 @@ A simple markdown docu can be implemented, as well as a self-service onboarding,
 ## CSS
 
 Simple color scheme changes can be done easily, just focus on the 1st 15 lines in [custom.css](app/gui/css/custom.css) 
-
-# TODOs / Ideas
-
-- [ ] Tests for ext. data API
-- [ ] Refactor API for scopes
-- [ ] Event filter
-- [ ] toggle rec delete button
-- [ ] Metrics field type
-- [ ] State model JSON import/export
-- [ ] fix session timeout handling

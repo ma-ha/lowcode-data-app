@@ -8,6 +8,7 @@ const userDta   = require( '../persistence/app-dta-user' )
 exports: module.exports = { 
   init,
   userTenantAuthz,
+  provisioningApiAppAuthz,
   apiAppAuthz,
   initJWTcheck,
   userAuthzForSvc
@@ -39,6 +40,24 @@ function userTenantAuthz( theGUI ) {
       ))
     }
     return next();
+  }
+  return check
+}
+
+// ----------------------------------------------------------------------------
+
+function provisioningApiAppAuthz( ) {
+  let check = async (req, res, next) => {
+    let key = req.headers[ 'provisioning-key' ]
+    log.info( 'key', key )
+    if ( key != cfg.PROVISIONING_API_KEY ) { 
+        log.warn( 'Provisioning API call is not authorized', req.headers )
+        return next( new UnauthorizedError(
+          'Not authorized', 
+          { message: 'Not authorized' }
+        ))
+      }
+    return next()
   }
   return check
 }

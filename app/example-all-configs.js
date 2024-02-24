@@ -7,6 +7,9 @@ let lowCodeApp = require( './index' )
 // let lowCodeApp = require( 'lowcode-data-app' ) // ... when using the npm package
 
 lowCodeApp.init({
+
+  PROVISIONING_API_KEY : 'CHANGE_ME',
+  
   // file based persistence goes into this folder
   DATA_DIR : '../dta/',
   

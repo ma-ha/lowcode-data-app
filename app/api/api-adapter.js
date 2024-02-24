@@ -30,16 +30,115 @@ async function setupAPI( app, oauthCfg ) {
 
   //---------------------------------------------------------------------------
   const apiAuthz = apiSec.apiAppAuthz( app )
+  const provisioningApiAppAuthz = apiSec.provisioningApiAppAuthz( )
 
+  svc.post(   '/adapter/scope', provisioningApiAppAuthz, creRootScope )
+  svc.get(    '/adapter/scope', provisioningApiAppAuthz, getRootScopes )
+  svc.delete( '/adapter/scope', provisioningApiAppAuthz, delRootScope )
+  svc.delete( '/adapter/user',  provisioningApiAppAuthz, delUser )
+
+  svc.get(  '/adapter/scope/:scopeId', apiAuthz, getSubScopes )
+  svc.post( '/adapter/scope/:scopeId', apiAuthz, addSubScope )
+  
   // svc.get(  '/adapter/app/:scopeId', apiAuthz, TODO )
   // svc.get(  '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, TODO )
   // svc.post( '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, TODO )
   // svc.get(  '/adapter/entity/:scopeId/entity', apiAuthz, TODO )
   // svc.get(  '/adapter/entity/:scopeId/:appId/:appVersion/entity', apiAuthz, TODO )
+  
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId',        apiAuthz, getDocArr )
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId/:recId', apiAuthz, getDoc )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId/:recId', apiAuthz, addDoc )
   svc.delete('/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId/:recId', apiAuthz, delDoc )
+}
+
+// ----------------------------------------------------------------------------
+
+async function creRootScope( req, res ) {
+  log.info( 'creRootScope...')
+  if ( ! req.body.name || ! req.body.owner ) { log.warn( 'creRootScope data missing' ); return res.status(400).send() }
+  if ( ! req.body.adminEmail || ! req.body.adminPassword ) { log.warn( 'creRootScope admin missing' );return res.status(400).send() }
+  if ( ! req.body.apiId || ! req.body.apiKey ) { log.warn( 'creRootScope SP missing' );return res.status(400).send() }
+
+  let scopeId = await userDta.creRootScope( 
+    req.body.name,
+    req.body.adminEmail,
+    req.body.owner,
+    ( req.body.tagArr ? req.body.tagArr : [] )
+  )
+
+  log.info( 'creRootScope admin user...')
+  let adminUser = {
+    name :  req.body.adminEmail,
+    role : {
+      dev     : [ scopeId],
+      admin   : [ scopeId ],
+      appUser : [ scopeId ],
+      api     : [] 
+    },
+    password : req.body.adminPassword,
+    expires  : null
+  }
+
+  await userDta.addUser( req.body.adminEmail, adminUser )
+
+  log.info( 'creRootScope admin SP...')
+
+  let newSP = {
+    name : req.body.apiId,
+    sp   : true,
+    role : {
+      dev     : [],
+      admin   : [],
+      appUser : [],
+      api     : [ scopeId ] 
+    },
+    password : req.body.apiKey,
+    expires  : null
+  }
+  await userDta.addUser( req.body.apiId, newSP )
+
+  res.send({
+    status  : 'OK',
+    scopeId : scopeId
+  })
+}
+
+
+async function getRootScopes( req, res ) {
+  log.info( 'getRootScopes...')
+  let scopeMap = await userDta.getRootScopes()
+  res.send( scopeMap )
+}
+
+
+async function delRootScope( req, res ) {
+  log.info( 'delRootScope...', req.body )
+  let result = 'OK'
+  let result1 = await userDta.delRootScope( req.body.scopeId )
+  if ( result1 != ' OK ') { result = result1 }
+  let result2 = await dta.delRootScope( req.body.scopeId )
+  if ( result2 != ' OK ') { result = result2 }
+  res.send({ status : result })
+}
+
+
+async function delUser( req, res ) {
+  log.info( 'delUser...', req.body  )
+  let result = await userDta.delUser( req.body.userId )
+  res.send({ status : result })
+}
+
+// ----------------------------------------------------------------------------
+
+async function getSubScopes( req, res ) {
+  log.info( '...')
+  res.send({status: 'TODO'})
+}
+
+async function addSubScope( req, res ) {
+  log.info( '...')
+  res.send({status: 'TODO'})
 }
 
 // ----------------------------------------------------------------------------

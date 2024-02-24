@@ -9,6 +9,9 @@ const { createHash, randomBytes } = require( 'node:crypto' )
 exports: module.exports = { 
   init,
   authenticate,
+  creRootScope,
+  getRootScopes,
+  delRootScope,
   setSelScope,
   getSelScope,
   getSelScopeName,
@@ -22,6 +25,7 @@ exports: module.exports = {
   addUser,
   updateUser,
   getUserArr,
+  delUser,
   getApiAppScopes,
   loadOidcSessions,
   saveOidcSessions
@@ -32,6 +36,7 @@ exports: module.exports = {
 let userScopeCache = null
 
 let SCOPE_DB      = '../dta/scope.json'
+let SCOPE_ID      = '../dta/scopeSeq.json'
 let USER_AUTH_DB  = '../dta/user-auth.json'
 let USER_SCOPE_DB = '../dta/user-scope.json'
 let OICD_SESSION_DB = '../dta/oidc-session.json'
@@ -41,10 +46,83 @@ let FAKE_LOGIN = false
 async function init( dbDir, fakeLogin ) {
   if ( fakeLogin ) { FAKE_LOGIN = fakeLogin }
   SCOPE_DB        = dbDir + 'scope.json'
+  SCOPE_ID        = dbDir + 'scopeSeq.json'
   USER_AUTH_DB    = dbDir + 'user-auth.json'
   USER_SCOPE_DB   = dbDir + 'user-scope.json'
   OICD_SESSION_DB = dbDir + 'oidc-session.json'
 }
+
+// ============================================================================
+
+async function creRootScope( name, adminEmail, owner, tagArr ) {
+  let scopeTbl = await getScope() 
+  let newId = await getNextScopeId()
+  scopeTbl[ newId ] = {
+    name       : name,
+    tag        : ( tagArr ? tagArr : [] ),
+    meta       : {},
+    adminEmail : adminEmail,
+    owner      : owner,
+    _cre       : Date.now()
+  }
+  await writeScope() 
+  return newId
+}
+
+async function getNextScopeId() {
+  let scopeSeq = JSON.parse( await readFile( SCOPE_ID ) )
+  scopeSeq.ID ++
+  let newId = scopeSeq.ID + ''
+  await writeFile( SCOPE_ID, JSON.stringify( scopeSeq, null, '  ' ) )
+  return newId
+}
+
+
+async function getRootScopes() {
+  let scopeTbl = await getScope() 
+  let scopeMap = {}
+  for ( let tId in scopeTbl ) {
+    if ( tId.indexOf('/') == -1 ) {
+      scopeMap[ tId ] = scopeTbl[ tId ]
+    }
+  }
+  return scopeMap
+}
+
+async function delRootScope( scopeId ) {
+  log.info( 'AppDta delRootScope ...' )
+  let scopeTbl = await getScope() 
+  let authTbl = await getAuthTbl()
+
+  // remove scope from user roles
+  for ( let uid in authTbl ) {
+    let user = authTbl[ uid ]
+    removeScopeId( scopeId, user.role.admin )
+    removeScopeId( scopeId, user.role.dev )
+    removeScopeId( scopeId, user.role.appUser )
+    removeScopeId( scopeId, user.role.api )
+  }
+
+  // remove scope
+  for ( let tId in scopeTbl ) {
+    if ( tId.startsWith( scopeId ) ) {
+      delete scopeTbl[ tId ] 
+    }
+  }
+  await writeScope() 
+
+  return 'OK'
+}
+
+function removeScopeId( scopeId, scopeArr ) {
+  for ( let scId of scopeArr ) {
+    if ( scId.startsWith( scopeId ) ) {
+      scopeArr.splice( scopeArr.indexOf( scId ), 1 )
+    }
+  }
+}
+
+// ============================================================================
 
 async function getUserScope() {
   // if ( ! userScopeCache ) {
@@ -376,6 +454,16 @@ async function getUserArr( scopeId ) {
   return result
 }
 
+async function delUser( uid ) {
+  let authTbl = await getAuthTbl()
+  if ( authTbl[ uid ]) {
+    delete authTbl[ uid ]
+    await writeAuthTbl()
+    return 'OK'
+  }
+  return 'Not found'
+}
+
 async function getApiAppScopes( appId, appSecret ) {
   let authTbl = await getAuthTbl()
 
@@ -414,41 +502,6 @@ async function saveOidcSessions( oidcSessions ) {
 // ============================================================================
 // ============================================================================
 let scopeCache = {}
-// {
-//   "1000": { "name": "Test Tenant", tag:[] },
-//   "1000/DE": { "name": "Region Germany", tag:['region'] },
-//   "1000/DE/Berlin": { "name": "City: Berlin", tag:['city','capital','huge'] },
-//   "1000/DE/Hamburg": { "name": "City: Hamburg", tag:['city','huge'] },
-//   "1000/DE/Munich": { "name": "City: Munich", tag:['city','huge'] },
-//   "1000/DE/Essen": { "name": "City: Essen", tag:['city','huge'] },
-//   "1000/DE/Bochum": { "name": "City: Bochum", tag:['city','mid'] },
-//   "1000/DE/Hattingen": { "name": "City: Hattingen", tag:['city','small'] },
-//   "1000/UK": { "name": "UK", tag:['region'] },
-//   "2000": { "name": "Other Root Tenant", tag:[]  }
-// }
 
 let authTblCache = {}
-// {
-//   "demo": {
-//     name: 'demo@xzy.org',
-//     role: {
-//       dev: [ "1000" ],
-//       admin: [ "1000/DE" ],
-//       appUser: [ "1000" ],
-//       api: []
-//     },
-//     password: 'secret',
-//     expires: 2234567890000
-//   },
-//   '5a095719-cfbe-49d3-8927-a55da94221ed': {
-//     name: 'Super App',
-//     role: {
-//       dev: [],
-//       admin: [],
-//       appUser: [ ],
-//       api: [  "1000"  ]
-//     },
-//     password: '5a095719-cfbe-49d3-8927-a55da94221ed',
-//     expires: 1234567890
-//   }
-// }
+

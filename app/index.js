@@ -54,6 +54,8 @@ async function init( lowCodeConfig ) {
 function checkConfig( cfg ) {
   if ( ! cfg ) {  cfg = {} } 
   
+  checkCfgParam( cfg, 'PROVISIONING_API_KEY', 'CHANGE_ME' )
+
   checkCfgParam( cfg, 'DATA_DIR', '../dta/' )
   cfg.DATA_DIR = path.resolve( cfg.DATA_DIR ) 
   
