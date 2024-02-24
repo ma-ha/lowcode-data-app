@@ -309,11 +309,17 @@ async function addUser( id, newUser ) {
   let authTbl = await getAuthTbl()
   if ( id && authTbl[ id ] ) { return 'ERROR: ID exists' }
   if ( id ) { // add user
+    let result = 'User added'
+    if ( newUser.password ) {
+      newUser.password = createHash('sha256').update( newUser.password ).digest('hex')
+    } else {
+      let pwd = randomBytes(5).toString('hex')
+      newUser.password = createHash('sha256').update( pwd ).digest('hex')
+      result = 'User added, password is "'+pwd+'"'
+    }
     authTbl[ id ] = newUser
-    let pwd = randomBytes(5).toString('hex')
-    newUser.password = createHash('sha256').update( pwd ).digest('hex')
     await writeAuthTbl()
-    return 'User added, password is "'+pwd+'"'
+    return 
   } else { // add API account
     let spId = helper.uuidv4()
     newUser.password = helper.uuidv4()
@@ -466,8 +472,9 @@ async function delUser( uid ) {
 
 async function getApiAppScopes( appId, appSecret ) {
   let authTbl = await getAuthTbl()
-
-  if ( authTbl[ appId ] && authTbl[ appId ].password == appSecret ) {
+  let hash = createHash('sha256').update( appSecret ).digest('hex')
+  log.info( 'getApiAppScopes', hash,  authTbl[ appId ] )
+  if ( authTbl[ appId ] && authTbl[ appId ].password == hash ) {
     return authTbl[ appId ].role.api
   } else {
     return null

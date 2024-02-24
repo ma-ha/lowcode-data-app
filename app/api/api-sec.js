@@ -31,6 +31,8 @@ function userTenantAuthz( theGUI ) {
   let check = async (req, res, next) => {
     let user = await userDta.getUserInfoFromReq( gui, req )
     if ( user ) { 
+      // TODO check scopeId
+
       req.user = user
     } else {
       log.info( 'call is not authorized', req.headers )
@@ -72,8 +74,9 @@ function apiAppAuthz( theGUI ) {
     let appPw = req.headers[ 'app-secret' ]
     log.info( 'apiAppAuthz', appId, appPw )
     let appScopes = await userDta.getApiAppScopes( appId, appPw )
+    log.info( 'apiAppAuthz appScopes', req.params.scopeId , appScopes )
     if ( appScopes ) { 
-      if ( req.params.scopeId && ! appScopes.indexOf( req.params.scopeId ) >= 0 ) {
+      if ( req.params.scopeId && appScopes.indexOf( req.params.scopeId ) == -1 ) {
         log.warn( 'call scope is not authorized', req.headers )
         return next( new UnauthorizedError(
           'Not authorized for scope', 

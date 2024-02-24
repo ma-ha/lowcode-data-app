@@ -739,5 +739,27 @@
         ]
       }
     }
+  },
+  "2011/mocha-test-app/1.0.0": {
+    "scopeId": null,
+    "title": "MochaTest",
+    "require": {},
+    "entity": {
+      "test": {
+        "title": "Test",
+        "scope": "inherit",
+        "maintainer": [],
+        "properties": {
+          "Name": {
+            "type": "String"
+          }
+        }
+      }
+    },
+    "startPage": "test",
+    "role": [
+      "appUser"
+    ],
+    "scope": {}
   }
 }

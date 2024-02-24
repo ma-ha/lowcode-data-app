@@ -2,6 +2,7 @@
 
 const assert = require( 'assert' )
 const axios  = require( 'axios' )
+const helper = require( './helper' )
 
 const SCOPE_API_URL = 'http://localhost:8888/app/adapter/scope'
 const USER_API_URL = 'http://localhost:8888/app/adapter/user'
@@ -9,6 +10,13 @@ const USER_API_URL = 'http://localhost:8888/app/adapter/user'
 let HEADERS = { 'provisioning-key': 'CHANGE_ME' }
 
 describe( 'Tenant Provisioning', () => { 
+
+  let scopeId = null
+
+  before( async () => { 
+    scopeId = await helper.getRootScopeId()
+    assert.notEqual( scopeId, null )
+  })
 
   it( 'Delete admin user', async () => {
     let result = await axios.delete( USER_API_URL,{ data: { userId: 'mochatest@t.de' }, headers: HEADERS } )
@@ -23,21 +31,6 @@ describe( 'Tenant Provisioning', () => {
     assert.equal( result.data.status, 'OK' )
   })
 
-
-  let scopeId = null
-  it( 'List root scopes', async () => {
-    let result = await axios.get( SCOPE_API_URL, { headers: HEADERS }  )
-    // console.log( result.data )
-    assert.equal( result.status, 200 )
-    let scopeMap = result.data
-    for ( let id in scopeMap ) {
-      if ( scopeMap[ id ].name == 'mochatest' ) {
-        scopeId = id
-        break
-      }
-    }
-    assert.notEqual( scopeId, null )
-  })
 
   it( 'Delete root scope', async () => {
     let result = await axios.delete( SCOPE_API_URL, { data: { scopeId: scopeId }, headers: HEADERS  }  )

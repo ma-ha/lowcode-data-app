@@ -40,7 +40,7 @@ async function setupAPI( app, oauthCfg ) {
   
   // svc.get(  '/adapter/app/:scopeId', apiAuthz, TODO )
   // svc.get(  '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, TODO )
-  // svc.post( '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, TODO )
+  svc.post( '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, creApp )
   // svc.get(  '/adapter/entity/:scopeId/entity', apiAuthz, TODO )
   // svc.get(  '/adapter/entity/:scopeId/:appId/:appVersion/entity', apiAuthz, TODO )
   
@@ -137,6 +137,18 @@ async function getSubScopes( req, res ) {
 async function addSubScope( req, res ) {
   log.info( '...')
   res.send({status: 'TODO'})
+}
+
+// ----------------------------------------------------------------------------
+
+async function creApp( req, res ) {
+  log.info( 'creApp...')
+  let appId = req.params.scopeId +'/'+ req.params.appId +'/'+ req.params.appVersion
+  let app = await dta.getAppById( appId )
+  if ( app ) { log.warn( 'app exists', appId ); return res.status(400).send() }
+  app = req.body
+  await dta.addApp( appId, app )
+  res.send({status: 'OK'})
 }
 
 // ----------------------------------------------------------------------------

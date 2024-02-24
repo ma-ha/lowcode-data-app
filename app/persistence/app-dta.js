@@ -334,7 +334,7 @@ async function cleanUpScopeInTbl( tbl, scopeId ) {
   await syncTbl( tbl )
   for ( let id in data[ tbl ] ) {
     if ( id.startsWith( scopeId ) ) {
-      delete data[ tbl ][ appId ]
+      delete data[ tbl ][ id ]
     }
   }
   await writeFile( fileName( tbl ), JSON.stringify( data[ tbl ], null, '  ' ) )
