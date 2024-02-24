@@ -26,8 +26,6 @@ async function setupAPI( app, oauthCfg ) {
   svc.use( bodyParser.urlencoded({  limit: "20mb", extended: false }) )
   svc.use( bodyParser.json({ limit: "20mb" }) )
 
-  apiSec.init( oauthCfg )
-
   //---------------------------------------------------------------------------
   const apiAuthz = apiSec.apiAppAuthz( app )
   const provisioningApiAppAuthz = apiSec.provisioningApiAppAuthz( )

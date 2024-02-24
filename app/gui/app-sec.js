@@ -17,8 +17,9 @@ let publicPages = [
 ]
 
 // ----------------------------------------------------------------------------
-function init( gui, cfg ) {
+function init( gui, allCfg ) {
   log.info( 'Init App security...' )
+  let cfg = allCfg.OICD
   
   // switch securiy on:
   gui.enableSec2({ 

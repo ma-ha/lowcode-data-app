@@ -5,6 +5,8 @@ const axios  = require( 'axios' )
 
 const API_URL = 'http://localhost:8888/app/adapter/scope'
 
+let HEADERS = { 'provisioning-key': 'CHANGE_ME' }
+
 describe( 'Tenant Provisioning', () => { 
 
     let scopeId = null
@@ -17,7 +19,7 @@ describe( 'Tenant Provisioning', () => {
         apiId         : 'mochatest',
         apiKey        : 'mochatest-supasecret-id',
         owner         : 'ma-ha'
-      })
+      }, { headers: HEADERS } )
       // console.log( result )
       assert.equal( result.status, 200 )
       scopeId = result.data.scopeId
@@ -25,7 +27,7 @@ describe( 'Tenant Provisioning', () => {
 
 
     it( 'List root scopes', async () => {
-      let result = await axios.get( API_URL )
+      let result = await axios.get( API_URL, { headers: HEADERS } )
       assert.notEqual( result.data, null )
       assert.notEqual( result.data[ scopeId ], null )
     })

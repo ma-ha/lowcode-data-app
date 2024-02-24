@@ -17,16 +17,16 @@ exports: module.exports = {
 let gui = null
 let cfg = null
 
-function init( oicdCfg ) {
-  log.info( 'Starting API/sec...' )
-  cfg = oicdCfg
+function init( configs ) {
+  log.info( 'Starting API/sec...', cfg )
+  cfg = configs
 }
 
 function userTenantAuthz( theGUI ) {
   gui = theGUI
   // let clientID = cfg.CLIENT_ID
-  let audience = cfg.AUDIENCE
-  let issuer   = cfg.ISSUER
+  // let audience = cfg.OICD.AUDIENCE
+  // let issuer   = cfg.OICD.ISSUER
 
   let check = async (req, res, next) => {
     let user = await userDta.getUserInfoFromReq( gui, req )
@@ -49,14 +49,14 @@ function userTenantAuthz( theGUI ) {
 function provisioningApiAppAuthz( ) {
   let check = async (req, res, next) => {
     let key = req.headers[ 'provisioning-key' ]
-    log.info( 'key', key )
-    if ( key != cfg.PROVISIONING_API_KEY ) { 
-        log.warn( 'Provisioning API call is not authorized', req.headers )
+    if ( ! key || key != cfg.PROVISIONING_API_KEY ) { 
+        log.warn( 'Provisioning API call is not authorized', req.method, req.originalUrl )
         return next( new UnauthorizedError(
           'Not authorized', 
           { message: 'Not authorized' }
         ))
-      }
+    }
+    log.debug( 'provisioningApiAppAuthz OK' )
     return next()
   }
   return check
@@ -100,8 +100,8 @@ function apiAppAuthz( theGUI ) {
 
 function initJWTcheck() {
   // let clientID = cfg.CLIENT_ID
-  let audience = cfg.AUDIENCE
-  let issuer   = cfg.ISSUER
+  // let audience = cfg.OICD.AUDIENCE
+  // let issuer   = cfg.OICD.ISSUER
 
   let check = (req, res, next) => {
     log.debug( 'JWTcheck', req.headers.authorization )

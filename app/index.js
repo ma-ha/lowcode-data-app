@@ -26,7 +26,7 @@ exports: module.exports = {
 async function init( lowCodeConfig ) {
   let cfg = checkConfig( lowCodeConfig )
 
-  apiSec.init( cfg.OICD )
+  apiSec.init( cfg )
   let app = appGUI.init( cfg )
   await appData.init( cfg.DATA_DIR, cfg.FAKE_LOGIN )
   await eh.init( app, cfg.DATA_DIR )
@@ -34,7 +34,7 @@ async function init( lowCodeConfig ) {
   await appGUI.initPages()
 
   await appMgrGUI.init()
-  appSec.init( app, cfg.OICD )
+  appSec.init( app, cfg )
 
   if ( cfg.OIDC_SERVER )  {
    oidc.init( app, cfg.OICD )
@@ -73,7 +73,7 @@ function checkCfgParam( cfg, paramName, defaultVal ) {
   if ( config[ paramName ] ) {
     cfg[ paramName ] = config[ paramName ]
     log.debug( 'Low Code App Init: ',paramName, defaultVal ) 
-  } else if ( ! cfg[ paramName ]  || ! typeof myVar === 'string' ) { 
+  } else if ( ! cfg[ paramName ]  || ! typeof cfg[ paramName ] === 'string' ) { 
     log.warn( 'Low Code App Init: Use default '+paramName+'="'+defaultVal+'"' ) 
     cfg[ paramName ] = defaultVal
   }  
