@@ -656,7 +656,7 @@
             }
           },
           "Description": {
-            "type": "String",
+            "type": "Text",
             "stateTransition": {
               "null_Create": true,
               "Open_StartProgress": true,
@@ -668,7 +668,8 @@
               "Blocked_Unblock": true,
               "Blocked_StartProgress": true,
               "Closed_Reopen": true
-            }
+            },
+            "lines": 3
           },
           "Assignee": {
             "type": "String",

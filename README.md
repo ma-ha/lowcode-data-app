@@ -88,6 +88,7 @@ Open your new app in the "App" tab (the app is only visible in the defined scope
 
 Data types (and their Web GUI mapping)
 - `Strings` (simple input fields)
+- `Text` (multi line input fields)
 - `Number` (simple input fields)
 - `Boolean`  (checkboxes)
 - `Date` (date picker)

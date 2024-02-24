@@ -1,3 +1,6 @@
+# 0.9.2
+- New "Text" property type
+
 # 0.9.1
 - State model: API managed action 
 

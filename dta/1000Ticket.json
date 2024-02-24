@@ -23,14 +23,14 @@
   },
   "11": {
     "id": "11",
-    "_state": "InProgress",
-    "scopeId": "1000/DE",
     "Task": "Simple TODO",
-    "Description": "test",
+    "Description": "Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     "Assignee": "me",
+    "scopeId": "1000/DE",
+    "_state": "InProgress",
     "Resolution": "ok again",
     "_cre": 1708157401380,
-    "_upd": 1708668259172
+    "_upd": 1708752968589
   },
   "21": {
     "id": "21",

@@ -4,6 +4,7 @@ const dta     = require( '../persistence/app-dta' )
 // All property type specific handling is done here
 
 exports: module.exports = {
+  getPropTypes,
   setPropRef,
   getpropTypeDef,
   addNewPropertyDef,
@@ -19,9 +20,22 @@ exports: module.exports = {
 
 // ============================================================================
 
+function getPropTypes() {
+  return [
+    'String', 'Text',
+    'Boolean', 'Number', 'Date', 
+    'Select', 
+    'DocMap', 'SelectRef', 'MultiSelectRef', /* 'RefArray',*/ 
+    'UUID', 'Metric', 'Link', 'JSON', 'Event' 
+  ]
+}
+
 
 function setPropRef( prop, dbProp ) {
   switch ( dbProp.type ) {
+    case 'Text':
+      prop.ref = dbProp.lines
+      break 
     case 'Select':
       prop.ref = dbProp.options.join()
       break 
@@ -54,6 +68,9 @@ function setPropRef( prop, dbProp ) {
 function getpropTypeDef( prop ) {
   let pType = ( prop.type ? prop.type : "?" )
   switch ( pType ) {
+    case 'Text':
+      pType = "Text ("+prop.lines+')'
+      break 
     case 'Select':
       pType = "Select: ["+prop.options.join()+']'
       break 
@@ -87,7 +104,17 @@ function getpropTypeDef( prop ) {
 async function addNewPropertyDef( prop, type, ref  ) {
 
   // special types need additional info
-  if ( type == 'Select' ) {
+  if ( type == 'Text' ) {
+
+    prop.lines = 3
+    if ( ref && ref !== '' ) { 
+      let cnt = Number.parseInt( ref )
+      if ( cnt != NaN && cnt > 0 ) {
+        prop.lines = cnt
+      }
+    } 
+
+  } else if ( type == 'Select' ) {
 
     prop.options = ref.split(',')
 
@@ -239,6 +266,9 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
     let fld = null
 
     switch ( prop.type ) {
+      case 'Text':
+        fld = { id: propId, label: lbl, type: 'text', rows: prop.lines }
+        break 
       case 'Boolean':
         fld = { id: propId, label: lbl, type: 'checkbox' }
         break 
@@ -342,6 +372,9 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
     let fld = null
 
     switch ( prop.type ) {
+      case 'Text':
+        fld = { id: propId, label: lbl, type: 'text', rows: prop.lines, value: rec[ propId ] }
+        break 
       case 'Boolean':
         fld = { id: propId, label: lbl, type: 'checkbox', value: rec[ propId ] }
         break 
@@ -489,6 +522,10 @@ function reformatDataTableReturn( entity, rec, url, stateModel  ) {
     log.debug( 'getDoc', propId, prop.type )
 
     switch ( prop.type ) {
+      case 'Text':
+        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) 
+        if ( tblRec[ propId ].length > 100 ) { tblRec[ propId ] = tblRec[ propId ].substr(0,100) +'...' }
+        break 
       case 'SelectRef':
         tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
         break 
