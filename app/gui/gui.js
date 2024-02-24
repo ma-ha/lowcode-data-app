@@ -87,7 +87,7 @@ async function initPages( ) {
   
 
   gui.pages['main'].footer.copyrightText = PRD_NAME + ' v'+pjson.version + ' &#169; ma-ha, 2023  ' 
-    + '<a href="https://github.com/ma-ha/lowcode-data-app" target="_blank">GitLab</a> / '
+    + '<a href="https://github.com/ma-ha/lowcode-data-app" target="_blank">GitHub</a> / '
     + '<a href="https://www.npmjs.com/package/lowcode-data-app" target="_blank">NPM</a>'
   gui.pages['main'].addFooterLink( 'Imprint',  getHtmlURL( 'imprint-en' )  )
   gui.pages['main'].addFooterLink( 'Privacy Policy',  getHtmlURL( 'privacy-en' ) ) 
