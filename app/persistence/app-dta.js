@@ -122,7 +122,7 @@ async function getApp( scopeId, appId ) {
 }
 
 async function getAppById( fullAppId ) {
-  log.debug( 'getApp',fullAppId )
+  log.info( 'getApp',fullAppId )
   await syncTbl( APP_TBL )
   if ( data.app[fullAppId] ) {
     return data.app[  fullAppId ]
@@ -334,6 +334,7 @@ async function cleanUpScopeInTbl( tbl, scopeId ) {
   await syncTbl( tbl )
   for ( let id in data[ tbl ] ) {
     if ( id.startsWith( scopeId ) ) {
+      log.info( 'cleanUpScopeInTbl delete:', scopeId, tbl, id )
       delete data[ tbl ][ id ]
     }
   }

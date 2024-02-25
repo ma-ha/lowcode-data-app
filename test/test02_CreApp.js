@@ -7,7 +7,7 @@ const helper = require( './helper' )
 const API_URL = 'http://localhost:8888/app/adapter/app/'
 
 let HEADERS = { 
-  'app-id     ': 'mochatest',
+  'app-id'     : 'mochatest',
   'app-secret' : 'mochatest-supasecret-id'
 }
 
@@ -52,7 +52,20 @@ describe( 'Create App', () => {
     let result = await axios.post( url, app, { headers: HEADERS } )
     // console.log( result )
     assert.equal( result.status, 200 )
-    scopeId = result.data.scopeId
   })
 
+
+  it( 'List root scopes', async () => {
+    let result = await axios.get( API_URL + scopeId, { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data, null )
+  })
+
+
+  it( 'Get new app', async () => {
+    let result = await axios.get( API_URL + scopeId  +'/mocha-test-app/1.0.0', { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data, null )
+  })
+  
 })

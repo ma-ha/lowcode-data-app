@@ -38,8 +38,8 @@ async function setupAPI( app, oauthCfg ) {
   svc.get(  '/adapter/scope/:scopeId', apiAuthz, getSubScopes )
   svc.post( '/adapter/scope/:scopeId', apiAuthz, addSubScope )
   
-  // svc.get(  '/adapter/app/:scopeId', apiAuthz, TODO )
-  // svc.get(  '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, TODO )
+  svc.get(  '/adapter/app/:scopeId', apiAuthz, getAppList )
+  svc.get(  '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, getApp )
   svc.post( '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, creApp )
   // svc.get(  '/adapter/entity/:scopeId/entity', apiAuthz, TODO )
   // svc.get(  '/adapter/entity/:scopeId/:appId/:appVersion/entity', apiAuthz, TODO )
@@ -149,6 +149,24 @@ async function creApp( req, res ) {
   app = req.body
   await dta.addApp( appId, app )
   res.send({status: 'OK'})
+}
+
+async function getAppList( req, res ) {
+  log.info( 'getAppList...')
+  let tags = []
+  if ( req.query.tags ) {
+    // TODO
+  }
+  let appMap = await dta.getAppList( req.params.scopeId, tags  )
+  res.send( appMap )
+}
+
+async function getApp( req, res ) {
+  log.info( 'getApp...')
+  let appId = req.params.scopeId +'/'+ req.params.appId +'/'+ req.params.appVersion
+  let app = await dta.getAppById( appId )
+  if ( ! app ) { log.warn( 'Not found', appId ); return res.status(400).send('Not found') }
+  res.send( app )
 }
 
 // ----------------------------------------------------------------------------
