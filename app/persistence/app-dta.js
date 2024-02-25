@@ -20,6 +20,7 @@ exports: module.exports = {
   idExists,
   addDataObj,
   delDataObj,
+  delCollection,
   delRootScope
 }
 
@@ -173,12 +174,12 @@ async function getData( tbl, scopeId, admin ) {
       inheritData = true 
     }
   } else {
-
+    // nothing
   }
   await syncTbl( table )
   let result = {}
   for ( let recId in data[ table ] ) {
-    log.info( 'getData dta',inheritData,  recId, scopeId, data[ table ][ recId ].scopeId  )
+    log.info( 'getData dta:',inheritData,  recId, scopeId, data[ table ][ recId ].scopeId  )
     if ( admin ) {
       result[ recId ] = data[ table ][ recId ]
     } else  if ( inheritData ) {
@@ -322,6 +323,13 @@ async function delDataObj( tbl, id, ) {
 }
 
 // ============================================================================
+async function delCollection( scopeId, entityId ) {
+  let dbFile = fileName( scopeId + entityId )
+  if ( fs.existsSync( dbFile ) ) {
+    await rm( dbFile )
+  }
+}
+
 async function delRootScope( scopeId ) {
   cleanUpScopeInTbl( APP_TBL, scopeId )
   cleanUpScopeInTbl( STATE_TBL, scopeId )
@@ -339,7 +347,6 @@ async function cleanUpScopeInTbl( tbl, scopeId ) {
     }
   }
   await writeFile( fileName( tbl ), JSON.stringify( data[ tbl ], null, '  ' ) )
-
 }
 // ============================================================================
 

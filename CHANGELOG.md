@@ -1,5 +1,7 @@
 # 0.10.0
 - Provisioning API + tests
+- App API + tests
+- Entity API + tests
 
 # 0.9.2
 - New "Text" property type

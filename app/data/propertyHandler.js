@@ -15,7 +15,8 @@ exports: module.exports = {
   reformatDataReturn,
   genEmptyDataReturn,
   reformatDataTableReturn,
-  reformatDataUpdateInput
+  reformatDataUpdateInput,  
+  validateParam
 }
 
 // ============================================================================
@@ -638,6 +639,25 @@ function reformatDataUpdateInput( entity, rec ) {
   return {}
 }
 
+// ============================================================================
+function validateParam( p, type) {
+  switch ( type ) {
+    case 'String':  if ( typeof p === 'string' ) { return true }; break
+    case 'Text':    if ( typeof p === 'string' ) { return true }; break
+    case 'Number':  if ( isNaN( p ) ) { return  true}; break
+    case 'Boolean': if ( typeof p === 'boolean' ) { return  true}; break
+    // case 'Date':   /* TODO */ break
+    case 'Select':  if ( typeof p === 'boolean' ) { return  true}; break
+    // case 'DocMap':  /* TODO */  break
+    // case 'SelectRef':  /* TODO */  break
+    // case 'MultiSelectRef':  /* TODO */  break
+    case 'JSON':  if ( typeof p === 'object' ) { return  true}; break
+    case 'Link':  if ( typeof p === 'string' ) { return  true}; break
+    case 'UUID':  if ( typeof p === 'string' ) { return  true}; break
+    default: return true
+  }
+  return false 
+}
 // ============================================================================
 
 function genLink( page, id ) {

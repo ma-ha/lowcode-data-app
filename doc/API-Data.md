@@ -4,6 +4,20 @@ Header:
 - `app-id`
 - `app-secret`
 
+
+# Scopes
+
+## GET /adapter/scope/:scopeId
+
+Get sub/scopes of scopeId
+
+## POST /adapter/scope/:scopeId
+
+Add/update a sub-scope
+
+
+# Apps
+
 ## GET /adapter/app/:scopeId
 
 Get apps defined in scope.
@@ -16,18 +30,25 @@ Get full app definition, including entity definitions.
 
 Add or update full app definition, including entity definitions.
 
-## GET /adapter/entity/:scopeId/entity
 
-Get entity definitions for scope 
+# Entities
 
-## GET /adapter/entity/:scopeId/:appId/:appVersion/entity
+## GET /adapter/entity/:scopeId/:appId/:appVersion/:entityId
 
-Get array of documents.
+Get map of documents.
 
-## GET /adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId
+## GET /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
 
 Get document by id.
 
-## POST /adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId
+## POST /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
 
 Add document or update document by id.
+
+## POST /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
+
+Delete document by id.
+
+## DELETE /adapter/entity/:scopeId/:entityId
+
+Delete collection

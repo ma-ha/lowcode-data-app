@@ -72,9 +72,9 @@ function apiAppAuthz( theGUI ) {
   let check = async (req, res, next) => {
     let appId = req.headers[ 'app-id' ]
     let appPw = req.headers[ 'app-secret' ]
-    log.info( 'apiAppAuthz', appId, appPw )
+    // log.info( 'apiAppAuthz', appId, appPw )
     let appScopes = await userDta.getApiAppScopes( appId, appPw )
-    log.info( 'apiAppAuthz appScopes', req.params.scopeId , appScopes )
+    // log.info( 'apiAppAuthz appScopes', req.params.scopeId , appScopes )
     if ( appScopes ) { 
       if ( req.params.scopeId && appScopes.indexOf( req.params.scopeId ) == -1 ) {
         log.warn( 'call scope is not authorized', req.headers )

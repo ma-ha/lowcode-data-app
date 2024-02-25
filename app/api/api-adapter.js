@@ -6,6 +6,7 @@ const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
 const bodyParser = require( 'body-parser' )
 const helper     = require( '../helper/helper' )
+const props      = require( '../data/propertyHandler' )
 
 exports: module.exports = { 
   setupAPI  
@@ -41,13 +42,12 @@ async function setupAPI( app, oauthCfg ) {
   svc.get(  '/adapter/app/:scopeId', apiAuthz, getAppList )
   svc.get(  '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, getApp )
   svc.post( '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, creApp )
-  // svc.get(  '/adapter/entity/:scopeId/entity', apiAuthz, TODO )
-  // svc.get(  '/adapter/entity/:scopeId/:appId/:appVersion/entity', apiAuthz, TODO )
   
-  svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId',        apiAuthz, getDocArr )
-  svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId/:recId', apiAuthz, getDoc )
-  svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId/:recId', apiAuthz, addDoc )
-  svc.delete('/adapter/entity/:scopeId/:appId/:appVersion/entity/:entityId/:recId', apiAuthz, delDoc )
+  svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId',        apiAuthz, getDocArr )
+  svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, getDoc )
+  svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, addDoc )
+  svc.delete('/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, delDoc )
+  svc.delete('/adapter/entity/:scopeId/:entityId', apiAuthz, delCollection )
 }
 
 // ----------------------------------------------------------------------------
@@ -174,18 +174,20 @@ async function getApp( req, res ) {
 async function getDocArr( req, res ) {
   log.info( 'GET data array', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
   if ( ! await checkApp( req, res ) ) { return }
-  let tbl = req.scopeId + req.params.entityId
-  let dtaArr = await getData( tbl, req.scopeId )
-  res.send( dtaArr )
+  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+  let recs = await dta.getData( tbl, req.params.scopeId )
+  log.info( 'recs',recs)
+  res.send( recs )
 }
 
 
 async function getDoc( req, res ) {
   log.info( 'GET data by id', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
   if ( ! await checkApp( req, res ) ) { return }
-  let tbl = req.scopeId + req.params.entityId
-  let dta = await getDataById( tbl, req.params.recId )
-  return dta
+  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+  let rec = await dta.getDataById( tbl, req.params.recId )
+  log.info( 'rec',rec )
+  res.send( rec )
 }
 
 
@@ -193,7 +195,7 @@ async function addDoc( req, res )  {
   log.info( 'Add data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
   let app = await checkApp( req, res )
   if ( ! app ) { return }
-  let tbl = req.scopeId + req.params.entityId
+  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
   
   let properties = app.entity[ req.params.entityId ].properties
   for ( let propId in req.body ) {
@@ -205,48 +207,22 @@ async function addDoc( req, res )  {
   
   for ( let propId in properties ) {
     let p = req.body[ propId ]
-    if ( ! req.body[ propId ] ) {
+    if ( ! p ) {
       log.warn( 'api-adapter: properties missing', propId )
       return res.status( 400 ).send( )
     }
-    switch ( properties[ propId ].type ) {
-      case 'String': 
-        if ( typeof p === 'string' ) { return  sendErr( res, 'api-adapter: body not valid: '+propId )}; break
-      case 'Number': 
-        if ( isNaN( p ) ) { return  sendErr( res, 'api-adapter: body not valid: '+propId )}; break
-      case 'Boolean': 
-        if ( typeof p === 'boolean' ) { return  sendErr( res, 'api-adapter: body not valid: '+propId )}; break
-      case 'Date': 
-        break
-      case 'Select': 
-        if ( typeof p === 'boolean' ) { return  sendErr( res, 'api-adapter: body not valid: '+propId )}; break
-      case 'DocMap': 
-        // TODO
-        break
-      case 'SelectRef': 
-        // TODO
-        break
-      case 'MultiSelectRef': 
-        // TODO
-        break
-      case 'UUID': 
-        if ( typeof p === 'string' ) { return  sendErr( res, 'api-adapter: body not valid: '+propId )}; break
-        break
-      case 'JSON': 
-        if ( typeof p === 'object' ) { return  sendErr( res, 'api-adapter: body not valid: '+propId )}; break
-        break
-      case 'Link': 
-        if ( typeof p === 'string' ) { return  sendErr( res, 'api-adapter: body not valid: '+propId )}; break
-        break
-
-      default:
-        return sendErr( res, 'api-adapter: body not valid: '+propId )
-        break
+    let paramOK = props.validateParam( p, properties[ propId ].type ) 
+    if ( ! paramOK ) {
+      return  sendErr( res, 'api-adapter: body not valid: '+propId )
     }
   }
-
+  req.body.scopeId = req.params.scopeId
   let result = await dta.addDataObj( tbl, req.params.recId, req.body )
-  res.send( result )
+  if ( result ) {
+    res.send({ status: 'OK' })
+  } else {
+    res.send({ error: '?' })
+  }
 }
 
 
@@ -254,9 +230,16 @@ async function delDoc( req, res )  {
   log.info( 'Del data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! await checkApp( req, res ) ) { return }
-  let tbl = req.scopeId + req.params.entityId
+  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
   let result = await dta.delDataObj( tbl, req.params.recId )
   res.send( result )
+}
+
+
+async function delCollection( req, res )  {
+  log.info( 'Del Collectinm', req.params.scopeId, req.params.entityId )
+  await dta.delCollection( req.params.scopeId, req.params.entityId  )
+  res.send({ status: 'OK'})
 }
 
 
@@ -281,17 +264,27 @@ function sendErr( res, err ) {
   res.status( 400 ).send( )
 }
 
+function getRootScope( scopeId ) {
+  if ( scopeId.indexOf('/') > -0 ) {
+    let scopeArr = scopeId.split('/')
+    return scopeArr[0]
+  }
+  return scopeId
+}
+
 
 async function checkApp( req, res ) {
-  let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
+  let appId = req.params.scopeId +'/'+ req.params.appId +'/'+ req.params.appVersion
   let app = await dta.getAppById( appId )
   if ( ! app ) { 
     log.warn( 'api-adapter: app not found', appId )
     res.status( 400 ).send( )
+    return null 
   }
   if ( ! app.entity[ req.params.entityId ] ) { 
     log.warn( 'api-adapter: entity not found', appId )
     res.status( 400 ).send( )
+    return null 
   }
   return app
 }
