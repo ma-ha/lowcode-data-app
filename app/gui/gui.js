@@ -41,7 +41,11 @@ function init( appConfig ) {
 
   // gui.getExpress().use( '/content', express.static( __dirname + '/serve-html' ) )
   // gui.getExpress().use( '/ext-module', express.static( __dirname + '/ext-module' ) )
-  gui.getExpress().use( '/img', express.static( __dirname + '/img' ) )
+  if ( cfg.IMG_PATH ) {
+    gui.getExpress().use( '/img', express.static( cfg.IMG_PATH  ) )
+  } else {
+    gui.getExpress().use( '/img', express.static( __dirname + '/img' ) )
+  }
   
   gui.express.use( weblog() )
 

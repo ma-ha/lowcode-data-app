@@ -9,11 +9,13 @@ let lowCodeApp = require( './index' )
 lowCodeApp.init({
 
   PROVISIONING_API_KEY : 'CHANGE_ME',
-  
+
   // file based persistence goes into this folder
   DATA_DIR : '../dta/',
   
-  //CSS_PATH : '/var/www/custom-css'
+  // CSS_PATH : '/var/www/custom-css',
+  // IMG_PATH : '/var/www/img',
+  // CONTENT_PATH : '/var/www/myhtmldocs',
 
   // in stand alone mode you should set this three params
   GUI_URL  : 'http://localhost:8888/app/',

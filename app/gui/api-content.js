@@ -14,17 +14,13 @@ let cfg = {}
 async function init( svc, appConfig ) {
   cfg = appConfig
 
-
-  svc.get( '/get-free-trial', async (req, res) => {
-    res.redirect( cfg.GUI_URL + 'index.html?layout=trial-nonav' ) 
-  })
+  // svc.get( '/get-free-trial', async (req, res) => {
+  //   res.redirect( cfg.GUI_URL + 'index.html?layout=trial-nonav' ) 
+  // })
 
   svc.get( '/sitemap.txt',  async ( req, res ) => {
     res.header( 'Content-Type', 'text/plain').status( 200 ).send( 
-      cfg.GUI_URL+'index.html\n'+
-      cfg.GUI_URL+'index.html?layout=Docu/dashboard\n' +
-      cfg.GUI_URL+'index.html?layout=Docu/installation\n' +
-      cfg.GUI_URL+'index.html?layout=Docu/webchecks'
+      cfg.GUI_URL+'index.html'
     )
   })
 
@@ -40,6 +36,11 @@ async function init( svc, appConfig ) {
   })
 
   svc.get( '/content/:file/html', async (req, res) => {
+    if ( cfg.CONTENT_PATH ) {
+      res.status( 200 ).sendFile( cfg.CONTENT_PATH +'/'+ req.params.file+'.html' )
+      return
+    }
+
     if ( dbCache[ '/content/'+req.params.file+'/html' ] ) {
       res.status( 200 ).send( dbCache[ '/content/'+req.params.file+'/html' ] )
     } else {
@@ -72,25 +73,6 @@ async function init( svc, appConfig ) {
   })
 
 
-  svc.get( '/goto-ekosys/pong-form', ( req, res ) => {
-    let form = {
-      fieldGroups: [{ columns: [
-        { formFields: [] }
-      ] }],
-      actions : [
-        // RETIRE
-        // { id:'ekosysAdd', actionName: 'Add New Cluster', target:'_parent',
-        //   actionURL: cfg.GUI_URL + 'get-free-trial' },
-        { id:'ekosysMng', actionName: 'Manage Clusters', target:'_parent',
-          actionURL: cfg.GUI_URL + 'get-services' },
-        { id:'ekosysSupp', actionName: 'Support', target:'_parent',
-          actionURL: cfg.GUI_URL + 'get-support' }
-      ]
-    }
-    //log.info( 'form', form )
-    res.status( 200 ).send( form )
-  })
-
   await initDbCache()
   setInterval( initDbCache, 600000 ) // refresh every 10 min
 }
@@ -98,13 +80,6 @@ async function init( svc, appConfig ) {
 async function initDbCache() {
   log.debug( 'Init Cache' )
   let cache = {}
-  // cache[ '/md/dashboard/EN' ]        = await db.loadMD( 'dashboard', 'EN' )
-  // cache[ '/md/installation/EN' ]     = await db.loadMD( 'installation', 'EN' )
-  // cache[ '/md/architecture/EN' ]     = await db.loadMD( 'architecture', 'EN' )
-  // cache[ '/md/webchecks/EN' ]        = await db.loadMD( 'webchecks', 'EN' )
-  // cache[ '/md/alarm-conditions/EN' ] = await db.loadMD( 'alarm-conditions', 'EN' )
-  // cache[ '/md/pro-options/EN' ]      = await db.loadMD( 'pro-options', 'EN' )
-  // cache[ '/md/alarming/EN' ]         = await db.loadMD( 'alarming', 'EN' )
   cache[ '/content/welcome/html' ]   = fs.readFileSync(  __dirname + '/html/welcome.html', 'utf-8' )
   dbCache = cache
 }
