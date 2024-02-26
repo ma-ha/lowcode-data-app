@@ -16,6 +16,17 @@ let publicPages = [
   'openid-login-nonav'
 ]
 
+const DEV_PAGES = [
+  'Customize',
+  'Marketplace',
+  'AppEntities-nonav',
+  'AppEntityProperties-nonav',
+  'UploadApp-nonav',
+  'AppEntityStatus-nonav',
+  'StateAdmin-nonav',
+  'EditState-nonav'
+]
+
 // ----------------------------------------------------------------------------
 function init( gui, allCfg ) {
   log.info( 'Init App security...' )
@@ -43,10 +54,10 @@ function init( gui, allCfg ) {
   gui.getExpress().use( '/js',  express.static( __dirname + '/serve-js' ) )
 
   // check authorization for GUI pages 
-  gui.authorize = ( user, page ) => {
+  gui.authorize = async ( user, page ) => {
     // return true  
-    // log.info( 'autz', user, page )
-    if ( publicPages.indexOf( page ) >= 0  || page.indexOf('Docu' ) == 0 ) {
+    log.debug( 'autz', user, page )
+    if ( publicPages.indexOf( page ) >= 0  || page.indexOf( 'Docu' ) == 0 ) {
         // log.info( 'All users are authorized for page "'+page+'", also "'+user+'"' )
       return true;
     }
@@ -54,7 +65,12 @@ function init( gui, allCfg ) {
       // log.info( 'User "'+user+'" is not authorized for page "'+page+'"' )
       return false
     }
-    
+    let u = await userDta.getUserInfo( user )
+    if ( u.role.dev.length == 0  &&  DEV_PAGES.includes(page) ) {
+      log.warn( 'User tries to access Dev Page:', user, '->', page )
+      return false
+    }
+
     return true  
   }
 

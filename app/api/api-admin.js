@@ -21,15 +21,137 @@ async function setupAPI( app ) {
   let svc = app.getExpress()
   gui = app
 
-  const myJWTcheck = apiSec.initJWTcheck()
-  const userTenantAutz = apiSec.userTenantAuthz( gui )
+  // const myJWTcheck = apiSec.initJWTcheck()
+  const adminAuthz = apiSec.adminAuthz( gui )
+  const guiAuthz = apiSec.userTenantAuthz( gui )
+
 
   // --------------------------------------------------------------------------
-  svc.post( '/user', userTenantAutz, addUser )
-  svc.get(  '/user', userTenantAutz, getUser )
-  svc.post( '/user/lock',  userTenantAutz, lockUser )
-  svc.post( '/user/reset', userTenantAutz, resetUser )
+  svc.post( '/scope',  adminAuthz, addScope )
+  svc.get(  '/scope',  adminAuthz, getScope )
+  svc.get(  '/scope/options',    guiAuthz, getScopeOpts )
+  svc.get(  '/scope/pong-table', adminAuthz, getScopeTbl )
+
+  svc.post( '/user',       adminAuthz, addUser )
+  svc.get(  '/user',       adminAuthz, getUser )
+  svc.post( '/user/lock',  adminAuthz, lockUser )
+  svc.post( '/user/reset', adminAuthz, resetUser )
+ 
+}
+
+// ============================================================================
+
+async function addScope( req, res ) {
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.body.scopeId || ! req.body.scopeId.startsWith( user.scopeId ) || ! isScopeId( req.body.scopeId ) ) {
+    log.warn( 'POST scope: id invalid', req.body.scopeId )
+    return res.status(400).send('Scope ID invalid') 
   }
+  let scopes = await userDta.geScopeArr( user.rootScopeId )
+  let resultTxt = 'Scope added'
+  for ( let scope of scopes ) {
+    if ( scope.id == req.body.scopeId ) {
+      log.info( 'POST scope: id exists', req.body.scopeId )
+      resultTxt = 'Scope updated'
+    }
+  }
+  let name = ( req.body.name ? req.body.name : req.body.scopeId )
+  let tags = ( req.body.tags ?  req.body.tags.split(',') : [] )
+  let meta = {}
+  if ( req.body.metaJSON &&  req.body.metaJSON.trim().startsWith('{') ) { try {
+      meta = JSON.parse( req.body.metaJSON )
+  } catch ( exc ) { res.status(400).send('Meta Data not a valid JSON')  } }
+  await userDta.addScope( req.body.scopeId, name, tags, meta )
+  res.send( resultTxt ) 
+}
+
+async function getScope( req, res ) {
+  log.debug( 'getScope', req.query )
+  let user = await userDta.getUserInfoFromReq(gui,  req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  let scopeArr = await userDta.geScopeArr( user.scopeId )
+
+  if ( req.query.id ) { // get by id 
+
+    for ( let scope of scopeArr ) {
+      if ( scope.id == req.query.id ) {
+        log.info('sc',scope )
+        let resultScope = {
+          scopeId  : scope.id,
+          name     : scope.name,
+          tags     : scope.tagArr,
+          metaJSON : ( scope.meta ? JSON.stringify( scope.meta, null, ' ' )  : '' )
+        }
+        return res.send( resultScope )
+      }
+    }
+    return res.send( null ) // id not in scopes
+ 
+  } else { // get all related scopes
+
+    let scopeTbl = []
+    for ( let scope of scopeArr ) {
+      let rec = {
+        id : scope.id,
+        name : scope.name,
+        tagStr : scope.tagArr.join()
+      }
+      for ( let tag of scope.tagArr ) {
+        rec[ "tag"+tag ] = true
+      }
+      scopeTbl.push( rec )
+    }
+    res.send( scopeTbl )   
+  }
+}
+
+async function getScopeOpts( req, res ) {
+  log.debug( 'getScopeOpts' )
+  let user = await userDta.getUserInfoFromReq(gui,  req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  let scopeArr = await userDta.geScopeArr( user.scopeId )
+  let scopeTbl = []
+  // log.info( 'getScopeOpts', user )
+
+  // if ( user.scopeId == user.rootScopeId ) {
+  //   scopeTbl.push(  {
+  //     id   : '-',
+  //     name : 'all'
+  //   } )  
+  // }
+  for ( let scope of scopeArr ) { 
+    scopeTbl.push({
+      id   : scope.id,
+      name : scope.name
+    })
+  }
+  res.send( scopeTbl )   
+  
+}
+
+async function  getScopeTbl( req, res ) {
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  let tbl = {
+    dataURL: "",
+    rowId: "id",
+    cols: [
+      { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+        method: "GET", setData: [ { resId : 'AddScope' } ] } ,
+      { id: "id",    label: "Id",   width: "20%", cellType: "text" },
+      { id: "name",  label: "Name", width: "20%", cellType: "text" },
+      // { id: "tag",   label: "Tags", width: "20%", cellType: "text" },
+    ]
+  }
+  let scopeArr = await userDta.geScopeArr( user.scopeId )
+  let tags = getAllTags( scopeArr )
+  for ( let aTag of tags ) {
+    tbl.cols.push({ id: 'tag'+aTag, label: aTag, width: "5%", cellType: "checkbox" })
+  }
+  res.send( tbl )
+}
+
 
 // ============================================================================
 
@@ -180,6 +302,7 @@ function getAllTags( scopeArr ) {
 }
 
 function isValidEmail( email ) {
+  if ( email == 'demo' ) { return true }
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   return re.test( String( email ).toLowerCase() )
 }

@@ -54,7 +54,7 @@ async function init( dbDir, fakeLogin ) {
 
 // ============================================================================
 
-async function creRootScope( name, adminEmail, owner, tagArr ) {
+async function creRootScope( name, adminEmail, owner, tagArr, noCustomizing ) {
   let scopeTbl = await getScope() 
   let newId = await getNextScopeId()
   scopeTbl[ newId ] = {
@@ -64,6 +64,9 @@ async function creRootScope( name, adminEmail, owner, tagArr ) {
     adminEmail : adminEmail,
     owner      : owner,
     _cre       : Date.now()
+  }
+  if ( noCustomizing ) {
+    scopeTbl[ newId ].noCustomizing = true
   }
   await writeScope() 
   return newId
@@ -260,6 +263,7 @@ async function geScopeArr( rootScopeId ) {
   }
   return scopeArr
 }
+
 async function addScope( id, name, tagArr, meta) {
   let scopeTbl = await getScope() 
   scopeTbl[ id ] = {
@@ -300,6 +304,9 @@ async function getUserInfo( userId ) {
     rootScopeId : rootScope,
     scopeTags   : scopeTbl[ scopeId ].tag,
     role        : authTbl[ userId ].role
+  }
+  if ( scopeTbl[ rootScope ].noCustomizing ) {
+    userInfo.role.dev = []  // dev not allowed
   }
   return userInfo
 }

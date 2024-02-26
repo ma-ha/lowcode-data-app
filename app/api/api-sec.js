@@ -7,6 +7,9 @@ const userDta   = require( '../persistence/app-dta-user' )
 
 exports: module.exports = { 
   init,
+  adminAuthz,
+  customizeAuthz,
+  checkScopeIsAllowed,
   userTenantAuthz,
   provisioningApiAppAuthz,
   apiAppAuthz,
@@ -21,6 +24,67 @@ function init( configs ) {
   log.info( 'Starting API/sec...', cfg )
   cfg = configs
 }
+
+
+function adminAuthz( theGUI ) {
+  if ( ! gui ) { gui = theGUI }
+  let check = async (req, res, next) => {
+    let accessOk = false
+
+    let user = await userDta.getUserInfoFromReq( gui, req )
+    if ( user ) { 
+      accessOk = checkScopeIsAllowed( user.scopeId, user.role.admin )
+      req.user = user
+    } 
+    
+    if ( ! accessOk ) {
+      log.warn( 'call is not authorized', req.headers )
+      return next( new UnauthorizedError(
+        'Not authorized', 
+        { message: 'Not authorized' }
+      ))
+    }
+
+    return next()
+  }
+  return check
+}
+
+
+function customizeAuthz( theGUI ) {
+  if ( ! gui ) { gui = theGUI }
+  let check = async (req, res, next) => {
+    let accessOk = false
+
+    let user = await userDta.getUserInfoFromReq( gui, req )
+    if ( user ) { 
+      accessOk = checkScopeIsAllowed( user.scopeId, user.role.dev )
+      req.user = user
+    } 
+    
+    if ( ! accessOk ) {
+      log.warn( 'call is not authorized', req.headers )
+      return next( new UnauthorizedError(
+        'Not authorized', 
+        { message: 'Not authorized' }
+      ))
+    }
+
+    return next()
+  }
+  return check
+}
+
+
+function checkScopeIsAllowed( scopeId, allowedScopeIdArr ) {
+  for ( let allowedScopeId of allowedScopeIdArr ) {
+    if ( scopeId.startsWith( allowedScopeId ) ) {
+      return true
+    }
+  }
+  return false
+}
+
 
 function userTenantAuthz( theGUI ) {
   gui = theGUI

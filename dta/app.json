@@ -343,7 +343,7 @@
   },
   "1000/device-mgr-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
-    "scopeId": null,
+    "scopeId": "",
     "title": "Device Manager",
     "require": {},
     "entity": {
@@ -499,14 +499,12 @@
       "#region": {
         "role": [
           "appUser"
-        ],
-        "srcURL": ""
+        ]
       },
       "#city": {
         "role": [
           "appUser"
-        ],
-        "srcURL": ""
+        ]
       }
     }
   },
@@ -614,7 +612,9 @@
         ],
         "properties": {
           "Name": {
-            "type": "String"
+            "type": "String",
+            "label": "GW Name",
+            "noDelete": true
           }
         }
       }

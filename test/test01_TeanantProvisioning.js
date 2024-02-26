@@ -18,7 +18,8 @@ describe( 'Tenant Provisioning', () => {
       adminPassword : 'supasecret',
       apiId         : 'mochatest',
       apiKey        : 'mochatest-supasecret-id',
-      owner         : 'ma-ha'
+      owner         : 'ma-ha',
+      dev           : false   // no GUI customizing allowed
     }, { headers: HEADERS } )
     // console.log( result )
     assert.equal( result.status, 200 )

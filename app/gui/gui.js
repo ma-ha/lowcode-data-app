@@ -127,7 +127,7 @@ function genDynNav ( navType, oldNavTabs, req ) {
           }
           // check if user needs dev menu
           for ( let devScopeId of user.role.dev ) {
-            // log.info( 'dynamicNav admin', devScopeId )
+            log.debug( 'dynamicNav dev', user )
             if ( user.scopeId.indexOf( devScopeId ) == 0 ) {
               menu.push({ layout: 'Customize', label: 'Customize' })
               menu.push({ layout: 'Marketplace', label: 'App Marketplace' })

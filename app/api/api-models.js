@@ -20,7 +20,7 @@ async function setupAPI( app ) {
   let svc = app.getExpress()
   gui = app
 
-  const guiAuthz = apiSec.userTenantAuthz( gui )
+  const guiAuthz = apiSec.customizeAuthz( gui )
 
   // --------------------------------------------------------------------------
 

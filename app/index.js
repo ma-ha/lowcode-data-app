@@ -12,7 +12,7 @@ const appData   = require( './persistence/app-dta' )
 const appAPI    = require( './api/api-entity' )
 const appAdapter= require( './api/api-adapter' )
 const apiSec    = require( './api/api-sec' )
-const userAPI   = require( './api/api-user' )
+const adminAPI  = require( './api/api-admin.js' )
 const appMgrAPI = require( './api/api-appmgr' )
 const appMgrGUI = require( './gui/gui-appmgr' )
 const oidc      = require( './gui/oidc.js' )
@@ -43,7 +43,7 @@ async function init( lowCodeConfig ) {
   await appAPI.setupAPI( app, cfg.OICD )
   await appAdapter.setupAPI( app, cfg.OICD )
   await appMgrAPI.setupAPI( app )
-  await userAPI.setupAPI( app )
+  await adminAPI.setupAPI( app )
 
 }
 

@@ -1,3 +1,8 @@
+# 0.11.0
+- Rework admin/dev scope authorizations
+- Refactor admin API
+- Scopes with no customization via GUI allowed
+
 # 0.10.1
 - config for un-deletable
 - fix inherit mode

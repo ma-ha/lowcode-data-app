@@ -62,7 +62,8 @@ async function creRootScope( req, res ) {
     req.body.name,
     req.body.adminEmail,
     req.body.owner,
-    ( req.body.tagArr ? req.body.tagArr : [] )
+    ( req.body.tagArr ? req.body.tagArr : [] ),
+    ( req.body.dev ? req.body.dev : false ) // noCustomizing = false ... allowed by default
   )
 
   log.info( 'creRootScope admin user...')
