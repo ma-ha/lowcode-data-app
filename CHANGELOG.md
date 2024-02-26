@@ -1,3 +1,7 @@
+# 0.10.1
+- config for un-deletable
+- fix inherit mode
+
 # 0.10.0
 - Provisioning API + tests
 - App API + tests

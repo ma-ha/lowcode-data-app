@@ -183,8 +183,8 @@ async function getData( tbl, scopeId, admin ) {
     if ( admin ) {
       result[ recId ] = data[ table ][ recId ]
     } else  if ( inheritData ) {
-      // if ( scopeId.indexOf( data[ table ][ recId ].scopeId ) >= 0 ) {
-      if ( data[ table ][ recId ].scopeId.startsWith( scopeId ) ) {
+      if ( scopeId.indexOf( data[ table ][ recId ].scopeId ) >= 0 ) {
+      // if ( data[ table ][ recId ].scopeId.startsWith( scopeId ) ) {
         result[ recId ] = data[ table ][ recId ]
       }
     } else {
