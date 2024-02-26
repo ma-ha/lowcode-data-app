@@ -163,6 +163,7 @@ async function init( ) {
           { id: "scope",      label: "Scope",      width: "10%", cellType: "text" },
           { id: "startPage",  label: "Start Page", width: "10%", cellType: "text" },
           { id: "editForm",   label: "Edit Form",  width: "10%", cellType: "text" },
+          { id: "userDelete", label: "Deletable",  width: "10%", cellType: "text" },
           { id: "stateModel", label: "State Model",width: "10%", cellType: "text" },
           { id: "propLnk",    label: "Properties", width: "10%", cellType: "text" },
           { id: "maintainer", label: "Maintainer", width: "10%", cellType: "text" },
@@ -201,7 +202,8 @@ async function init( ) {
             { id: "noEdit", label: "Hide Add/Edit Form", type: "checkbox" }
           ]},
           { formFields: [
-            { id: "stateModel", label: "State Model", type: "select", options: stateModels }
+            { id: "stateModel", label: "State Model", type: "select", options: stateModels },
+            { id: "userDelete", label: "User can delete", type: "checkbox" }
           ]}
         ] }],
         actions : [ 

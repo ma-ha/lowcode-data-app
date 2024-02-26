@@ -269,7 +269,9 @@
             "type": "String",
             "apiManaged": true
           }
-        }
+        },
+        "noDelete": true,
+        "noEdit": true
       },
       "Invoice": {
         "title": "Invoice",
@@ -294,9 +296,8 @@
             "type": "UUID"
           }
         },
-        "Customer": {
-          "type": "String"
-        }
+        "noDelete": true,
+        "noEdit": true
       },
       "Customer": {
         "title": "Customer",
@@ -715,6 +716,7 @@
             "noEdit": true
           }
         },
+        "noDelete": true,
         "stateModel": "Ticket"
       }
     },

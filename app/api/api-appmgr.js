@@ -402,7 +402,8 @@ async function getEntity( req, res )  {
         maintainer : entity.maintainer,
         start      : ( app.startPage.indexOf( req.query.entityId ) < 0 ? false : 'start' ),
         stateModel : ( entity.stateModel ? entity.stateModel : '' ),
-        noEdit     : ( entity.noEdit === true ? true : false )
+        noEdit     : ( entity.noEdit === true ?  'no' : 'yes' ),
+        userDelete : ( entity.noDelete === true ? false : true )
       }) 
 
     } else { return res.send( null )  } // id not in scopes
@@ -424,7 +425,8 @@ async function getEntity( req, res )  {
         title      : entity.title,
         scope      : entity.scope,
         startPage  : ( app.startPage.indexOf( entityId ) < 0 ? '': 'yes' ),
-        editForm   : ( entity.noEdit === true ? 'hide' : '' ),
+        editForm   : ( entity.noEdit === true ? 'hide' : 'yes' ),
+        userDelete : ( entity.noDelete === true ? 'no' : 'yes' ),
         stateModel : stateModel,
         maintainer : entity.maintainer,
         propLnk :'<a href="index.html?layout=AppEntityProperties-nonav&id='+appId+','+entityId+'">Manage Properties</a>'
@@ -457,6 +459,10 @@ async function addEntity( req, res ) {
       app.startPage.splice( app.startPage.indexOf( req.body.entityId ), 1 )
     }
   }
+
+  if ( ! req.body.userDelete ) {
+    newEntity.noDelete = true
+  } 
 
   if ( req.body.noEdit == 'noEdit' ) {
     newEntity.noEdit = true
@@ -508,6 +514,7 @@ async function getProperty( req, res ) {
       label    : ( dbProp.label ? dbProp.label : '' ),
       filter   : ( dbProp.filter ? true : false ),
       noEdit     : ( dbProp.noEdit  === true ? true : false ),
+      userDelete : ( entity.noDelete === true ? false : true ),
       noTable    : ( dbProp.noTable === true ? true : false ),
       apiManaged : ( dbProp.apiManaged ? true : false ),
     }
@@ -533,6 +540,7 @@ async function getProperty( req, res ) {
       filter   : ( prop.filter   ? true : false ),
       api      : ( prop.apiManaged ? true : false ),
       noEdit   : ( prop.noEdit  ? true : false ),
+      userDelete : ( entity.noDelete === true ? false : true ),
       noTable  : ( prop.noTable ? true : false )
     })
   }
@@ -649,6 +657,13 @@ async function addProperty ( req, res ) {
   } else {
     delete entity.properties[ id ].noEdit
   }
+
+  if ( req.body.userDelete  ) { 
+    delete entity.properties[ id ].noDelete
+  } else {
+    entity.properties[ id ].noDelete = true 
+  }
+  
   if ( req.body.noTable ) { 
     entity.properties[ id ].noTable = true 
   } else {
