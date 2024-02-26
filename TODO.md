@@ -1,6 +1,5 @@
 # TODOs / Ideas
 
-- [ ] toggle rec delete button
 - [ ] Event filter
 - [ ] Metrics field type
 - [ ] BLOB field type
