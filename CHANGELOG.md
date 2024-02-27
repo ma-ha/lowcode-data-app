@@ -1,4 +1,5 @@
 # 0.11.0
+- fix empty DB in npm mode
 - Rework admin/dev scope authorizations
 - Refactor admin API
 - Scopes with no customization via GUI allowed

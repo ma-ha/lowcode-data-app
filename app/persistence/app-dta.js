@@ -48,8 +48,14 @@ async function init( dbDir, fakeLogin ) {
 async function prepDB() {
   if ( ! fs.existsSync( DB_DIR ) ) {
     fs.mkdirSync( DB_DIR )
-    let dbFile = 
+    //let dbFile = 
+  }
+
+  if ( ! fs.existsSync( APP_TBL ) ) {
     await writeFile( fileName( APP_TBL ), "{}" ) 
+  }
+
+  if ( ! fs.existsSync( 'user-auth' ) ) {
     const { createHash } = require( 'node:crypto' )
     let pwd = createHash('sha256').update('demo').digest('hex')
 
@@ -67,15 +73,17 @@ async function prepDB() {
         lastLogin: 1707424667309
       }
     }, null, ' ' ))
+  }
 
+  if ( ! fs.existsSync( 'scope' ) ) {
     await writeFile( fileName( 'scope' ), JSON.stringify({
       1000: {
         name: "Test Tenant",
         tag: []
       }
     }, null, ' ' ))
-
   }
+
 }
 
 // ============================================================================

@@ -53,7 +53,7 @@ function init( appConfig ) {
   //   return dynamicTitle( title, req, page )
   // })
 
-  content.init( gui.getExpress(), )
+  content.init( gui.getExpress(), cfg )
 
   return gui
 }
