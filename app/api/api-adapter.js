@@ -46,10 +46,11 @@ async function setupAPI( app, oauthCfg ) {
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId',        apiAuthz, getDocArr )
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, getDoc )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, addDoc )
+  svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId',        apiAuthz, addDoc )
   svc.delete('/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, delDoc )
   svc.delete('/adapter/entity/:scopeId/:entityId', apiAuthz, delCollection )
 }
-
+``
 // ----------------------------------------------------------------------------
 
 async function creRootScope( req, res ) {
@@ -193,11 +194,18 @@ async function getDoc( req, res ) {
 
 
 async function addDoc( req, res )  {
-  log.info( 'Add data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
+  log.info( 'Add data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
   let app = await checkApp( req, res )
   if ( ! app ) { return }
   let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
-  
+
+  let rec = req.body
+  let recId = req.params.recId 
+  if ( ! recId ) {
+    recId = helper.uuidv4()
+    rec.id = recId
+  }
+
   let properties = app.entity[ req.params.entityId ].properties
   for ( let propId in req.body ) {
     if ( ! properties[ propId ] ) {
@@ -205,9 +213,13 @@ async function addDoc( req, res )  {
       return res.status( 400 ).send( )
     }
   }
-  
   for ( let propId in properties ) {
-    let p = req.body[ propId ]
+    if ( propId == 'id'  && properties.id == 'UUID'  && ! rec.id ) { 
+      recId = helper.uuidv4()
+      rec.id = recId
+      continue
+    }
+    let p = rec[ propId ]
     if ( ! p ) {
       log.warn( 'api-adapter: properties missing', propId )
       return res.status( 400 ).send( )
@@ -217,10 +229,10 @@ async function addDoc( req, res )  {
       return  sendErr( res, 'api-adapter: body not valid: '+propId )
     }
   }
-  req.body.scopeId = req.params.scopeId
-  let result = await dta.addDataObj( tbl, req.params.recId, req.body )
+  rec.scopeId = req.params.scopeId
+  let result = await dta.addDataObj( tbl, recId, rec )
   if ( result ) {
-    res.send({ status: 'OK' })
+    res.send({ status: 'OK', id: recId })
   } else {
     res.send({ error: '?' })
   }

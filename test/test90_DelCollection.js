@@ -26,4 +26,10 @@ describe( 'Data Ops', () => {
     assert.notEqual( result.data, null )
   })
   
+  it( 'Delete UUID collection', async () => {
+    let result = await axios.delete( API_URL + scopeId +'/testUUID', { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data, null )
+  })
+  
 })

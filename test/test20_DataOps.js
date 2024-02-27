@@ -11,41 +11,17 @@ let HEADERS = {
   'app-secret' : 'mochatest-supasecret-id'
 }
 
-let app = {
-  "scopeId": null,
-  "title": "MochaTest",
-  "require": {
-  },
-  "entity": {
-    "test": {
-      "title": "Test",
-      "scope": "inherit",
-      "maintainer": [
-      ],
-      "properties": {
-        "Name": {
-          "type": "String"
-        }
-      }
-    }
-  },
-  "startPage": "test",
-  "role": [
-    "appUser"
-  ],
-  "scope": {
-  }
-}
-
 describe( 'Data Ops', () => { 
 
   let scopeId = null
   let dtaUrl = ''
+  let testUuidUrl = ''
 
   before( async () => { 
     scopeId = await helper.getRootScopeId()
     assert.notEqual( scopeId, null )
     dtaUrl = API_URL + scopeId + '/mocha-test-app/1.0.0/test'
+    testUuidUrl = API_URL + scopeId + '/mocha-test-app/1.0.0/testUUID'
     // console.log( 'URL', dtaUrl )
   })
 
@@ -65,7 +41,6 @@ describe( 'Data Ops', () => {
     assert.equal( result.status, 200 )
     // console.log( '2', result.data  )
   })
-
 
   it( 'List data', async () => {
     let result = await axios.get( dtaUrl, { headers: HEADERS } )
@@ -116,5 +91,25 @@ describe( 'Data Ops', () => {
     // console.log( '8', result.data  )
   })
 
-  
+  // --------------------------------------------------------------------------
+  let uid = null
+
+  it( 'UUID: Add rec with auto id', async () => {
+    let rec = { name : 'test3' }
+    let result = await axios.post( testUuidUrl, rec, { headers: HEADERS } )
+    // console.log( result )
+    assert.equal( result.status, 200 )
+    console.log( '2', result.data  )
+    assert.notEqual( result.data.id, null )
+    uid = result.data.id
+  })
+
+  it( 'UUID: List data', async () => {
+    let result = await axios.get( testUuidUrl, { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data, null )
+    assert.notEqual( result.data[ uid ], null )
+    // console.log( '8', result.data  )
+  })
+
 })

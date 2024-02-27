@@ -27,7 +27,25 @@ let app = {
           "type": "String"
         }
       }
-    }
+    },
+    "testUUID": {
+      "title": "testUUID",
+      "scope": "inherit",
+      "maintainer": [
+        "appUser"
+      ],
+      "properties": {
+        "name": {
+          "label": "Name",
+          "type": "String"
+        },
+        "id": {
+          "type": "UUID"
+        }
+      },
+      "noDelete": true,
+      "noEdit": true
+    },
   },
   "startPage": "test",
   "role": [

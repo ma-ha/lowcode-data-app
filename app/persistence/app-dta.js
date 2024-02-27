@@ -51,7 +51,7 @@ async function prepDB() {
     //let dbFile = 
   }
 
-  if ( ! fs.existsSync( APP_TBL ) ) {
+  if ( ! fs.existsSync( fileName( APP_TBL ) ) ) {
     await writeFile( fileName( APP_TBL ), "{}" ) 
   }
   if ( ! fs.existsSync( fileName( 'user-auth' )) ) {
