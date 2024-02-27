@@ -15,9 +15,9 @@ exports: module.exports = {
 let gui = null
 let cfg = null
 
-async function init ( app, oicdCfg ) {
+async function init ( app, OIDCCfg ) {
   log.info( 'Init OpenID Login' )
-  cfg = oicdCfg
+  cfg = OIDCCfg
   gui = app
 
   let oidctPg = gui.addPage( 'openid-login-nonav', 'Login' )
@@ -215,7 +215,7 @@ async function login( req, res ) {
     if ( req.body.client_id && req.body.email && req.body.password ) { 
       
       if ( userDta.authenticate( req.body.email ) ) {
-        log.info( 'oicd login', err, loginOK )
+        log.info( 'OIDC login', err, loginOK )
         let accessToken = await gui.createToken( req.body.email )
         res.cookie( 'pong-security', accessToken, { httpOnly: true, path: gui.appRoot } )
 

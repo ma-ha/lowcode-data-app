@@ -37,11 +37,11 @@ async function init( lowCodeConfig ) {
   appSec.init( app, cfg )
 
   if ( cfg.OIDC_SERVER )  {
-   oidc.init( app, cfg.OICD )
+   oidc.init( app, cfg.OIDC )
   }
 
-  await appAPI.setupAPI( app, cfg.OICD )
-  await appAdapter.setupAPI( app, cfg.OICD )
+  await appAPI.setupAPI( app, cfg.OIDC )
+  await appAdapter.setupAPI( app, cfg.OIDC )
   await appMgrAPI.setupAPI( app )
   await adminAPI.setupAPI( app )
 
@@ -63,7 +63,7 @@ function checkConfig( cfg ) {
   checkCfgParam( cfg, 'PORT', 8888 )
   checkCfgParam( cfg, 'GUI_URL','http://localhost:' + cfg.PORT + cfg.PATH )
 
-  checkOicdParams( cfg )
+  checkOidcParams( cfg )
   log.debug( 'CONFIG', cfg )
   return cfg
 }
@@ -79,9 +79,9 @@ function checkCfgParam( cfg, paramName, defaultVal ) {
   }  
 }
 
-function checkOicdParams( cfg ) {
-  if ( ! cfg.OICD ) {
-    cfg.OICD = {
+function checkOidcParams( cfg ) {
+  if ( ! cfg.OIDC ) {
+    cfg.OIDC = {
       OPENID_SEC_KEY: '_______change_me_______',
       CLIENT_ID: 'a0000a0000a0000a0000a000',
       ISSUER: 'https://localhost/',

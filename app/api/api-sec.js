@@ -89,8 +89,8 @@ function checkScopeIsAllowed( scopeId, allowedScopeIdArr ) {
 function userTenantAuthz( theGUI ) {
   gui = theGUI
   // let clientID = cfg.CLIENT_ID
-  // let audience = cfg.OICD.AUDIENCE
-  // let issuer   = cfg.OICD.ISSUER
+  // let audience = cfg.OIDC.AUDIENCE
+  // let issuer   = cfg.OIDC.ISSUER
 
   let check = async (req, res, next) => {
     let user = await userDta.getUserInfoFromReq( gui, req )
@@ -167,8 +167,8 @@ function apiAppAuthz( theGUI ) {
 
 function initJWTcheck() {
   // let clientID = cfg.CLIENT_ID
-  // let audience = cfg.OICD.AUDIENCE
-  // let issuer   = cfg.OICD.ISSUER
+  // let audience = cfg.OIDC.AUDIENCE
+  // let issuer   = cfg.OIDC.ISSUER
 
   let check = (req, res, next) => {
     log.debug( 'JWTcheck', req.headers.authorization )

@@ -30,7 +30,7 @@ const DEV_PAGES = [
 // ----------------------------------------------------------------------------
 function init( gui, allCfg ) {
   log.info( 'Init App security...' )
-  let cfg = allCfg.OICD
+  let cfg = allCfg.OIDC
   
   // switch securiy on:
   gui.enableSec2({ 

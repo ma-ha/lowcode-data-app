@@ -157,11 +157,11 @@ Simply rewrite:
 
 ## OpenID Connect
 
-The implementation brings it's own OICD auth server.  
+The implementation brings it's own OIDC auth server.  
 
-Have a look into the config files to configure a real OICD IAM.
+Have a look into the config files to configure a real OIDC IAM.
 
-The invitation process may need some additional OICD onboarding flow, 
+The invitation process may need some additional OIDC onboarding flow, 
 if th users aren't already there.
 
 ## Web Content 
