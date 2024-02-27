@@ -1,6 +1,6 @@
 {
   "name": "lowcode-data-app",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "LowCode App Environment",
   "main": "app.js",
   "scripts": {
@@ -32,7 +32,7 @@
     "lowcode",
     "low code",
     "OpenID Connect",
-    "OICD",
+    "OIDC",
     "Platform",
     "REST",
     "RESTful"
