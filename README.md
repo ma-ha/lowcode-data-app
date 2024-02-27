@@ -116,6 +116,29 @@ Property features:
 - you can define a property as "API managed", means zou will see it only in the table, 
   but there is no input available in the add/change GUI form
 
+# Add New Root Scope (aka "Tenant")
+
+This must be done via API ... but it's simple:
+
+    const axios  = require( 'axios' )
+    let result = await axios.post( 
+      'http://localhost:8888/app/adapter/scope', // or whatever you've configured
+      {
+        name          : 'ROOD SCOPE NAME',
+        adminEmail    : 'FOR NEW ADMIN USER',
+        adminPassword : 'FOR NEW ADMIN USER', 
+        apiId         : 'FOR NEW API CREDENTIALS',
+        apiKey        : 'FOR NEW API CREDENTIALS',
+        owner         : 'SOME NAME'
+      }, 
+      { headers:  { 'provisioning-key': 'PROVISIONING KEY' } } 
+    )
+
+The new admin credentials are required, since the app can't send out emails (yet).
+
+The API credentials can be used to bootstrap the new tenant and create apps, their entities and upload some initial data documents.
+
+
 # Integration 
 
 ## APIs
