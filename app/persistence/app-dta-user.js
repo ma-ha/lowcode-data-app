@@ -326,7 +326,7 @@ async function addUser( id, newUser ) {
     }
     authTbl[ id ] = newUser
     await writeAuthTbl()
-    return 
+    return result
   } else { // add API account
     let spId = helper.uuidv4()
     newUser.password = helper.uuidv4()
@@ -398,7 +398,21 @@ async function updateUser( uid, newEmail, user, scopeId, action ) {
     await writeAuthTbl()
     return 'User login reset! New password: '+ pwd
   }
-   
+  
+  roleSync( idnty.role.dev,   user.role.dev )
+  roleSync( idnty.role.admin, user.role.admin )
+
+  function roleSync( isRoles, roleAct ) {
+    log.info( 'roleSync', isRoles, roleAct )
+    if ( roleAct.length == 1 && isRoles.indexOf( roleAct[0] ) == -1 ) {
+      log.info( 'roleSync add' )
+      isRoles.push( roleAct[0] )
+    } else if ( roleAct.length == 0 && isRoles.indexOf( scopeId ) >= 0 ) {
+      log.info( 'roleSync del' )
+      isRoles.splice(  isRoles.indexOf( scopeId ), 1 )
+    }
+  }
+
   idnty.name    = user.name
   idnty.expires = user.expires
   
@@ -414,7 +428,7 @@ async function updateUser( uid, newEmail, user, scopeId, action ) {
 
 
 async function getUserArr( scopeId ) {
-  log.info( 'getUserArr...' )
+  log.debug( 'getUserArr...' )
   let authTbl = await getAuthTbl()
 
   let result = []

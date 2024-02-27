@@ -1,5 +1,6 @@
 # 0.12.0
 - fix typo and rename OICD -> OIDC
+- fix add/rm roles
 
 # 0.11.0
 - fix empty DB in npm mode

@@ -54,8 +54,7 @@ async function prepDB() {
   if ( ! fs.existsSync( APP_TBL ) ) {
     await writeFile( fileName( APP_TBL ), "{}" ) 
   }
-
-  if ( ! fs.existsSync( 'user-auth' ) ) {
+  if ( ! fs.existsSync( fileName( 'user-auth' )) ) {
     const { createHash } = require( 'node:crypto' )
     let pwd = createHash('sha256').update('demo').digest('hex')
 
@@ -75,7 +74,7 @@ async function prepDB() {
     }, null, ' ' ))
   }
 
-  if ( ! fs.existsSync( 'scope' ) ) {
+  if ( ! fs.existsSync(  fileName( 'user-auth' ) ) ) {
     await writeFile( fileName( 'scope' ), JSON.stringify({
       1000: {
         name: "Test Tenant",

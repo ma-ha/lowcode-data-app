@@ -174,13 +174,11 @@ async function addUser( req, res ) {
         appUser : [ user.scopeId ],
         api     : [] 
       },
-      password : 'secret',
+      password : null,
       expires  : getExpireDate( req.body.expire )
     }
     if ( req.body.dev   ) { userRec.role.dev.push( user.scopeId ) }
     if ( req.body.admin ) { userRec.role.admin.push( user.scopeId ) }
-    if ( req.body.dev   ) { userRec.role.dev.push( user.scopeId ) }
-
 
     let result = ''
     if ( req.body.mode == 'update' ) {
@@ -202,7 +200,7 @@ async function addUser( req, res ) {
         appUser : [],
         api     : [ user.scopeId ] 
       },
-      password : 'secret',
+      password : null,
       expires  : getExpireDate( req.body.sp_expire )
     }
 
@@ -240,7 +238,7 @@ function getExpireDate( expire ) {
 }
 
 async function getUser( req, res ) {
-  log.info( 'GET /user' )
+  log.debugW( 'GET /user' )
   let user = await userDta.getUserInfoFromReq( gui,  req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
