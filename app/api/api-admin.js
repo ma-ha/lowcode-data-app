@@ -238,7 +238,7 @@ function getExpireDate( expire ) {
 }
 
 async function getUser( req, res ) {
-  log.debugW( 'GET /user' )
+  log.debug( 'GET /user' )
   let user = await userDta.getUserInfoFromReq( gui,  req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 

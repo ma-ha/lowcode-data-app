@@ -1,4 +1,7 @@
 # 0.12.1
+- fix typo in user admin (crash)
+
+# 0.12.1
 - Adapter API: cre doc with auto id with UUID
 - fix app creation
 
