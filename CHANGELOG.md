@@ -1,4 +1,4 @@
-# 0.12.1
+# 0.12.2
 - fix typo in user admin (crash)
 
 # 0.12.1
