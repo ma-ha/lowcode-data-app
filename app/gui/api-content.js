@@ -2,6 +2,7 @@
 
 const log   = require( '../helper/log' ).logger
 const fs    = require( 'fs' )
+const { readFile } = require( 'node:fs/promises' )
 
 exports: module.exports = { 
   init
@@ -14,9 +15,9 @@ let cfg = {}
 async function init( svc, appConfig ) {
   cfg = appConfig
 
-  // svc.get( '/get-free-trial', async (req, res) => {
-  //   res.redirect( cfg.GUI_URL + 'index.html?layout=trial-nonav' ) 
-  // })
+  svc.get( '/get-free-trial', async (req, res) => {
+    res.redirect( cfg.GUI_URL + 'index.html?layout=trial-nonav' ) 
+  })
 
   svc.get( '/sitemap.txt',  async ( req, res ) => {
     res.header( 'Content-Type', 'text/plain').status( 200 ).send( 
@@ -61,12 +62,15 @@ async function init( svc, appConfig ) {
     res.status( 200 ).send( html )
   })
 
+  svc.get( '/docuhead/:title/jscript', async (req, res) => {
+    res.status( 200 ).send()
+  })
 
   svc.get( '/md/:lang/:file', async (req, res) => {
     // log.debug( 'GET md', req.params.lang, req.params.file )
     let page = await getPage( '/md', req.params.file, req.params.lang )
     if ( page ) {
-      res.status( 200 ).send( page.md )
+      res.status( 200 ).send( page )
     } else {
       res.status( 400 ).send( 'Markdown not found' )
     }
@@ -84,13 +88,17 @@ async function initDbCache() {
   dbCache = cache
 }
 
+const VALID_PG = [
+  'get-started',
+  'administration',
+  'customize'
+]
 
 async function getPage( type, file, lang ) {
-  return "TODO"
-  // if ( dbCache[ type+'/'+file+'/'+lang ] ) {
-  //   log.debug( 'From Cache', type, file, lang )
-  //   return dbCache[ type+'/'+file+'/'+lang ]
-  // } else {
-  //   return await db.loadMD( file, lang )
-  // }
+  if ( lang == 'EN'  && VALID_PG.indexOf( file ) >= 0 ) {
+    try {
+      let md = await readFile( './gui/md/'+ file +'.md' )
+      return md 
+    } catch ( exc ) { log.warn( 'getPage', exc.message ) }
+  }
 }

@@ -1,5 +1,6 @@
 # 0.12.3
 - Keep page on scope switch
+- Docu: Getting started
 
 # 0.12.2
 - fix typo in user admin (crash)

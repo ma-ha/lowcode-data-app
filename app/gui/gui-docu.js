@@ -12,16 +12,16 @@ exports: module.exports = {
 
 
 function init( ) {
-  addDocuPg( gui, 'get-started',  'Getting Started' ) 
-  addDocuPg( gui, 'marketplace',  'Administration' ) 
-  addDocuPg( gui, 'customize',    'Customize' ) 
+  addDocuPg( gui, 'get-started',    'Getting Started' ) 
+  addDocuPg( gui, 'administration', 'Administration' ) 
+  addDocuPg( gui, 'customize',      'Customize' ) 
 }
 
 // ==========================================================================++
  
 function addDocuPg( gui, id, title ) {
   let docuPage = gui.addPage( 'Docu/'+id, title ) 
-  docuPage.title    = 'K8s Mon Docu'
+  docuPage.title    = 'LowCode App Docu'
   docuPage.navLabel = title
   docuPage.setPageWidth( '90%' )
 

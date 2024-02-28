@@ -112,12 +112,12 @@ function genDynNav ( navType, oldNavTabs, req ) {
   return new Promise( async ( resolve, reject ) => {
     try {
       if ( navType === 'nav' ) { // can also be 'nav-embed' and 'nav-embed-sub'
-        // log.info( 'dynamicNav' )
-        let menu = oldNavTabs
+        log.debug( 'dynamicNav', oldNavTabs )
+        let menu = JSON.parse( JSON.stringify( oldNavTabs ) )
         let user = await userDta.getUserInfoFromReq( gui, req )
         // log.info( 'dynamicNav', user )
 
-        if ( user ) { 
+        if ( user ) {
           menu = [{ "layout": "Apps",  "label": "Apps" }]
 
           // check if user needs admin menu
@@ -142,9 +142,9 @@ function genDynNav ( navType, oldNavTabs, req ) {
           log.debug( 'menu', menu )
         }
 
-        if ( oldNavTabs && typeof oldNavTabs === 'array' ) {
+        if ( oldNavTabs ) {
           for ( let nav of oldNavTabs ) {
-            // log.info( 'nav', nav )
+            log.debug( 'nav', nav )
             if ( nav.label == 'Docu' ) {
               menu.push( nav )
             }
