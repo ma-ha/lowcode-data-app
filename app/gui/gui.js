@@ -192,7 +192,7 @@ async function genPageHeader ( pgHeader, req, page ) {
         let ident = ''
         let deepth = (scope.match(/\//g) || []).length
         for ( let i = 0; i < deepth; i++ ) { ident += '&nbsp;&nbsp;'}
-        menuItems.push({ html: ident + '<a href="setscope?id='+scope+'">'+scopeTbl[ scope ].name+'</a>' })
+        menuItems.push({ html: ident + '<a href="setscope?id='+scope+'&layout='+page+'">'+scopeTbl[ scope ].name+'</a>' })
       }
       let actScope = await userDta.getSelScopeName( user.userId )
       pgHeader.modules.push({ 

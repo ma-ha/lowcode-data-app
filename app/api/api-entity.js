@@ -52,7 +52,7 @@ async function setScope ( req, res ) {
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   if ( req.query.id && user ) { 
-    log.info( 'SET SCOPE', user.userId, req.query.id )
+    log.debug( 'SET SCOPE', user.userId, req.query.id )
     let scopeTbl = await userDta.getScopeList( user.userId )
     if ( scopeTbl[ req.query.id+'' ] ) {
       await userDta.setSelScope( user.userId, req.query.id+'' )
@@ -60,7 +60,8 @@ async function setScope ( req, res ) {
   } else {
     log.info( 'ERR: SET SCOPE', user.userId, req.query.id )
   }
-  res.redirect( 'index.html?layout=Apps' ) 
+  let layout = ( req.query.layout ? req.query.layout : 'Apps' )
+  res.redirect( 'index.html?layout='+layout ) 
 }
 
 

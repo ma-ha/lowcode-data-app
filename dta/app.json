@@ -296,8 +296,7 @@
             "type": "UUID"
           }
         },
-        "noDelete": true,
-        "noEdit": true
+        "noDelete": true
       },
       "Customer": {
         "title": "Customer",
