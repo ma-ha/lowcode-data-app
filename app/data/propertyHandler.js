@@ -1,5 +1,6 @@
 const log     = require( '../helper/log' ).logger
 const dta     = require( '../persistence/app-dta' )
+const helper  = require( '../helper/helper' )
 
 // All property type specific handling is done here
 
