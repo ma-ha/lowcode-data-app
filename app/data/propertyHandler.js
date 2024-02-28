@@ -245,7 +245,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
     cols.push({ formFields: [{ 
       id: "id", 
       label: ( entity.properties[ 'id' ].label ? entity.properties[ 'id' ].label : "Id (UUID)" ), 
-      type: "text", readonly: true 
+      type: "text", readonly: true, descr: 'ID is auto generated'
     } ]})
   } else { // every data rec need an id
     cols.push({ formFields: [{ id: "id", label: "Id", type: "text" } ]})
