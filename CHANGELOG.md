@@ -1,3 +1,6 @@
+# 0.12.4
+- SelectRef: Display selected properties to show instead of id (i.e. UUID)
+
 # 0.12.3
 - Keep page on scope switch
 - Docu: Getting started

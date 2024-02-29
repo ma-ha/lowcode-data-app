@@ -166,7 +166,7 @@ async function getDoc( req, res ) {
   for ( let rec of dataArr ) {
     let p =  req.params 
     let url =  'guiapp/'+p.tenantId+'/'+p.appId+'/'+p.appVersion+'/entity/'+p.entityId+'/'+rec.id
-    result.push( propHandler.reformatDataTableReturn( entity, rec, url, stateModel )  )
+    result.push( await propHandler.reformatDataTableReturn( entity, rec, url, stateModel )  )
   }
   // log.info( 'GET entity data', result )
   res.send( result )

@@ -50,7 +50,7 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
     if ( typeof app.startPage === 'string' || app.startPage instanceof String ) {
       // render simple entity page
       let entityId  =app.startPage
-      rowArr = renderEntityRows( app, appId, entityId, null )
+      rowArr = renderEntityRows( app, appId, entityId, null, user )
     
     } else if ( typeof app.startPage === 'array' || app.startPage instanceof Array ) {
     

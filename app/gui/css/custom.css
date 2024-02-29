@@ -486,7 +486,8 @@
  #AppEntityPropAddContentfilter,
  #AppEntityPropAddContentnoEdit,
  #AppEntityPropAddContentnoTable,
- #AppEntityPropAddContentapiManaged {
+ #AppEntityPropAddContentapiManaged,
+ #AppEntityPropAddContentrefLbl {
   width: auto;
  }
  .pong-table button {
@@ -509,6 +510,13 @@
   width: 80px;
  }
 
+#AppEntityPropAddContentfilterDiv label,
+#AppEntityPropAddContentapiManagedDiv label,
+#AppEntityPropAddContentnoTableDiv label,
+#AppEntityPropAddContentnoEditDiv label,
+#AppEntityPropAddContentrefLblDiv label {
+  width: 170px;
+ }
 #AppEntitiesAddContentstart,
 #AppEntitiesAddContentnoEdit,
 #AddStateTransitionFormContentapiManaged

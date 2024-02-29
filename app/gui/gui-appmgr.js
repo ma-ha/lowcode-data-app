@@ -267,6 +267,7 @@ async function init( ) {
           { id: "api",     label: "API Managed",width: "5%", cellType: "checkbox" },
           { id: "noTable", label: "No Table",   width: "5%", cellType: "checkbox" },
           { id: "noEdit",  label: "No Edit",    width: "5%", cellType: "checkbox" },
+          { id: "refLbl",  label: "Ref Label",  width: "5%", cellType: "checkbox" },
           { id: 'Del', label: "&nbsp;", cellType: "button", width :'8%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" }
         ]
@@ -299,7 +300,10 @@ async function init( ) {
           { formFields: [ { id: "noTable",  label: "No Table", type: "checkbox",
                             descr: "Will not appear in the Table." },
                           { id: "noEdit",  label: "No Edit", type: "checkbox",
-                            descr: "Will not appear in the GUI form." } ]} 
+                            descr: "Will not appear in the GUI form." } 
+                        ]},
+          { formFields: [ { id: "refLbl", label: "Refs: Show instead of ID", type: "checkbox" } ]}
+
         ] }],
         actions : [ 
           { id: "AddFormBtn", actionName: "Add / Update", actionURL: 'app/entity/property', 

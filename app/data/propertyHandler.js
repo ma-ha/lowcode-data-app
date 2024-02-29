@@ -285,8 +285,12 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
         fld = { id: propId, label: lbl, type: 'select', options: [] }
         try {
           let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
+          let refEntity = await getEntity( prop.selectRef )
           for ( let recId in opdTbl ) { 
-            fld.options.push({ option: recId }) 
+            fld.options.push({ 
+              value  : recId, 
+              option : getRefLabel( refEntity, recId, opdTbl[recId] ) 
+            }) 
           }
         } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
         break 
@@ -294,8 +298,12 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
         fld = { id: propId, label: lbl, type: 'select', options: [], multiple: true }
         try {
           let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
+          let refEntity = await getEntity( prop.selectRef )
           for ( let recId in opdTbl ) { 
-            fld.options.push({ option: recId }) 
+            fld.options.push({ 
+              value: recId, 
+              option: getRefLabel( refEntity, recId, opdTbl[recId] ) 
+            }) 
           }
         } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
         break 
@@ -339,7 +347,6 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
   }
   return cols
 }
-
 
 
 async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, rec, stateModel ) {
@@ -485,7 +492,7 @@ function genEmptyDataReturn( entity ) {
 }
 
 
-function reformatDataTableReturn( entity, rec, url, stateModel  ) {
+async function reformatDataTableReturn( entity, rec, url, stateModel ) {
   let tblRec = { recId: rec.id }
   log.debug( 'getDoc rec', rec, stateModel )
   if ( stateModel ) {
@@ -529,7 +536,14 @@ function reformatDataTableReturn( entity, rec, url, stateModel  ) {
         if ( tblRec[ propId ].length > 100 ) { tblRec[ propId ] = tblRec[ propId ].substr(0,100) +'...' }
         break 
       case 'SelectRef':
-        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+        tblRec[ propId ] = ''
+        if ( rec[ propId ]  && rec[ propId ]  != '' ) {
+          let refEntity = await getEntity( prop.selectRef )
+          let refParts = prop.selectRef.split('/')
+          let refDta = await dta.getDataById( refParts[0]+refParts[3], rec[ propId ] )
+          tblRec[ propId ] = getRefLabel( refEntity, rec[ propId ], refDta ) 
+        }
+        // tblRec[ propId ] = 'X'+ ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
         break 
       case 'DocMap':
         let params = prop.docMap.split('/')
@@ -675,4 +689,34 @@ function getRefId( id ) {
     param = p[0] +'/'+ p[1] +'/'+ p[2] +','+ p[3]
   } catch ( exc ) { log.warn( 'gen link failed', id, exc ) }
   return param
+}
+
+// ============================================================================
+
+async function getEntity( refId ) {
+  log.info( 'getEntity', refId )
+  try {
+    let idParts = refId.split('/')
+    let appId = idParts[0] + '/' + idParts[1] + '/' + idParts[2] 
+    let app = await dta.getAppById( appId )
+    if ( app && app.entity[ idParts[3] ] ) {
+      return app.entity[ idParts[3] ]
+    }
+  } catch ( exc ) { log.warn( 'getEntity', exc.message )  }
+  log.warn( 'getEntity no entity for for', refId)
+  return null
+}
+
+function getRefLabel( entity, recId, rec ) {
+  log.info( 'getRefLabel', entity, recId, rec )
+  let lbl = []
+  for ( let propId in entity.properties ) {
+    if ( entity.properties[ propId ].refLbl && rec[ propId ] ) {
+      lbl.push( rec[ propId ] )
+    }
+  }
+  if ( lbl.length == 0 ) {
+    return recId
+  }
+  return lbl.join(' ')
 }

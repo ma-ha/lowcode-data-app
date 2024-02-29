@@ -282,11 +282,15 @@
         "properties": {
           "Customer": {
             "label": "Customer",
-            "type": "String"
+            "type": "String",
+            "refLbl": true,
+            "noDelete": true
           },
           "InvoiceId": {
             "label": "Invoice Id",
-            "type": "String"
+            "type": "String",
+            "refLbl": true,
+            "noDelete": true
           },
           "Approve": {
             "type": "Event",
@@ -564,10 +568,13 @@
         ],
         "properties": {
           "Name": {
-            "type": "String"
+            "type": "String",
+            "refLbl": true,
+            "noDelete": true
           },
           "Short": {
-            "type": "String"
+            "type": "String",
+            "noDelete": true
           },
           "Size": {
             "type": "Select",
@@ -575,7 +582,9 @@
               "S",
               "M",
               "L"
-            ]
+            ],
+            "refLbl": true,
+            "noDelete": true
           }
         }
       }
