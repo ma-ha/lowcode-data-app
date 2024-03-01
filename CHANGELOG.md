@@ -1,3 +1,7 @@
+# 0.12.6
+- show apiManaged field as readonly
+- fields in state transition
+
 # 0.12.5
 - CSS nicer layout
 - Prop not null switch

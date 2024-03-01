@@ -658,14 +658,70 @@
           "OK": {
             "type": "Boolean",
             "noDelete": true
+          },
+          "Sel": {
+            "type": "Select",
+            "noDelete": true,
+            "options": [
+              "AA",
+              "BBB",
+              "CCC",
+              "DDD"
+            ]
           }
         },
         "noDelete": true
+      },
+      "OrderGW": {
+        "title": "GW Order",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "A1": {
+            "type": "String",
+            "noDelete": true,
+            "stateTransition": {
+              "null_Create": true
+            }
+          },
+          "A2": {
+            "type": "String",
+            "noDelete": true,
+            "stateTransition": {
+              "null_Create": true,
+              "Created_StartProgress": true,
+              "InProgress_RequestPayment": true
+            }
+          },
+          "A3": {
+            "type": "String",
+            "noDelete": true,
+            "stateTransition": {
+              "Created_StartProgress": true,
+              "InProgress_RequestPayment": true,
+              "PaymentPending_PaymentReceived": true
+            }
+          },
+          "A4": {
+            "type": "String",
+            "noDelete": true,
+            "stateTransition": {
+              "InProgress_RequestPayment": true,
+              "PaymentPending_PaymentReceived": true
+            }
+          }
+        },
+        "noDelete": true,
+        "noEdit": true,
+        "stateModel": "Bill"
       }
     },
     "startPage": [
       "gateway",
-      "CtTest"
+      "CtTest",
+      "OrderGW"
     ],
     "role": [
       "appUser"

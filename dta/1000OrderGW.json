@@ -1,0 +1,30 @@
+{
+  "a": {
+    "id": "a",
+    "_state": "InProgress",
+    "scopeId": "1000/DE/Berlin",
+    "A1": "a",
+    "A2": "a",
+    "A3": "a",
+    "_cre": 1709308975653,
+    "_upd": 1709308987825
+  },
+  "b": {
+    "id": "b",
+    "A1": "b",
+    "A2": "b",
+    "_state": "Created",
+    "scopeId": "1000/DE/Berlin",
+    "_cre": 1709308998424,
+    "_upd": 1709308998424
+  },
+  "c": {
+    "id": "c",
+    "A1": "c",
+    "A2": "c",
+    "_state": "Created",
+    "scopeId": "1000/DE/Berlin",
+    "_cre": 1709309329215,
+    "_upd": 1709309329215
+  }
+}

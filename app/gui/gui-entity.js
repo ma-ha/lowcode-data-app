@@ -99,7 +99,7 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
       actionFields.push({ formFields: [{ id: '_state', type: "text", value: initState.actions[actionId].to, hidden: true }] } )
 
       rows.push({ 
-        title  : 'New ' + entityId,
+        title  : 'New ' + ( entity.title ? entity.title : entityId),
         rowId : 'EntityNewFrm', 
         type : 'pong-form', 
         resourceURL : 'guiapp/'+appId+'/entity/'+entityId,

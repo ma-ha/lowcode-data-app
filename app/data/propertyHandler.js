@@ -262,6 +262,9 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
       if ( ! prop.stateTransition || ! prop.stateTransition[ stateTransition ] ) {
         continue
       }
+    } else if ( prop.apiManaged ) { 
+      cols.push({ formFields: [ { id: propId, label: lbl, type: 'text', readonly: true } ] })
+      continue 
     }
 
     let fld = null
@@ -339,9 +342,9 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
       fld.defaultVal = filter.value
       fld.readonly   = "true" 
     }
-    if ( prop.apiManaged ) {
-      fld.readonly   = true
-    }
+    // if ( prop.apiManaged ) {
+    //   fld.readonly   = true
+    // }
     
     if ( fld ) {
       cols.push({ formFields: [ fld ] })

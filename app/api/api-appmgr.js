@@ -358,7 +358,7 @@ async function getPropertyStatus( req, res ) {
         let prop = entity.properties[ propId ]
         // log.info( ' >>', propId )
         if ( ! prop.stateTransition ) { // default: all fields
-          propRow[ 'prop/'+propId ] = true 
+          propRow[ 'prop/'+propId ] = false 
         } else if (  prop.stateTransition[ statesId +'_'+ transitionId ] ) {
           propRow[ 'prop/'+propId ] = true
         } else {

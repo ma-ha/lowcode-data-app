@@ -198,10 +198,54 @@
     "scopeId": "1000",
     "state": {
       "null": {
-        "actions": {}
+        "actions": {
+          "Create": {
+            "to": "Created",
+            "label": "Create"
+          }
+        }
+      },
+      "Created": {
+        "actions": {
+          "StartProgress": {
+            "to": "InProgress",
+            "label": "Start Progress"
+          }
+        },
+        "x": 300,
+        "y": 100,
+        "label": "Created"
+      },
+      "InProgress": {
+        "actions": {
+          "RequestPayment": {
+            "to": "PaymentPending",
+            "label": "Request Payment"
+          }
+        },
+        "x": 500,
+        "y": 100,
+        "label": "In Progress"
+      },
+      "PaymentPending": {
+        "actions": {
+          "PaymentReceived": {
+            "to": "Closed",
+            "label": "Payment Received"
+          }
+        },
+        "x": 700,
+        "y": 100,
+        "label": "Payment Pending"
+      },
+      "Closed": {
+        "actions": {},
+        "x": 900,
+        "y": 100,
+        "label": "Closed"
       }
     },
     "_cre": 1708271764173,
-    "_upd": 1708271764173
+    "_upd": 1709308731259
   }
 }
