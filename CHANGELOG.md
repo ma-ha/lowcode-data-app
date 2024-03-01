@@ -1,4 +1,7 @@
 # 0.12.4
+- CSS nicer layout
+
+# 0.12.4
 - SelectRef: Display selected properties to show instead of id (i.e. UUID)
 
 # 0.12.3

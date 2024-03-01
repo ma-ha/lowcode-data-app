@@ -519,7 +519,8 @@
  }
 #AppEntitiesAddContentstart,
 #AppEntitiesAddContentnoEdit,
-#AddStateTransitionFormContentapiManaged
+#AddStateTransitionFormContentapiManaged,
+#AppEntitiesAddContentuserDelete
  {
   width: unset;
 }
