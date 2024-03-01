@@ -116,6 +116,10 @@ Property features:
 - you can define a property as "API managed", means zou will see it only in the table, 
   but there is no input available in the add/change GUI form
 
+*Important:* The entity id scope is globally within a top level scope between apps. 
+This enables different views on the same data in different apps (if different apps have the same entity, but different properties). 
+But: Please choose your entity ids wisely, if you don't want this behavior.
+
 # Add New Root Scope (aka "Tenant")
 
 This must be done via API ... but it's simple:
