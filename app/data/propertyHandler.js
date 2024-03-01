@@ -284,7 +284,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
         fld = { id: propId, label: lbl, type: 'select', options: [] }
         try {
           let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
-          let refEntity = await getEntity( prop.selectRef )
+          let refEntity = await getEntity( prop.selectRef, propId )
           for ( let recId in opdTbl ) { 
             fld.options.push({ 
               value  : recId, 
@@ -297,7 +297,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
         fld = { id: propId, label: lbl, type: 'select', options: [], multiple: true }
         try {
           let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
-          let refEntity = await getEntity( prop.selectRef )
+          let refEntity = await getEntity( prop.multiSelectRef, propId )
           for ( let recId in opdTbl ) { 
             fld.options.push({ 
               value: recId, 
@@ -540,7 +540,7 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
       case 'SelectRef':
         tblRec[ propId ] = ''
         if ( rec[ propId ]  && rec[ propId ]  != '' ) {
-          let refEntity = await getEntity( prop.selectRef )
+          let refEntity = await getEntity( prop.selectRef, propId )
           let refParts = prop.selectRef.split('/')
           let refDta = await dta.getDataById( refParts[0]+refParts[3], rec[ propId ] )
           tblRec[ propId ] = getRefLabel( refEntity, rec[ propId ], refDta ) 
@@ -695,8 +695,8 @@ function getRefId( id ) {
 
 // ============================================================================
 
-async function getEntity( refId ) {
-  log.info( 'getEntity', refId )
+async function getEntity( refId, propId ) {
+  log.info( 'getEntity', refId, propId )
   try {
     let idParts = refId.split('/')
     let appId = idParts[0] + '/' + idParts[1] + '/' + idParts[2] 
@@ -710,12 +710,14 @@ async function getEntity( refId ) {
 }
 
 function getRefLabel( entity, recId, rec ) {
-  log.info( 'getRefLabel', entity, recId, rec )
+  log.debug( 'getRefLabel', entity, recId, rec )
   let lbl = []
-  for ( let propId in entity.properties ) {
-    if ( entity.properties[ propId ].refLbl && rec[ propId ] ) {
-      lbl.push( rec[ propId ] )
-    }
+  if ( entity ) {
+    for ( let propId in entity.properties ) {
+      if ( entity.properties[ propId ].refLbl && rec[ propId ] ) {
+        lbl.push( rec[ propId ] )
+      }
+    }  
   }
   if ( lbl.length == 0 ) {
     return recId
