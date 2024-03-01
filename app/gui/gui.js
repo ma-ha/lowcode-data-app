@@ -222,13 +222,13 @@ function errorView( txt ) {
 }
 
 function getHtmlURL( id ) {
-  return  cfg.GUI_URL+'index.html?layout='+id+'-nonav'
+  return  cfg.GUI_URL+'/index.html?layout='+id+'-nonav'
 }
 
 function addHtmlPage( gui, id, title, cssId, contentId ) {
   log.info( 'addHtmlPage',  id + '-nonav' )
   let gtcPage = gui.addPage( id + '-nonav', title )
-  gtcPage.title = 'K8s Mon'
+  gtcPage.title = 'LowCode APp'
   gtcPage.setPageWidth( '90%' )
   /** Add an empty view to the default page. */
   gtcPage.addView({ 
