@@ -493,8 +493,9 @@ async function delUser( uid ) {
 
 async function getApiAppScopes( appId, appSecret ) {
   let authTbl = await getAuthTbl()
-  let hash = createHash('sha256').update( appSecret ).digest('hex')
-  // log.info( 'getApiAppScopes', hash,  authTbl[ appId ] )
+  // let hash = createHash('sha256').update( appSecret ).digest('hex')
+  let hash = appSecret // TODO
+  log.info( 'getApiAppScopes', hash,  authTbl[ appId ] )
   if ( authTbl[ appId ] && authTbl[ appId ].password == hash ) {
     return authTbl[ appId ].role.api
   } else {

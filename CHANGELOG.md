@@ -2,6 +2,8 @@
 - CSS nicer layout
 - Prop not null switch
 - fix broken footer links
+- API subscribe workaround
+- fix mulit ref
 
 # 0.12.4
 - SelectRef: Display selected properties to show instead of id (i.e. UUID)
