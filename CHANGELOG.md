@@ -1,5 +1,6 @@
-# 0.12.4
+# 0.12.5
 - CSS nicer layout
+- Prop not null switch
 
 # 0.12.4
 - SelectRef: Display selected properties to show instead of id (i.e. UUID)

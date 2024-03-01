@@ -316,7 +316,8 @@
           "Address": {
             "label": "Address",
             "type": "String",
-            "filter": true
+            "filter": true,
+            "noDelete": true
           }
         }
       }
@@ -541,7 +542,9 @@
         }
       }
     },
-    "startPage": "city",
+    "startPage": [
+      "city"
+    ],
     "role": [
       "admin"
     ],
@@ -589,7 +592,9 @@
         }
       }
     },
-    "startPage": "region",
+    "startPage": [
+      "region"
+    ],
     "role": [
       "admin"
     ],
@@ -625,9 +630,43 @@
             "noDelete": true
           }
         }
+      },
+      "CtTest": {
+        "title": "",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "id": {
+            "type": "UUID",
+            "noDelete": true
+          },
+          "OrderId": {
+            "type": "String",
+            "notNull": true,
+            "noDelete": true,
+            "lines": 3,
+            "apiManaged": true
+          },
+          "Remark": {
+            "type": "Text",
+            "notNull": true,
+            "noDelete": true,
+            "lines": 3
+          },
+          "OK": {
+            "type": "Boolean",
+            "noDelete": true
+          }
+        },
+        "noDelete": true
       }
     },
-    "startPage": "gateway",
+    "startPage": [
+      "gateway",
+      "CtTest"
+    ],
     "role": [
       "appUser"
     ],

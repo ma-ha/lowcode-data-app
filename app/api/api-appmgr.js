@@ -293,6 +293,7 @@ async function getProperty( req, res ) {
       filter   : ( dbProp.filter ? true : false ),
       noEdit     : ( dbProp.noEdit  === true ? true : false ),
       refLbl     : ( dbProp.refLbl  === true ? true : false ),
+      notNull    : ( dbProp.notNull  === true ? true : false ),
       userDelete : ( entity.noDelete === true ? false : true ),
       noTable    : ( dbProp.noTable === true ? true : false ),
       apiManaged : ( dbProp.apiManaged ? true : false ),
@@ -320,6 +321,7 @@ async function getProperty( req, res ) {
       api      : ( prop.apiManaged ? true : false ),
       noEdit   : ( prop.noEdit  ? true : false ),
       refLbl   : ( prop.refLbl  ? true : false ),
+      notNull  : ( prop.notNull ? true : false ),
       userDelete : ( entity.noDelete === true ? false : true ),
       noTable  : ( prop.noTable ? true : false )
     })
@@ -442,6 +444,12 @@ async function addProperty ( req, res ) {
     entity.properties[ id ].refLbl = true 
   } else {
     delete entity.properties[ id ].refLbl
+  }
+
+  if ( req.body.notNull  && req.body.type != 'Boolean' ) { 
+    entity.properties[ id ].notNull = true 
+  } else {
+    delete entity.properties[ id ].notNull
   }
 
   if ( req.body.userDelete  ) { 

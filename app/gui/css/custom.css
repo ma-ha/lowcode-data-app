@@ -487,7 +487,8 @@
  #AppEntityPropAddContentnoEdit,
  #AppEntityPropAddContentnoTable,
  #AppEntityPropAddContentapiManaged,
- #AppEntityPropAddContentrefLbl {
+ #AppEntityPropAddContentrefLbl,
+ #AppEntityPropAddContentnotNull {
   width: auto;
  }
  .pong-table button {
@@ -514,8 +515,9 @@
 #AppEntityPropAddContentapiManagedDiv label,
 #AppEntityPropAddContentnoTableDiv label,
 #AppEntityPropAddContentnoEditDiv label,
-#AppEntityPropAddContentrefLblDiv label {
-  width: 170px;
+#AppEntityPropAddContentrefLblDiv label,
+  #AppEntityPropAddContentnotNullDiv label {
+    width: 170px;
  }
 #AppEntitiesAddContentstart,
 #AppEntitiesAddContentnoEdit,
@@ -648,6 +650,7 @@
  .pongFormField .ui-disabled {
    color: #555;
    opacity: 0.8 !important;
+   background-color: #EEE;
  }
  
  .availableFields {

@@ -260,14 +260,15 @@ async function init( ) {
         cols: [
           { id: 'Edit', label: "&nbsp;", cellType: "button", width :'7%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AppEntityPropAdd' } ] },
-          { id: "propId",  label: "Id",       width: "20%", cellType: "text" },
-          { id: "label",   label: "Label",    width: "20%", cellType: "text" },
+          { id: "propId",  label: "Id",       width: "15", cellType: "text" },
+          { id: "label",   label: "Label",    width: "15", cellType: "text" },
           { id: "type",    label: "Type",     width: "40%", cellType: "text" },
           { id: "filter",  label: "Filter",     width: "5%",  cellType: "checkbox" },
           { id: "api",     label: "API Managed",width: "5%", cellType: "checkbox" },
           { id: "noTable", label: "No Table",   width: "5%", cellType: "checkbox" },
           { id: "noEdit",  label: "No Edit",    width: "5%", cellType: "checkbox" },
           { id: "refLbl",  label: "Ref Label",  width: "5%", cellType: "checkbox" },
+          { id: "notNull", label: "Not Null",   width: "5%", cellType: "checkbox" },
           { id: 'Del', label: "&nbsp;", cellType: "button", width :'8%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" }
         ]
@@ -302,7 +303,10 @@ async function init( ) {
                           { id: "noEdit",  label: "No Edit", type: "checkbox",
                             descr: "Will not appear in the GUI form." } 
                         ]},
-          { formFields: [ { id: "refLbl", label: "Refs: Show instead of ID", type: "checkbox" } ]}
+          { formFields: [ 
+            { id: "refLbl", label: "Refs: Show instead of ID", type: "checkbox" },
+            { id: "notNull", label: "Not Null", type: "checkbox" } 
+          ]}
 
         ] }],
         actions : [ 

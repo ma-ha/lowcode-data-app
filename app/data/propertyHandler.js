@@ -254,7 +254,6 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
-    if ( prop.apiManaged ) { continue } 
     if ( prop.noEdit     ) { continue }
     let lbl  = ( prop.label ? prop.label : propId )
     // console.log( 'LBL', lbl)
@@ -336,9 +335,12 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
         break 
     }
 
-    if ( filter && filter.field == propId ) {
+    if ( filter && filter.field == propId ) { // ??
       fld.defaultVal = filter.value
       fld.readonly   = "true" 
+    }
+    if ( prop.apiManaged ) {
+      fld.readonly   = true
     }
     
     if ( fld ) {
