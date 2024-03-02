@@ -36,8 +36,9 @@ async function setupAPI( app ) {
   svc.delete( '/app/entity', guiAuthz, delEntity )
 
   svc.get(    '/app/entity/property', guiAuthz, getProperty )
-  svc.post(   '/app/entity/property',  guiAuthz, addProperty )
+  svc.post(   '/app/entity/property', guiAuthz, addProperty )
   svc.delete( '/app/entity/property', guiAuthz, delProperty )
+  svc.post(   '/app/entity/property/move-down', guiAuthz, addPropertyMoveDn )
   svc.get(    '/app/entity/property/status-change', guiAuthz, getPropertyStatus )
   svc.post(   '/app/entity/property/status-change', guiAuthz, setPropertyStatus )
 
@@ -329,6 +330,28 @@ async function getProperty( req, res ) {
   res.send( propArr )
 }
 
+async function addPropertyMoveDn( req, res ) {
+  log.info( 'POST /app/entity/property/mode-down', req.body )
+  let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
+  if ( ! allOK ) { return }
+
+  let propCopy = JSON.parse( JSON.stringify( entity.properties ))
+  entity.properties = {}
+  let doNext = false
+  for ( let propId in propCopy ) {
+    if ( propId != req.body.propId ) { 
+      entity.properties[ propId ] = propCopy[ propId ]
+    }
+    if ( doNext ) {
+      entity.properties[ req.body.propId ] = propCopy[ req.body.propId ]
+      doNext = false
+    }
+    if ( propId == req.body.propId ) { 
+      doNext = true
+    }
+  }
+  res.send( entity.properties )
+}
 
 async function getPropertyStatus( req, res ) {
   log.debug( 'GET /app/entity/property', req.query )

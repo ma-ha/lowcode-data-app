@@ -523,7 +523,7 @@
 #AppEntitiesAddContentnoEdit,
 #AddStateTransitionFormContentapiManaged,
 #AppEntitiesAddContentuserDelete
- {
+{
   width: unset;
 }
 #AppEntitiesAddContentstartDiv label,
@@ -636,6 +636,10 @@
    clear: left; 
    display: block; 
    width: 300px;
+ }
+ .pongFormField input[type=checkbox]
+ {
+     width: unset;
  }
  .pongFormField select { 
    clear: left; 

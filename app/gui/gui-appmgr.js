@@ -96,7 +96,7 @@ async function init( ) {
 
   function cstmizePageAddAppFrom() {
     return { 
-      id: 'CustomizeAddApp', rowId: 'CustomizeAddApp', title: 'Add App',  height: '150px', 
+      id: 'CustomizeAddApp', rowId: 'CustomizeAddApp', title: 'Add App',  height: 'auto', 
       type : 'pong-form', resourceURL: 'app', 
       moduleConfig : {
         description: "Add",
@@ -180,7 +180,7 @@ async function init( ) {
     }
 
     rows.push({ 
-      id: 'AppEntitiesAdd', rowId: 'AppEntitiesAdd', title: 'Add / Update Entity',  height: '150px', 
+      id: 'AppEntitiesAdd', rowId: 'AppEntitiesAdd', title: 'Add / Update Entity',  height: 'auto', 
       type : 'pong-form', resourceURL: 'app/entity',   decor: 'decor',
       moduleConfig : {
         description: "Add",
@@ -270,7 +270,9 @@ async function init( ) {
           { id: "refLbl",  label: "Ref Label",  width: "5%", cellType: "checkbox" },
           { id: "notNull", label: "Not Null",   width: "5%", cellType: "checkbox" },
           { id: 'Del', label: "&nbsp;", cellType: "button", width :'8%', icon: 'ui-icon-trash', 
-            method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" }
+            method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" },
+          { id: 'moveDn', label: "&nbsp;", cellType: "button", width :'8%', icon: '	ui-icon-arrowthick-1-s', 
+            method: "POST", URL: 'app/entity/property/move-down', update: [ { resId : 'AppEntityProp' } ] }
         ]
       }
     })
@@ -282,7 +284,7 @@ async function init( ) {
     }
 
     rows.push({ 
-      id: 'AppEntityPropAdd', rowId: 'AppEntityPropAdd', title: 'Add / Update Property',  height: '150px', 
+      id: 'AppEntityPropAdd', rowId: 'AppEntityPropAdd', title: 'Add / Update Property',  height: 'auto', 
       type : 'pong-form', resourceURL: 'app/entity/property', decor: 'decor', 
       moduleConfig : {
         description: "Add",
