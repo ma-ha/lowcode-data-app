@@ -459,7 +459,7 @@ async function init( ) {
     moduleConfig : {}
   })
 
-  let editStatePageColumns = editStatePage.addColumnsRow( 'EditStatenRow', '620px' )
+  let editStatePageColumns = editStatePage.addColumnsRow( 'EditStatenRow', '650px' )
 
   let editStatePageColumns1 = editStatePageColumns.addRowsColumn( 'Col1', '50%' )
   editStatePageColumns1.addView({ id: 'StateLst', 
@@ -481,7 +481,7 @@ async function init( ) {
     } 
   })
   editStatePageColumns1.addView({ id: 'AddStateForm', 
-    title: 'Add / Update State', height: '185px', 
+    title: 'Add / Update State', height: 'auto', 
     type : 'pong-form', resourceURL: 'state-model/state'
   })
 
@@ -503,7 +503,7 @@ async function init( ) {
     }
   })
   editStatePageColumns2.addView({ id: 'AddStateTransitionForm', 
-    title: 'Add / Update Transition', height: '185px', 
+    title: 'Add / Update Transition', height: 'auto', 
     type : 'pong-form', resourceURL: 'state-model/transition'
   })
 
