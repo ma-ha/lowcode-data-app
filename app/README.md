@@ -45,12 +45,16 @@ Standalone mode using it as npm package: https://www.npmjs.com/package/lowcode-d
 
     let lowCodeApp = require( 'lowcode-data-app' )
 
-    lowCodeApp.init({
+    let app = lowCodeApp.init({
       DATA_DIR : '../dta/',
       GUI_URL  : 'http://localhost:8888/app/',
       URL_PATH : '/app',
       OIDC_SERVER : true
     })
+
+
+The `init(...)` returns the `easy-web-app`, so the whole [API](https://github.com/ma-ha/easy-web-app/blob/master/API-Reference.md) is open for customizing,
+e.g. `app.getExpress()` to add API routes or ` gui.pages['main'].addFooterLink(...)` to modify the footer.
 
 ## Getting Started With Empty DB
 

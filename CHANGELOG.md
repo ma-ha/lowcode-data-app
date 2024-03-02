@@ -1,3 +1,7 @@
+# 0.12.7
+- init returns app
+- change property order
+
 # 0.12.6
 - show apiManaged field as readonly
 - fields in state transition
