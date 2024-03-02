@@ -45,6 +45,7 @@ async function init( lowCodeConfig ) {
   await appMgrAPI.setupAPI( app )
   await adminAPI.setupAPI( app )
 
+  return app
 }
 
 
