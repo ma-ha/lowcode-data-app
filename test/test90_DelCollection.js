@@ -31,5 +31,11 @@ describe( 'Data Ops', () => {
     assert.equal( result.status, 200 )
     assert.notEqual( result.data, null )
   })
+
+  it( 'Delete TestState collection', async () => {
+    let result = await axios.delete( API_URL + scopeId +'/TestState', { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data, null )
+  })
   
 })

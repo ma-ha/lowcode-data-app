@@ -315,7 +315,14 @@ async function getUserInfo( userId ) {
 async function addUser( id, newUser ) {
   let authTbl = await getAuthTbl()
   if ( id && authTbl[ id ] ) { return 'ERROR: ID exists' }
-  if ( id ) { // add user
+  if ( id && newUser.sp ) {
+    if ( ! newUser.password ) {
+       newUser.password = helper.uuidv4()
+    }
+    authTbl[ id ] = newUser
+    await writeAuthTbl()
+    return 'API account added'
+  } else  if ( id ) { // add user
     let result = 'User added'
     if ( newUser.password ) {
       newUser.password = createHash('sha256').update( newUser.password ).digest('hex')
@@ -495,7 +502,7 @@ async function getApiAppScopes( appId, appSecret ) {
   let authTbl = await getAuthTbl()
   // let hash = createHash('sha256').update( appSecret ).digest('hex')
   let hash = appSecret // TODO
-  log.info( 'getApiAppScopes', hash,  authTbl[ appId ] )
+  log.debug( 'getApiAppScopes', hash,  authTbl[ appId ] )
   if ( authTbl[ appId ] && authTbl[ appId ].password == hash ) {
     return authTbl[ appId ].role.api
   } else {

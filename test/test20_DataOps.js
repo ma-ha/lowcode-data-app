@@ -99,7 +99,7 @@ describe( 'Data Ops', () => {
     let result = await axios.post( testUuidUrl, rec, { headers: HEADERS } )
     // console.log( result )
     assert.equal( result.status, 200 )
-    console.log( '2', result.data  )
+    // console.log( '2', result.data  )
     assert.notEqual( result.data.id, null )
     uid = result.data.id
   })

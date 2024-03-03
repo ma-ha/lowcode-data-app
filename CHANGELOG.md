@@ -1,3 +1,6 @@
+# 0.13.0
+- API status transition
+
 # 0.12.7
 - init returns app
 - change property order

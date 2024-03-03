@@ -60,7 +60,9 @@ async function setScope ( req, res ) {
   } else {
     log.info( 'ERR: SET SCOPE', user.userId, req.query.id )
   }
-  let layout = ( req.query.layout ? req.query.layout : 'Apps' )
+  log.debug( 'set scope', req.query )
+  let layout = req.query.layout 
+  if ( ! layout || layout == 'AppEntity-nonav' ) { layout = 'Apps' }
   res.redirect( 'index.html?layout='+layout ) 
 }
 

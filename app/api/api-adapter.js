@@ -42,15 +42,20 @@ async function setupAPI( app, oauthCfg ) {
   svc.get(  '/adapter/app/:scopeId', apiAuthz, getAppList )
   svc.get(  '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, getApp )
   svc.post( '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, creApp )
-  
+
+  svc.get(  '/adapter/state/:scopeId/:stateId', apiAuthz, getStateModel )
+  svc.post( '/adapter/state/:scopeId/:stateId', apiAuthz, creStateModel )
+
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId',        apiAuthz, getDocArr )
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, getDoc )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, addDoc )
+  svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:state/:action', apiAuthz, changeDocStatus )
+  svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:state', apiAuthz, getDocByStatus )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId',        apiAuthz, addDoc )
   svc.delete('/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, delDoc )
   svc.delete('/adapter/entity/:scopeId/:entityId', apiAuthz, delCollection )
 }
-``
+
 // ----------------------------------------------------------------------------
 
 async function creRootScope( req, res ) {
@@ -172,12 +177,33 @@ async function getApp( req, res ) {
 }
 
 // ----------------------------------------------------------------------------
+async function creStateModel( req, res ) {
+  log.info( 'creStateModel...')
+  let stateModelId = req.params.scopeId +'/'+ req.params.stateId
+  let stateModel  = await dta.getDataById( 'state', stateModelId )
+  if ( stateModel ) {return sendErr( res, 'state model exists' ) }
+  stateModel = req.body
+  stateModel.scopeId = req.params.scopeId
+  await dta.addDataObj( 'state', stateModelId, stateModel )
+  res.send({status: 'OK'})
+}
+
+
+async function getStateModel( req, res ) {
+  log.info( 'getStateModel...')
+  let stateModelId = req.params.scopeId +'/'+ req.params.stateId
+  let stateModel  = await dta.getDataById( 'state', stateModelId )
+  if ( ! stateModel ) {return sendErr( res, 'state model not found' ) }
+  res.send( stateModel )
+}
+
+// ----------------------------------------------------------------------------
 
 async function getDocArr( req, res ) {
   log.info( 'GET data array', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
   if ( ! await checkApp( req, res ) ) { return }
   let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
-  let recs = await dta.getData( tbl, req.params.scopeId )
+  let recs = await dta.getData( tbl, req.params.scopeId ) // TODO filter
   log.info( 'recs',recs)
   res.send( recs )
 }
@@ -207,12 +233,12 @@ async function addDoc( req, res )  {
   }
 
   let properties = app.entity[ req.params.entityId ].properties
-  for ( let propId in req.body ) {
-    if ( ! properties[ propId ] ) {
-      log.warn( 'api-adapter: properties not defined', propId )
-      return res.status( 400 ).send( )
-    }
-  }
+  // for ( let propId in req.body ) {
+  //   if ( ! properties[ propId ] ) {
+  //     log.warn( 'api-adapter: properties not defined', propId )
+  //     return res.status( 400 ).send( )
+  //   }
+  // }
   for ( let propId in properties ) {
     if ( propId == 'id'  && properties.id == 'UUID'  && ! rec.id ) { 
       recId = helper.uuidv4()
@@ -238,6 +264,115 @@ async function addDoc( req, res )  {
   }
 }
 
+// ----------------------------------------------------------------------------
+async function changeDocStatus( req, res )  {
+  log.info( 'Change Status', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.state, req.params.action )
+  log.debug( 'Change Status', req.body )
+  let app = await checkApp( req, res )
+  let properties = app.entity[ req.params.entityId ].properties
+  if ( ! app ) { return }
+  let stateModelId =  app.entity[ req.params.entityId ].stateModel
+  if ( ! stateModelId ) { return sendErr( res, 'Change Status: entity has no state' ) }
+  let stateModel = await dta.getDataById( 'state', req.params.scopeId +'/'+ stateModelId )
+  if ( ! stateModel ) { return sendErr( res, 'Change Status: state model error' ) } // should not happen, but...
+  let stateDef = stateModel.state[ req.params.state ]
+  if ( ! stateDef ) { return sendErr( res, 'Change Status: state not found' ) } 
+  let stateAction = stateDef.actions[ req.params.action ]
+  if ( ! stateAction ) { return sendErr( res, 'Change Status: state action not found' ) }
+  
+  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+
+  let rec = {}
+  if ( req.params.state != 'null' ) {
+    rec = await dta.getDataById( tbl, req.body.id )
+    if ( ! rec ) { return sendErr( res, 'Change Status: document not found' ) }
+    if ( ! rec._state || rec._state !=  req.params.state ) {
+      return sendErr( res, 'Change Status: wrong state not found' )
+    }
+  } else {
+    // create ...
+    // id
+    if ( req.body.id ) {
+      let dbRec = await dta.getDataById( tbl, req.body.id )
+      if ( dbRec ) { return sendErr( res, 'Change Status: document exists' ) }
+      rec.id = req.body.id
+    } else if ( properties.id && properties.id.type == 'UUID' ) { 
+      rec.id = helper.uuidv4()
+    } else {
+      return sendErr( res, 'Change Status: id required' )
+    }
+    // scopeId
+    if ( req.body.scopeId ) {
+      if ( req.body.scopeId.startsWith( req.params.scopeId ) ) {
+        rec.scopeId = eq.body.scopeId
+      } else {
+        return sendErr( res, 'Change Status: scopeId not allowed' )
+      }
+    } else {
+      rec.scopeId = req.params.scopeId
+    }
+  }
+  // check re.body for all prop req in transition
+  let stateActionId =  req.params.state +'_' +  req.params.action
+  for ( let propId in properties ) {
+    if ( propId == 'id' ) { continue }
+    let propMust = false
+    if ( properties[ propId ].stateTransition ) {
+      if ( properties[ propId ].stateTransition[ stateActionId ] ) {
+        propMust = true
+      }
+    }
+    log.debug( 'Change Status', stateActionId, propId, propMust,  req.body[ propId ] )
+
+    if ( propMust ) {
+      if ( ! req.body[ propId ] ) {
+        return sendErr( res, 'Change Status: property required for action' )
+      }
+    } else {
+      if ( req.body[ propId ] ) {
+        return sendErr( res, 'Change Status: property not allowed for action' )
+      }
+    }
+  }
+  // finally
+  for ( let p in req.body ) {
+    rec[ p ] = req.body[ p ]
+  }
+  
+  rec._state = stateAction.to
+
+  let result = await dta.addDataObj( tbl, rec.id, rec )
+  if ( result ) {
+    res.send({ status: 'OK', id: rec.id, doc: rec  })
+  } else {
+    res.send({ error: '?' })
+  }
+}
+
+
+async function getDocByStatus( req, res )  {
+  log.info( 'Change Status', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.state )
+  log.debug( 'Change Status', req.body )
+  let app = await checkApp( req, res )
+  if ( ! app ) { return }
+  let stateModelId =  app.entity[ req.params.entityId ].stateModel
+  if ( ! stateModelId ) { return sendErr( res, 'Change Status: entity has no state' ) }
+  let stateModel = await dta.getDataById( 'state', req.params.scopeId +'/'+ stateModelId )
+  if ( ! stateModel ) { return sendErr( res, 'Change Status: state model error' ) } // should not happen, but...
+  let stateDef = stateModel.state[ req.params.state ]
+  if ( ! stateDef ) { return sendErr( res, 'Change Status: state not found' ) } 
+  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+  
+  let qry = { '_state': req.params.state }
+  let docMap = await dta.getData( tbl, req.params.scopeId, false, qry )
+  
+  let result = []
+  for ( let docId in docMap ) {
+    result.push( docMap[ docId ])
+  }
+  res.send( result )
+}
+// ----------------------------------------------------------------------------
 
 async function delDoc( req, res )  {
   log.info( 'Del data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
@@ -256,19 +391,19 @@ async function delCollection( req, res )  {
 }
 
 
-function extractFilter( filterQuery ){
-  let filter = null
-  if ( filterQuery ) {
-    for (  let fp in filterQuery ) { try {
-      let query = filterQuery[ fp ].replaceAll( '%20', ' ' ).trim()
-      if ( query != '' ) {
-        if ( ! filter ) { filter = {} }
-        filter[ fp ] = query
-      }
-    } catch ( exc ) { log.warn( 'extractFilter', exc ) }}
-  }
-  return filter
-}
+// function extractFilter( filterQuery ){
+//   let filter = null
+//   if ( filterQuery ) {
+//     for (  let fp in filterQuery ) { try {
+//       let query = filterQuery[ fp ].replaceAll( '%20', ' ' ).trim()
+//       if ( query != '' ) {
+//         if ( ! filter ) { filter = {} }
+//         filter[ fp ] = query
+//       }
+//     } catch ( exc ) { log.warn( 'extractFilter', exc ) }}
+//   }
+//   return filter
+// }
 
 // ----------------------------------------------------------------------------
 
@@ -301,4 +436,3 @@ async function checkApp( req, res ) {
   }
   return app
 }
-

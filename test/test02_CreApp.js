@@ -5,13 +5,14 @@ const axios  = require( 'axios' )
 const helper = require( './helper' )
 
 const API_URL = 'http://localhost:8888/app/adapter/app/'
+const STATE_URL = 'http://localhost:8888/app/adapter/state/'
 
 let HEADERS = { 
   'app-id'     : 'mochatest',
   'app-secret' : 'mochatest-supasecret-id'
 }
 
-let app = {
+const APP = {
   "scopeId": null,
   "title": "MochaTest",
   "require": {
@@ -46,12 +47,62 @@ let app = {
       "noDelete": true,
       "noEdit": true
     },
+    "TestState": {
+      "title": "Test",
+      "scope": "inherit",
+      "maintainer": [
+      ],
+      "properties": {
+        "id": {
+          "type": "UUID"
+        },
+        "Name": {
+          "type": "String",
+          "stateTransition": {
+            "null_Create": true
+          },
+        },
+        "Desc": {
+          "type": "String",
+          "stateTransition": {
+            "Open_Close": true
+          }
+        }
+      },
+      "stateModel": "TestState"
+    }
   },
   "startPage": "test",
   "role": [
     "appUser"
   ],
   "scope": {
+  }
+}
+
+const STATE_MODEL = {
+  "state": {
+    "null": {
+      "actions": {
+        "Create": {
+          "to": "Open"
+        }
+      }
+    },
+    "Open": {
+      "actions": {
+        "Close": {
+          "to": "Closed"
+        }
+      }
+    }
+  },
+  "Closed": {
+    "actions": {
+      "Reopen": {
+        "to": "Open"
+      }
+    }
   }
 }
 
@@ -67,12 +118,26 @@ describe( 'Create App', () => {
 
   it( 'Create a test app', async () => {
     let url = API_URL + scopeId + '/mocha-test-app/1.0.0'
-    let result = await axios.post( url, app, { headers: HEADERS } )
+    let result = await axios.post( url, APP, { headers: HEADERS } )
     // console.log( result )
     assert.equal( result.status, 200 )
   })
 
 
+  it( 'Create State Model', async () => {
+    const URL = STATE_URL + scopeId + '/TestState'
+    let result = await axios.post( URL, STATE_MODEL, { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+  })
+
+  it( 'Get State Model', async () => {
+    const URL = STATE_URL + scopeId + '/TestState'
+    let result = await axios.get( URL, { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data, null )
+  })
+
+  
   it( 'List root scopes', async () => {
     let result = await axios.get( API_URL + scopeId, { headers: HEADERS } )
     assert.equal( result.status, 200 )

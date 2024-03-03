@@ -167,7 +167,7 @@ async function getStateModelById( rootScopeId, stateModelId ) {
 // ============================================================================
 
 // tbl param can be like "1000city" or "1000/region-mgr/1.0.0/city"
-async function getData( tbl, scopeId, admin ) {  
+async function getData( tbl, scopeId, admin, qry ) {  
   log.info( 'getData',  tbl, scopeId )
   let table = tbl
   let inheritData = false
@@ -186,23 +186,32 @@ async function getData( tbl, scopeId, admin ) {
   await syncTbl( table )
   let result = {}
   for ( let recId in data[ table ] ) {
-    log.info( 'getData dta:',inheritData,  recId, scopeId, data[ table ][ recId ].scopeId  )
+    let rec = data[ table ][ recId ]
+    if ( !  isQueried( rec, qry ) ) { continue }
+    log.info( 'getData dta:', inheritData, recId, scopeId, rec.scopeId  )
     if ( admin ) {
-      result[ recId ] = data[ table ][ recId ]
+      result[ recId ] = rec
     } else  if ( inheritData ) {
-      if ( scopeId.indexOf( data[ table ][ recId ].scopeId ) >= 0 ) {
-      // if ( data[ table ][ recId ].scopeId.startsWith( scopeId ) ) {
-        result[ recId ] = data[ table ][ recId ]
+      if ( scopeId.indexOf( rec.scopeId ) >= 0 ) {
+      // if ( rec.scopeId.startsWith( scopeId ) ) {
+        result[ recId ] = rec
       }
     } else {
       if ( data[ table ][ recId ].scopeId == scopeId ){
-        result[ recId ] = data[ table ][ recId ]
+        result[ recId ] = rec
       }
     }
   }
   return result
 }
 
+function isQueried( doc, qry ) {
+  if ( ! qry ) { return true }
+  for ( let q in qry ) {
+    if ( ! doc[q]  ||  doc[q] != qry[q] ) { return false }
+  }
+  return true
+}
 
 async function getDataById( tbl, id ) {
   log.debug( 'getDataById',tbl, id  )
