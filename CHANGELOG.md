@@ -1,3 +1,7 @@
+# 0.13.2
+- hide UUID col in table
+- noEdit not evaluated for create state entity form
+
 # 0.13.1
 - fix multi entity create 
 
