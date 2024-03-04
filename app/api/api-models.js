@@ -37,6 +37,7 @@ async function setupAPI( app ) {
   svc.get( '/state-model/transition', guiAuthz, getStateTransitions )
   svc.get( '/state-model/transition/pong-form', guiAuthz, getStateTransFrm )
   svc.post('/state-model/transition', guiAuthz, setStateTransitions )
+  svc.delete('/state-model/transition', guiAuthz, delStateTransitions )
 
   svc.get( '/state-model/diagram', guiAuthz, getStateModel )
   
@@ -379,8 +380,11 @@ async function getStateTransFrm( req, res )  {
     ] }
     ],
     actions : [ 
-      { id: "AddStateBtn", actionName: "Add / Update", update: [{ resId:'StateTransitionLst' }, { resId:'StateModel' }], 
-        actionURL: 'state-model/transition', target: "modal" }
+      { id: "AddTransitionBtn", actionName: "Add / Update", update: [{ resId:'StateTransitionLst' }, { resId:'StateModel' }], 
+        actionURL: 'state-model/transition', target: "modal" },
+      { id: "DaleteTransitiontn", actionName: "Delete", update: [{ resId:'StateTransitionLst' }, { resId:'StateModel' }], 
+        method: "DELETE", actionURL: 'state-model/transition', target: "modal" }
+
     ]
   })  
 }
@@ -518,6 +522,26 @@ async function setStateTransitions( req, res )  {
 
     return res.send( 'OK' )
 
+  }
+  res.status(400).send( ) 
+}
+
+
+async function delStateTransitions( req, res )  {
+  log.info( 'delStateTransitions', req.body )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'Login required' ) }
+  if ( req.body.stateModelId && req.body.stateIdFrom && req.body.actionId ) {
+    let stateModel = await dta.getDataById( 'state', req.body.stateModelId ) 
+    if ( ! stateModel ) { return res.status(400).send( 'StateModel not found' ) }
+    let stateFrom = stateModel.state[ req.body.stateIdFrom ]
+    if ( ! stateFrom ) { return res.status(400).send( 'StateFrom not found' ) }
+    if ( ! stateFrom.actions[ req.body.actionId ]) {  
+      return res.status(400).send( 'ActionId not found' )
+    }
+    delete stateFrom.actions[ req.body.actionId ]
+    await dta.addDataObj( 'state', req.body.stateModelId, stateModel ) 
+    return res.send( 'OK' )
   }
   res.status(400).send( ) 
 }
