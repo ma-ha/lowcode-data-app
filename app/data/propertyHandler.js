@@ -254,7 +254,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
-    if ( prop.noEdit     ) { continue }
+    if ( prop.noEdit && ! stateTransition ) { continue }
     let lbl  = ( prop.label ? prop.label : propId )
     // console.log( 'LBL', lbl)
 
