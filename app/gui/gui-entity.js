@@ -243,7 +243,9 @@ function genTblColsConfig( entityId, entity ) {
     cols.push({ id: '_state', label: "State",  cellType: "text", width:'10%' })
   }
 
-  cols.push({ id: 'recId', label: "Id",  cellType: "text", width:'10%' })
+  if ( ! ( entity.properties.id && entity.properties.id.noTable ) ) {
+    cols.push({ id: 'recId', label: "Id",  cellType: "text", width:'10%' })
+  }
 
   cols = cols.concat( propHandler.genGuiTableColsDef( appEntityPropMap ) )
 

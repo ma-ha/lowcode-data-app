@@ -297,7 +297,9 @@
             "event": "Approve"
           },
           "id": {
-            "type": "UUID"
+            "type": "UUID",
+            "noDelete": true,
+            "noTable": true
           }
         },
         "noDelete": true
