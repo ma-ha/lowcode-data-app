@@ -358,19 +358,28 @@ async function udpState( req, res )  {
 }
 
 async function getStateTransFrm( req, res )  {
+  let stateModel = await dta.getDataById( 'state', req.query.id ) 
+  let fromOpts = []
+  let toOpts   = []
+  if ( stateModel ) {
+    for ( let stateId in stateModel.state ) {
+      fromOpts.push({ value: stateId })
+      if ( stateId != 'null' ) { toOpts.push({ value: stateId }) }
+    }
+  }
   res.send({
     id: 'AddStateTransitionForm',
     fieldGroups:[{ columns: [
       { formFields: [
         { id: "stateModelId", label: "Model Id", type: "text", hidden: true, value: req.query.id },
         { id: "actionId",     label: "Action ID", type: "text" },
-        { id: "stateIdFrom",  label: "From State", type: "text" },
+        { id: "stateIdFrom",  label: "From State", type: "text", options: fromOpts },
         { id: "line", label: "Line", type: "text", 
           descr:'For non direct lines zou can add intermediate x,y points, like: 10,10;20,20' }  
         ]},
       { formFields: [
         { id: "actionName",   label: "Action Name", type: "text" },
-        { id: "stateIdTo",    label: "To State", type: "text" },
+        { id: "stateIdTo",    label: "To State", type: "text", options: toOpts },
         { id: "labelPosXY", label: "Label x,y", type: "text", 
           descr: 'Action label x,z position, like: 20,30' }  
       ]},
