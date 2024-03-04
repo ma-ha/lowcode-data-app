@@ -43,7 +43,7 @@ async function init( lowCodeConfig ) {
   await appAPI.setupAPI( app, cfg.OIDC )
   await appAdapter.setupAPI( app, cfg.OIDC )
   await appMgrAPI.setupAPI( app )
-  await adminAPI.setupAPI( app )
+  await adminAPI.setupAPI( app, cfg )
 
   return app
 }
@@ -56,6 +56,7 @@ function checkConfig( cfg ) {
   if ( ! cfg ) {  cfg = {} } 
   
   checkCfgParam( cfg, 'PROVISIONING_API_KEY', 'CHANGE_ME' )
+  checkCfgParam( cfg, 'SUPER_TENANT_ADMIN', '' )
 
   checkCfgParam( cfg, 'DATA_DIR', '../dta/' )
   cfg.DATA_DIR = path.resolve( cfg.DATA_DIR ) 

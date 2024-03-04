@@ -10,5 +10,6 @@ lowCodeApp.init({
   DATA_DIR : '../dta/',
   GUI_URL  : 'http://localhost:8888/app/',
   URL_PATH : '/app',
-  OIDC_SERVER : true
+  OIDC_SERVER : true,
+  SUPER_TENANT_ADMIN: 'demo' // comma separated user ids
 })

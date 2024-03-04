@@ -125,7 +125,7 @@ But: Please choose your entity ids wisely, if you don't want this behavior.
 
 # Add New Root Scope (aka "Tenant")
 
-This must be done via API ... but it's simple:
+This should be done via API ... but it's simple:
 
     const axios  = require( 'axios' )
     let result = await axios.post( 
@@ -144,6 +144,10 @@ This must be done via API ... but it's simple:
 The new admin credentials are required, since the app can't send out emails (yet).
 
 The API credentials can be used to bootstrap the new tenant and create apps, their entities and upload some initial data documents.
+
+A new tenant (root scope) can also be added via GUI. 
+The user must be in the `SUPER_TENANT_ADMIN` list (comma separated user ids).
+In the add scope form simple put a `#` into the scope id. 
 
 
 # Integration 

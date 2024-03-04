@@ -24,6 +24,7 @@ exports: module.exports = {
   addScope,
   addUser,
   updateUser,
+  addUserAdmin,
   getUserArr,
   delUser,
   getApiAppScopes,
@@ -228,19 +229,23 @@ async function getScopeList( userId, role='appUser' ) {
   let authTbl = await getAuthTbl()
   if ( ! authTbl[ userId ] ) { return null }
   let scopeTbl = await getScope() 
+
+  let scopeIds = []
+  for ( let aScope in scopeTbl ) {
+    scopeIds.push( aScope )
+  }
+  
   let availableScopes = {}
-  for ( let userRootScope of authTbl[ userId ].role[ role ] ) {
-    // console.log( 'userRootScope', userRootScope)
-    let scopeIds = []
-    for ( let aScope in scopeTbl ) {
-      scopeIds.push( aScope )
-    }
-    scopeIds.sort()
-    for ( let aScope of scopeIds ) {
+  for ( let aScope of scopeIds ) {
+    let scopeAuthorized = false
+    for ( let userRootScope of authTbl[ userId ].role[ role ] ) {
       if ( aScope.startsWith( userRootScope ) ) {
-        // console.log( 'aScope', aScope )
-        availableScopes[ aScope ] = scopeTbl[ aScope ]
+        scopeAuthorized = true
+        break
       }
+    }
+    if ( scopeAuthorized ) {
+      availableScopes[ aScope ] = scopeTbl[ aScope ]
     }
   }
   return availableScopes
@@ -343,6 +348,15 @@ async function addUser( id, newUser ) {
   } 
 } 
 
+async function addUserAdmin( uid, scopeId ) {
+  let authTbl = await getAuthTbl()
+  let user = authTbl[ uid ]
+  if ( ! user ) { return 'not found' }
+  user.role.appUser.push( scopeId )
+  user.role.admin.push( scopeId )
+  user.role.dev.push( scopeId )
+  await writeAuthTbl()
+}
 
 async function getUser( uid, scopeId ) {
   log.info( 'getUser..' )

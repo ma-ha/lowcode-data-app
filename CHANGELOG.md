@@ -1,3 +1,6 @@
+# 0.14.0
+- Add new tenants via GUI
+
 # 0.13.2
 - Option to hide UUID col in table
 - State model: export/import

@@ -3,10 +3,6 @@
     "name": "Test Tenant",
     "tag": []
   },
-  "2000": {
-    "name": "Other Root Tenant",
-    "tag": []
-  },
   "1000/DE": {
     "name": "Region Germany",
     "tag": [

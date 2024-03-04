@@ -16,10 +16,12 @@ exports: module.exports = {
 // now we need to implement the ReST service for /products 
 // this should also only be available for authenticated users
 let gui = null
+let cfg = {}
 
-async function setupAPI( app ) {
+async function setupAPI( app, config ) {
   let svc = app.getExpress()
   gui = app
+  cfg = config
 
   // const myJWTcheck = apiSec.initJWTcheck()
   const adminAuthz = apiSec.adminAuthz( gui )
@@ -44,6 +46,28 @@ async function setupAPI( app ) {
 async function addScope( req, res ) {
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
+
+  if ( req.body.scopeId == '#' ) { // oups, new root scope requested
+    log.info('SUPER_TENANT_ADMIN', cfg.SUPER_TENANT_ADMIN )
+    if ( ! cfg.SUPER_TENANT_ADMIN ) { return res.status(401).send('not authorized') }
+    let tenantAdmins = cfg.SUPER_TENANT_ADMIN.split(',')
+    if ( tenantAdmins.indexOf( user.userId ) == -1 ) { return res.status(401).send('user not authorized') }
+    
+    let name = req.body.name.trim()
+    if ( name == '' ) { name = 'New Tenant' }
+    
+    let scopeId = await userDta.creRootScope( 
+      name,
+      user.userId,
+      user.name,
+      ( req.body.tags ?  req.body.tags.split(',') : [] )
+    )
+    
+    await userDta.addUserAdmin( user.userId, scopeId )
+    
+    return res.send( 'OK' ) 
+  }
+
   if ( ! req.body.scopeId || ! req.body.scopeId.startsWith( user.scopeId ) || ! isScopeId( req.body.scopeId ) ) {
     log.warn( 'POST scope: id invalid', req.body.scopeId )
     return res.status(400).send('Scope ID invalid') 
@@ -126,8 +150,13 @@ async function getScopeOpts( req, res ) {
       name : scope.name
     })
   }
-  res.send( scopeTbl )   
   
+  scopeTbl.sort( ( a, b ) => { 
+    if ( a.id > b.id ) { return 1 }
+    return -1
+  })
+  log.info( 'getScopeOpts', scopeTbl )
+  res.send( scopeTbl )
 }
 
 async function  getScopeTbl( req, res ) {
