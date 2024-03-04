@@ -149,8 +149,6 @@ async function uploadAppJSON( req, res ) {
     log.warn( 'uploadAppJSON', exc )
     return res.status(400).send( 'Error' )
   }
-
-  
   res.send( 'OK' )
 }
 

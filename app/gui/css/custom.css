@@ -533,7 +533,8 @@
   width: unset;
 }
 
-#CustomizeAddAppContentLnkImportLink {
+#CustomizeAddAppContentLnkImportLink,
+#AddStateFormContentLnkImportLink {
   margin-left: 30px;
 }
 

@@ -328,9 +328,14 @@ async function init( ) {
   uploadAppPage.navLabel = 'LCA Upload App'
   uploadAppPage.setPageWidth( '90%' )
   uploadAppPage.addView( uploadAppForm() )
-  uploadAppPage.addView( uploadAppOut() )
+  uploadAppPage.addView(  uploadOut( 'app' ) )
 
-
+  let uploadStatePage = gui.addPage( 'UploadStateModel-nonav' ) 
+  uploadStatePage.title    = 'LCA Upload State Model'
+  uploadStatePage.navLabel = 'LCA Upload State Model'
+  uploadStatePage.setPageWidth( '90%' )
+  uploadStatePage.addView( uploadStateModelForm() )
+  uploadStatePage.addView( uploadOut( 'state-model' ) )
 
   // --------------------------------------------------------------------------
   let entityStatusPage = gui.addPage( 'AppEntityStatus-nonav' ) 
@@ -429,7 +434,7 @@ async function init( ) {
     } 
   })
   admStatusPage.addView({ id: 'AddStateForm', 
-    title: 'Add', height: '150px', 
+    title: 'Add State Model', height: '150px', 
     type : 'pong-form', resourceURL: 'state-model',
     moduleConfig : {
       id: 'AddSscopeIdtateForm',
@@ -439,8 +444,9 @@ async function init( ) {
       ] }],
       actions : [ 
         { id: "AddStatusBtn", actionName: "Add State", update: [{ resId:'StateLst' }], 
-          actionURL: 'state-model', target: "modal" }
-      ]
+          actionURL: 'state-model', target: "modal" },
+        { id: "ImportLink", link: 'Import JSON', linkURL: 'index.html?layout=UploadStateModel-nonav' }
+    ]
     }
   })
 
@@ -513,19 +519,31 @@ async function init( ) {
 
 function uploadAppForm() {
   return {
-    rowId: "AppUpload", title: "Upload Files",
+    rowId: "AppUpload", title: "Upload App JSON",
     type : "pong-upload", resourceURL: "app/json",
     height: '100px', 
     moduleConfig: {
-      update : [ "AppUploadOut" ],
+      update : [ "ImportLog" ],
       input: []
     }
   }
 }
 
-function uploadAppOut() {
+function uploadStateModelForm() {
   return {
-    rowId: "AppUploadOut", title: "Import App", resourceURL: "app/json",
+    rowId: "StateModelUpload", title: "Upload State Model JSON",
+    type : "pong-upload", resourceURL: "state-model/json",
+    height: '100px', 
+    moduleConfig: {
+      update : [ "ImportLog" ],
+      input: []
+    }
+  }
+}
+
+function uploadOut( uploadType ) {
+  return {
+    rowId: "ImportLog", title: "Import Output", resourceURL: uploadType+"/json",
     height: '500px'
   }
 }
