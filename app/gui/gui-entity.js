@@ -100,7 +100,7 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
 
       rows.push({ 
         title  : 'New ' + ( entity.title ? entity.title : entityId),
-        rowId : 'EntityNewFrm', 
+        rowId : 'EntityNewFrm'+entityId, 
         type : 'pong-form', 
         resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
         height : 'auto', decor : "decor",

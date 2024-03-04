@@ -1,3 +1,6 @@
+# 0.13.1
+- fix multi entity create 
+
 # 0.13.0
 - API status transition
 
