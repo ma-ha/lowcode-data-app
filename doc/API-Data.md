@@ -11,12 +11,16 @@ Header:
 
 Get sub/scopes of scopeId
 
+See [examples API test cases](../test/helper.js).
+
 ## POST /adapter/scope/:scopeId
 
 Add/update a sub-scope
 
 
 # Apps
+
+See[app examples in API test cases](../test/test02_CreApp.js).
 
 ## GET /adapter/app/:scopeId
 
@@ -32,6 +36,8 @@ Add or update full app definition, including entity definitions.
 
 # State Models
 
+See [examples in API test cases](../test/test02_CreApp.js).
+
 ## POST /adapter/state/:scopeId/:stateId
 
 Create state model. Warning: The model can't be updated via API
@@ -42,6 +48,8 @@ Get a state model by id.
 
 
 # Entities
+
+See [examples in API test cases](../test/test20_DataOps.js).
 
 ## GET /adapter/entity/:scopeId/:appId/:appVersion/:entityId
 
@@ -65,6 +73,8 @@ Delete document by id.
 
 # Entities with State
 
+See [examples in API test cases](../test/test30_DataState.js).
+
 ## POST /adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:stateid/:action
 
 Create (stateId = "null") or change data state. 
@@ -81,6 +91,8 @@ Get all documents in the specific state.
 
 
 # Collections
+
+See [examples in API test cases](../test/test90_DelCollection.js).
 
 ## DELETE /adapter/entity/:scopeId/:entityId
 
