@@ -250,7 +250,7 @@ function genTblColsConfig( entityId, entity ) {
   cols = cols.concat( propHandler.genGuiTableColsDef( appEntityPropMap ) )
 
   if ( entity.stateModel ) {
-    cols.push({ id: '_stateBtn', label: "",  cellType: "text", width:'10%' })
+    cols.push({ id: '_stateBtn', label: "Action",  cellType: "text", width:'10%' })
   }
 
   if ( ! entity.noEdit &&  ! entity.noDelete && ! entity.stateModel ) {
