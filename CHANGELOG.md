@@ -1,5 +1,6 @@
 # 0.15.0
 - Events: Embed SelectRef objects instead of IDs
+- Entity with state: Edit form should not be able to created new data
 
 # 0.14.0
 - Add new tenants via GUI

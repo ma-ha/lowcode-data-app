@@ -238,7 +238,7 @@ function genGuiTableColsDef( entityMap ) {
 }
 
 
-async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
+async function genGuiFormFieldsDef( entity, filter, user, stateTransition, render ) {
   let cols = []
 
   if ( entity.properties[ 'id' ] && entity.properties[ 'id' ].type == 'UUID' ) {
@@ -247,6 +247,9 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
       label: ( entity.properties[ 'id' ].label ? entity.properties[ 'id' ].label : "Id (UUID)" ), 
       type: "text", readonly: true, descr: 'ID is auto generated'
     } ]})
+  } else if ( entity.stateModel ) { 
+    // prevent create via the edit form
+    cols.push({ formFields: [{ id: "id", label: "Id", type: "text", readonly: true } ]})
   } else { // every data rec need an id
     cols.push({ formFields: [{ id: "id", label: "Id", type: "text" } ]})
   }
@@ -271,7 +274,11 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition ) {
 
     switch ( prop.type ) {
       case 'Text':
-        fld = { id: propId, label: lbl, type: 'text', rows: prop.lines }
+        if ( render && render == 'small') {
+          fld = { id: propId, label: lbl, type: 'text', rows: 1 }
+        } else {
+          fld = { id: propId, label: lbl, type: 'text', rows: prop.lines }
+        }
         break 
       case 'Boolean':
         fld = { id: propId, label: lbl, type: 'checkbox' }

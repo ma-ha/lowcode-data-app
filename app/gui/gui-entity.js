@@ -95,7 +95,7 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
     let initState = stateModel.state[ 'null' ]
     if ( ! initState || ! initState.actions ) { log.warn('renderEntityRows: stateModel not found'); return [] }
     for ( let actionId in initState.actions ) {
-      let actionFields = await propHandler.genGuiFormFieldsDef( entity, null, user, 'null_'+actionId )
+      let actionFields = await propHandler.genGuiFormFieldsDef( entity, null, user, 'null_'+actionId, 'small' )
       actionFields.push({ formFields: [{ id: '_state', type: "text", value: initState.actions[actionId].to, hidden: true }] } )
 
       rows.push({ 
@@ -281,6 +281,24 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
 
   let cols = await propHandler.genGuiFormFieldsDef( entity, filter, user )
 
+  let actions = []
+  if ( entity.stateModel ) {
+    actions = [ 
+      { id: "AddEntityBtn", actionName: "Update",
+        actionURL: 'guiapp/'+appId+'/entity/'+entityId,
+        update: updateResArr, target: "modal" }
+    ]
+  } else {
+    actions = [ 
+      { id: "AddEntityBtn", actionName: "Add/update",
+        actionURL: 'guiapp/'+appId+'/entity/'+entityId,
+        update: updateResArr, target: "modal" },
+      { id: "ResetEntityFormBtn", actionName: "Reset", method: 'GET',
+        actionURL: 'guiapp/'+appId+'/entity/'+entityId+'?recId=_empty',
+        setData:  [ { resId : 'Add' + entityId } ] }
+    ]
+  }
+
   let addFormView = { 
     id: 'Add' + entityId, rowId: 'Add' + entityId, type : 'pong-form',
     title: 'Add/edit'+ entity.title,  
@@ -291,15 +309,8 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
       // label:'Add '+viewId,
       // description: "Add",
       id: 'AddForm',
-      fieldGroups:[{ columns: cols }],
-      actions : [ 
-        { id: "AddEntityBtn", actionName: "Add/update",
-          actionURL: 'guiapp/'+appId+'/entity/'+entityId,
-          update: updateResArr, target: "modal" },
-        { id: "ResetEntityFormBtn", actionName: "Reset", method: 'GET',
-          actionURL: 'guiapp/'+appId+'/entity/'+entityId+'?recId=_empty',
-          setData:  [ { resId : 'Add' + entityId } ] }
-      ]
+      fieldGroups: [{ columns: cols }],
+      actions : actions
     }
   }
   return addFormView
