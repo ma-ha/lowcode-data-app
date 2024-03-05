@@ -89,8 +89,9 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
   let entity = app.entity[ entityId ]
   if ( ! entity ) { log.error( 'Entity not found: ', entity ); return [] }
 
+  let stateModel = null
   if ( entity.stateModel ) {
-    let stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
+    stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
     if ( ! stateModel ) { log.warn('renderEntityRows: stateModel not found'); return [] }
     let initState = stateModel.state[ 'null' ]
     if ( ! initState || ! initState.actions ) { log.warn('renderEntityRows: stateModel not found'); return [] }
@@ -143,9 +144,9 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
   let tblHeight = ( entity.noEdit ? '780px' : '550px' )
   
   if ( entity.divs ) {
-    rows.push( genListTable( app, appId, entityId, entity, user, tblHeight ) )
+    rows.push( genListTable( app, appId, entityId, entity, user, tblHeight, stateModel ) )
   } else {
-    rows.push( genDataTable( app, appId, entityId, entity, user, tblHeight ) )
+    rows.push( genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel ) )
   }
 
   if ( ! entity.noEdit ) {
@@ -166,7 +167,7 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
 }
 
 // ============================================================================
-function genListTable( app, appId, entityId, entity, user, tblHeight ) {
+function genListTable( app, appId, entityId, entity, user, tblHeight, stateModel ) {
   log.info( 'genListTable',  app, appId, entityId, entity, user )
   if ( entity.divs ) {
 
@@ -190,7 +191,7 @@ function genListTable( app, appId, entityId, entity, user, tblHeight ) {
    return lstDef 
    
   } else { // fallback
-    return genDataTable( app, appId, entityId, entity, user, tblHeight )  
+    return genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel )  
   }
 }
 
@@ -214,7 +215,7 @@ function genDivs( divArr, properties ) { // recursive
 
 // ============================================================================
 
-function genDataTable( app, appId, entityId, entity, user, tblHeight ) {
+function genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel ) {
   log.debug( 'genDataTable', appId, entityId, entity, user )
   
   let tblDef = { 
@@ -224,13 +225,13 @@ function genDataTable( app, appId, entityId, entity, user, tblHeight ) {
     type        : 'pong-table',
     height      : tblHeight,
     resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
-    moduleConfig : genTblColsConfig( entityId, entity )
+    moduleConfig : genTblColsConfig( entityId, entity, user, stateModel  )
   }
   return tblDef
 }
 
 
-function genTblColsConfig( entityId, entity ) {
+function genTblColsConfig( entityId, entity, user, stateModel ) {
   let appEntityPropMap = entity.properties
 
   let cols = [ ]
@@ -249,8 +250,22 @@ function genTblColsConfig( entityId, entity ) {
 
   cols = cols.concat( propHandler.genGuiTableColsDef( appEntityPropMap ) )
 
-  if ( entity.stateModel ) {
-    cols.push({ id: '_stateBtn', label: "Action",  cellType: "text", width:'10%' })
+  if (  stateModel ) {
+    // TODO hide if there are only api managed actions
+    let showUserAction = false
+    for ( let state in stateModel.state ) {
+      if ( state == 'null' ) { continue }
+      for ( action in stateModel.state[ state ].actions ) {
+        if ( ! stateModel.state[ state ].actions[ action ].apiManaged ) { 
+          showUserAction = true
+          break
+        }
+      }
+      if ( showUserAction ) { break }
+    }
+    if ( showUserAction ) {
+      cols.push({ id: '_stateBtn', label: "Action",  cellType: "text", width:'10%' })
+    }
   }
 
   if ( ! entity.noEdit &&  ! entity.noDelete && ! entity.stateModel ) {
@@ -262,6 +277,10 @@ function genTblColsConfig( entityId, entity ) {
     rowId   : [ 'recId' ], 
     dataURL : '',
     cols    : cols
+  }
+
+  if ( entity.stateModel ) { // update tbl every 10 secs
+    tblCfg.pollDataSec = "10"
   }
 
   let filter = propHandler.genGuiTableFilterDef( appEntityPropMap )

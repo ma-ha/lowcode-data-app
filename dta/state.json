@@ -231,7 +231,8 @@
         "actions": {
           "PaymentReceived": {
             "to": "Closed",
-            "label": "Payment Received"
+            "label": "Payment Received",
+            "apiManaged": true
           }
         },
         "x": 700,
@@ -246,6 +247,6 @@
       }
     },
     "_cre": 1708271764173,
-    "_upd": 1709552442847
+    "_upd": 1709652949169
   }
 }
