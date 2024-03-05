@@ -138,17 +138,18 @@ function genDynNav ( navType, oldNavTabs, req ) {
               break                
             }
           }
-        } else {
-          log.debug( 'menu', menu )
-        }
-
-        if ( oldNavTabs ) {
-          for ( let nav of oldNavTabs ) {
-            log.debug( 'nav', nav )
-            if ( nav.label == 'Docu' ) {
-              menu.push( nav )
+          
+          if ( oldNavTabs ) {
+            for ( let nav of oldNavTabs ) {
+              log.debug( 'nav', nav )
+              if ( nav.label == 'Docu' ) {
+                menu.push( nav )
+              }
             }
           }
+
+        } else {
+          log.debug( 'menu', menu )
         }
 
         resolve( menu )
