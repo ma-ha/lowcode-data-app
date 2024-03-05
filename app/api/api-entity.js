@@ -219,7 +219,7 @@ async function addDoc( req, res )  {
     }
   }
 
-  let result = await dta.addDataObj( dtaColl, rec.id, rec )
+  let result = await dta.addDataObj( dtaColl, rec.id, rec, null, entity )
   // TODO check entity
   res.send( 'OK' )
 }
@@ -236,7 +236,7 @@ async function docStateChange( req, res ) {
   let entity = app.entity[ req.params.entityId ]
   if ( ! entity ) { return res.send( 'ERROR: Entity not found') }
 
-  await dta.addDataObj( req.params.tenantId + req.params.entityId, req.body.id, req.body, 'dta.stateUpdate' )
+  await dta.addDataObj( req.params.tenantId + req.params.entityId, req.body.id, req.body, 'dta.stateUpdate', entity )
 
   let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
 

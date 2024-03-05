@@ -299,7 +299,7 @@ function scopeOK( userScope, recScope, inherit ) {
 }
 
 
-async function addDataObj( tbl, id, obj, evt ) {
+async function addDataObj( tbl, id, obj, evt, entity ) {
   log.info( 'addDataObj', tbl, id )
   await syncTbl( tbl )
   let cre = null
@@ -318,9 +318,31 @@ async function addDataObj( tbl, id, obj, evt ) {
   data[ tbl ][ id.trim() ]._upd = Date.now()
   let dbFile = fileName( tbl )
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
-  
-  eh.publishDataChgEvt( ( evt ? evt : dtaEvt ), id, tbl, obj )
+
+  let objCopy = await embedRefObjects( obj, entity )
+  eh.publishDataChgEvt( ( evt ? evt : dtaEvt ), id, tbl, objCopy )
   return true
+}
+
+async function embedRefObjects( origDta, entity ) {
+  log.debug('embedRefObjects e', entity )
+  if ( ! entity ) { return origDta }
+  let dta = JSON.parse( JSON.stringify( origDta ) )
+  for ( let propId in entity.properties ) {
+    if ( dta[ propId ] ) { // only care if opr is really present
+      let prp = entity.properties[ propId ]
+      if ( prp.type == 'SelectRef' ) {
+        let ref = prp.selectRef.split('/')
+        let refTbl = ref[0] + ref[3]
+        let refDta = await getDataById( refTbl, dta[ propId ] )
+        if ( refDta ) {
+          dta[ propId ] = refDta
+        }
+      }
+    }
+  }
+  log.debug( 'embedRefObjects', dta )
+  return dta
 }
 
 
@@ -330,11 +352,12 @@ async function delDataObj( tbl, id, ) {
   let idT = id.trim() 
   if ( ! data[ tbl ]  ||  ! data[ tbl ][ idT ] ) { return "Not found" }
   log.info( 'delDataObj', tbl, data[ tbl ][ idT ] )
+  let cpyDta = JSON.parse( JSON.stringify( data[ tbl ][ idT ] ) )
   delete  data[ tbl ][ idT ]
   let dbFile = fileName( tbl )
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
 
-  eh.publishDataChgEvt( 'dta.del', id, tbl )
+  eh.publishDataChgEvt( 'dta.del', id, tbl, cpyDta )
   return "Deleted"
 }
 

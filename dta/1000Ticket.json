@@ -41,5 +41,15 @@
     "_state": "Blocked",
     "_cre": 1708158438704,
     "_upd": 1708194528402
+  },
+  "22": {
+    "id": "22",
+    "Task": "Nope",
+    "Description": "Nope",
+    "Assignee": "me",
+    "_state": "Open",
+    "scopeId": "1000/DE",
+    "_cre": 1709649789317,
+    "_upd": 1709649789317
   }
 }

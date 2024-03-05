@@ -57,7 +57,7 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
       // multiple tabs per entity in array
       let tabRow = {
         rowId  : 'Tabs' + appIdX,
-        height : "830px",
+        height : "880px",
         tabs   : [] 
       }
       for ( let entityId of app.startPage ) {

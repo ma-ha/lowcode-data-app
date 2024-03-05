@@ -1,3 +1,6 @@
+# 0.15.0
+- Events: Embed SelectRef objects instead of IDs
+
 # 0.14.0
 - Add new tenants via GUI
 
