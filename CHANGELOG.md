@@ -3,6 +3,7 @@
 - Entity with state: Edit form should not be able to created new data
 - Entity with state: Table with "Action" col only if there are non apiManaged actions 
 - fix double Docu nav
+- npm: axios update
 
 # 0.14.0
 - Add new tenants via GUI
