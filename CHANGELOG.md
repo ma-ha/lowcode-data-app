@@ -4,7 +4,6 @@
 - Entity with state: Table with "Action" col only if there are non apiManaged actions 
 - fix double Docu nav
 
-
 # 0.14.0
 - Add new tenants via GUI
 
