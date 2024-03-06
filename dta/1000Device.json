@@ -38,7 +38,6 @@
     "Hardware": "Raspi5",
     "Description": "abc",
     "ConnType": "LW-M2M",
-    "Tags[]": "EH-DEV",
     "scopeId": "1000/DE",
     "Tags": [
       "EH-DEV"
@@ -53,7 +52,6 @@
     "Hardware": "Raspi5",
     "Description": "abc",
     "ConnType": "LW-M2M",
-    "Tags[]": "EH-DEV",
     "scopeId": "1000/DE",
     "Tags": [
       "EH-DEV"
@@ -68,10 +66,6 @@
     "Hardware": "Raspi5",
     "Description": "abc",
     "ConnType": "LW-M2M",
-    "Tags[]": [
-      "EH-PRD",
-      "EH-DEV"
-    ],
     "scopeId": "1000/DE",
     "Tags": [
       "EH-PRD",
@@ -85,12 +79,13 @@
     "DeviceNo": "b1x",
     "Status": "Ordered",
     "Hardware": "Raspi5",
-    "Description": "",
+    "Description": "??",
     "ConnType": "COAP",
-    "Tags[]": "EH-PRD",
     "scopeId": "1000/DE",
-    "Tags": "EH-PRD",
+    "Tags": [
+      "EH-PRD"
+    ],
     "_cre": 1707503066825,
-    "_upd": 1708015184495
+    "_upd": 1709749205769
   }
 }
