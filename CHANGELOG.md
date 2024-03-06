@@ -1,3 +1,6 @@
+# 0.15.1
+- Fix: Api managed label in state transition form
+
 # 0.15.0
 - Events: Embed SelectRef objects instead of IDs
 - Entity with state: Edit form should not be able to created new data

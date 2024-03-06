@@ -374,11 +374,11 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
+    let lbl  = ( prop.label ? prop.label : propId )
     if ( prop.apiManaged ){ 
       fields.push({ id: propId, label: lbl, type: "text", readonly: true, value: rec[ propId ] })
       continue 
     } 
-    let lbl  = ( prop.label ? prop.label : propId )
     // console.log( 'LBL', lbl)
 
     if ( stateTransition ) {
