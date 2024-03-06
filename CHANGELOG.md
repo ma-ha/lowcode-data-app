@@ -1,5 +1,7 @@
 # 0.15.2
+- event MultiSelectRef replace ids
 - fix Docu MD loading
+- fix State Image option loading
 
 # 0.15.1
 - Fix: API-managed label in state transition form

@@ -325,22 +325,38 @@ async function addDataObj( tbl, id, obj, evt, entity ) {
 }
 
 async function embedRefObjects( origDta, entity ) {
-  log.debug('embedRefObjects e', entity )
+  log.debug('embedRefObjects e', origDta, entity )
   if ( ! entity ) { return origDta }
   let dta = JSON.parse( JSON.stringify( origDta ) )
-  for ( let propId in entity.properties ) {
-    if ( dta[ propId ] ) { // only care if opr is really present
-      let prp = entity.properties[ propId ]
-      if ( prp.type == 'SelectRef' ) {
-        let ref = prp.selectRef.split('/')
-        let refTbl = ref[0] + ref[3]
-        let refDta = await getDataById( refTbl, dta[ propId ] )
-        if ( refDta ) {
-          dta[ propId ] = refDta
+  try {
+    for ( let propId in entity.properties ) {
+      if ( dta[ propId ] ) { // only care if opr is really present
+        let prp = entity.properties[ propId ]
+        if ( prp.type == 'SelectRef' ) {
+          let ref = prp.selectRef.split('/')
+          let refTbl = ref[0] + ref[3]
+          let refDta = await getDataById( refTbl, dta[ propId ] )
+          if ( refDta ) {
+            dta[ propId ] = refDta
+          }
+        } else if ( prp.type == 'MultiSelectRef' ) {
+          let ref = prp.multiSelectRef.split('/')
+          let refTbl = ref[0] + ref[3]
+          let refObArr = []
+          for ( let refId of dta[ propId ] ) {
+            let refDta = await getDataById( refTbl, refId )
+            if ( refDta ) {
+              refObArr.push( refDta )
+            } else {
+              refObArr.push({ id: refId })
+              log.warn( 'embedRefObjects NOT FOUND', propId, refId )
+            }
+          }
+          dta[ propId ] = refObArr // replace array
         }
       }
     }
-  }
+  } catch ( exc ) { log.warn( 'embedRefObjects', exc ) }
   log.debug( 'embedRefObjects', dta )
   return dta
 }

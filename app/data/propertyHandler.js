@@ -618,6 +618,7 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
 
 
 function reformatDataUpdateInput( entity, rec ) {
+  log.debug( 'reformatDataUpdateInput', rec )
   if ( ! rec.id ) {
     if ( entity.properties[ 'id' ]  &&  entity.properties[ 'id' ].type == 'UUID' ) {
       rec.id = helper.uuidv4()
@@ -647,7 +648,7 @@ function reformatDataUpdateInput( entity, rec ) {
     } else if ( entity.properties[ propId ].type == 'MultiSelectRef' ) { 
 
       try {
-        log.info( 'MultiSelectRef', propId, rec[ propId ], rec )
+        log.debug( 'MultiSelectRef', propId, rec[ propId ], rec )
         rec[ propId ] = []
         if ( rec[ propId+'[]' ] ) {
           if ( Array.isArray( rec[ propId+'[]' ] ) ) {
@@ -655,6 +656,7 @@ function reformatDataUpdateInput( entity, rec ) {
           } else {
             rec[ propId ].push( rec[ propId+'[]' ] )
           }
+          delete rec[ propId+'[]' ]
         } 
       } catch ( exc ) { 
         log.warn( 'addDoc: Parse MultiSelectRef', exc ) 
