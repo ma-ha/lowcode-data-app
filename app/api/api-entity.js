@@ -202,7 +202,7 @@ async function addDoc( req, res )  {
   // complete data set with property data from DB
   let dbRec = await  dta.getDataById( dtaColl, rec.id ) 
   for ( let propId in dbRec ) {
-    if ( ! rec[ propId ] ||  entity.properties[ propId ].apiManaged) {
+    if ( ! rec[ propId ] || ( entity.properties[ propId ] && entity.properties[ propId ].apiManaged ) ) {
       rec[ propId ] = dbRec[ propId ]
     }
   }
