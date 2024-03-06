@@ -1,4 +1,6 @@
-It starts with a generic, secure **web gui**.
+## Background
+
+It all starts with a dynamic generating, secure **web gui**.
 
 **Entities** can be **defined on-the-fly**, as well as their relationship.
 Web forms and lists are generated to maintain data (documents) of this entities.

@@ -67,7 +67,7 @@ async function init( svc, appConfig ) {
   })
 
   svc.get( '/md/:lang/:file', async (req, res) => {
-    // log.debug( 'GET md', req.params.lang, req.params.file )
+    log.info( 'GET md', req.params.lang, req.params.file )
     let page = await getPage( '/md', req.params.file, req.params.lang )
     if ( page ) {
       res.status( 200 ).send( page )
@@ -97,7 +97,7 @@ const VALID_PG = [
 async function getPage( type, file, lang ) {
   if ( lang == 'EN'  && VALID_PG.indexOf( file ) >= 0 ) {
     try {
-      let md = await readFile( './gui/md/'+ file +'.md' )
+      let md = await readFile( __dirname + '/md/'+ file +'.md' )
       return md 
     } catch ( exc ) { log.warn( 'getPage', exc.message ) }
   }

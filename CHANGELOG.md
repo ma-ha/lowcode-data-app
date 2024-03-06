@@ -1,3 +1,6 @@
+# 0.15.2
+- fix Docu MD loading
+
 # 0.15.1
 - Fix: API-managed label in state transition form
 - Fix: NotNull properties inf update form
