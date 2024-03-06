@@ -1,5 +1,6 @@
 # 0.15.2
 - event MultiSelectRef replace ids
+- State model: buttons to move box
 - fix Docu MD loading
 - fix State Image option loading
 
