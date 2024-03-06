@@ -41,6 +41,7 @@ async function setupAPI( app ) {
   svc.get( '/state-model/state', guiAuthz, getState )
   svc.get( '/state-model/state/pong-form', guiAuthz, genStateFrm )
   svc.post('/state-model/state', guiAuthz, udpState )
+  svc.post('/state-model/state/move/:dir', guiAuthz, moveState )
   svc.get( '/state-model/transition', guiAuthz, getStateTransitions )
   svc.get( '/state-model/transition/pong-form', guiAuthz, getStateTransFrm )
   svc.post('/state-model/transition', guiAuthz, setStateTransitions )
@@ -319,7 +320,7 @@ async function genStateFrm( req, res )  {
 
   let imgOpts = []
   try {
-    fs.readdirSync( __dirname + '/gui/img' ).forEach( file => {
+    fs.readdirSync( __dirname + '/../gui/img' ).forEach( file => {
       // log.info( 'img', file, file.startsWith( 'state' ) , file.endsWith( '.png'))
       if ( file.startsWith( 'state' ) && file.endsWith( '.png') ) {
         log.debug( 'img', file )
@@ -328,6 +329,7 @@ async function genStateFrm( req, res )  {
     })
   } catch ( exc ) { log.error( 'imgOpts', exc ) }
 
+  let updateRes = [{ resId:'StateLst' }, { resId:'StateModel' }]
   res.send({
     id: 'AddStateForm',
     fieldGroups:[{ columns: [
@@ -343,8 +345,12 @@ async function genStateFrm( req, res )  {
       ]}
     ] }],
     actions : [ 
-      { id: "AddStateBtn", actionName: "Add / Update", update: [{ resId:'StateLst' }, { resId:'StateModel' }], 
-        actionURL: 'state-model/state', target: "modal" }
+      { id: "AddStateBtn", actionName: "Add / Update", update: updateRes, 
+        actionURL: 'state-model/state', target: "modal" },
+      { id: "StateBtnMvW", actionName: "W", update: updateRes, actionURL: 'state-model/state/move/w' },
+      { id: "StateBtnMvN", actionName: "N", update: updateRes, actionURL: 'state-model/state/move/n' },
+      { id: "StateBtnMvE", actionName: "E", update: updateRes, actionURL: 'state-model/state/move/e' },
+      { id: "StateBtnMvS", actionName: "S", update: updateRes, actionURL: 'state-model/state/move/s' }
     ]
   })
 }
@@ -441,6 +447,25 @@ async function udpState( req, res )  {
   res.send( 'Error, id required' )  
 }
 
+
+async function moveState( req, res ) {
+  log.debug( 'moveState', req.body, req.params )
+  let stateModel = await dta.getDataById( 'state', req.body.stateModelId ) 
+  if ( ! stateModel ) { return res.status(400).send( 'Model not found!' )}
+  let state = stateModel.state[ req.body.stateId ]
+  if ( ! state ) { return res.status(400).send( 'State not found!' )}
+  switch ( req.params.dir ) {
+    case 'w': if ( state.x >   20 ) { state.x -=20 }; break
+    case 'e': if ( state.x < 2000 ) { state.x +=20 }; break
+    case 'n': if ( state.y >   20 ) { state.y -=20 }; break
+    case 's': if ( state.y <  400 ) { state.y +=20 }; break
+    default:  return res.status(400).send( 'Wrong dir' )
+  }
+  await dta.addDataObj( 'state', stateModel.id, stateModel ) 
+  res.send()
+}
+
+
 async function getStateTransFrm( req, res )  {
   let stateModel = await dta.getDataById( 'state', req.query.id ) 
   let fromOpts = []
@@ -477,7 +502,6 @@ async function getStateTransFrm( req, res )  {
         actionURL: 'state-model/transition', target: "modal" },
       { id: "DaleteTransitiontn", actionName: "Delete", update: [{ resId:'StateTransitionLst' }, { resId:'StateModel' }], 
         method: "DELETE", actionURL: 'state-model/transition', target: "modal" }
-
     ]
   })  
 }
