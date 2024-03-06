@@ -319,7 +319,7 @@ async function genStateFrm( req, res )  {
 
   let imgOpts = []
   try {
-    fs.readdirSync( './gui/img' ).forEach( file => {
+    fs.readdirSync( __dirname + '/gui/img' ).forEach( file => {
       // log.info( 'img', file, file.startsWith( 'state' ) , file.endsWith( '.png'))
       if ( file.startsWith( 'state' ) && file.endsWith( '.png') ) {
         log.debug( 'img', file )
