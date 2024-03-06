@@ -198,24 +198,21 @@ async function addDoc( req, res )  {
   if ( parse.err ) {
     return res.status(400).send( parse.err )
   }
-  for ( let propId in entity.properties ) {
-     // check not null required
-     if ( entity.properties[ propId ].notNull ) {
-      if ( ! rec[ propId ] || rec[ propId ].trim() == '' ) {
-        return res.status(401).send( propId + ' required' ) 
-      }
-    }
-    // remove API managed properties
-    if ( entity.properties[ propId ].apiManaged  && rec[ propId ] ) {
-      delete rec[ propId ]
-    }
-   
-  }
+  
   // complete data set with property data from DB
   let dbRec = await  dta.getDataById( dtaColl, rec.id ) 
   for ( let propId in dbRec ) {
-    if ( ! rec[ propId ] ) {
+    if ( ! rec[ propId ] ||  entity.properties[ propId ].apiManaged) {
       rec[ propId ] = dbRec[ propId ]
+    }
+  }
+
+  for ( let propId in entity.properties ) {
+    // check not null required
+    if ( entity.properties[ propId ].notNull ) {
+      if ( ! rec[ propId ] || rec[ propId ].trim() == '' ) {
+        return res.status(401).send( propId + ' required' ) 
+      }
     }
   }
 

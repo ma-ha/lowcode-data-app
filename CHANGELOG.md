@@ -1,5 +1,6 @@
 # 0.15.1
-- Fix: Api managed label in state transition form
+- Fix: API-managed label in state transition form
+- Fix: NotNull properties inf update form
 
 # 0.15.0
 - Events: Embed SelectRef objects instead of IDs
