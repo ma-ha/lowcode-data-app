@@ -228,6 +228,8 @@ function genGuiTableColsDef( entityMap ) {
       //   cols.push({ id: propId, label : label, cellType: 'date', width:width }) 
       //   break 
       case 'JSON':
+        cols.push({ id: propId+'JSON', label : label, cellType: 'text', width:width }) 
+        cols.push({ id: propId, label : propId+'JSON', cellType: 'tooltip' }) 
         break 
       default:  // String, Number, Select, Event, Link, RefArray, Ref, DocMap, SelectRef
         cols.push({ id: propId, label : label, cellType: 'text', width:width }) 
@@ -338,7 +340,11 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         // do nothing
         break 
       case 'JSON':
-        fld = { id: propId, label: lbl, type: 'text', rows: 5 }
+        if ( render && render == 'small') {
+          fld = { id: propId, label: lbl, type: 'text', rows: 2 }
+        } else {
+          fld = { id: propId, label: lbl, type: 'text', rows: 5 }
+        }
         break 
       default:   // String, Number
         fld = { id: propId, label: lbl, type: 'text' }
@@ -362,6 +368,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
 
 
 async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, rec, stateModel ) {
+  log.info( 'genGuiFormStateChangeDef', entity, stateTransition )
   let fields = []
 
   fields.push({ id: "id", label: "Id", type: "text", readonly: true, value: rec.id })
@@ -375,26 +382,14 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
     let lbl  = ( prop.label ? prop.label : propId )
-    if ( prop.apiManaged ){ 
-      fields.push({ id: propId, label: lbl, type: "text", readonly: true, value: rec[ propId ] })
-      continue 
-    } 
+    
     // console.log( 'LBL', lbl)
-
-    if ( stateTransition ) {
-      if ( ! prop.stateTransition || ! prop.stateTransition[ stateTransition ] ) {
-        if ( rec[ propId ] ) {
-          fields.push({ id: propId, label: lbl, type: "text", readonly: true, value: rec[ propId ] })
-        }
-        continue
-      }
-    }
 
     let fld = null
 
     switch ( prop.type ) {
       case 'Text':
-        fld = { id: propId, label: lbl, type: 'text', rows: prop.lines, value: rec[ propId ] }
+        fld = { id: propId, label: lbl, type: 'text', rows: prop.lines, defaultVal: rec[ propId ] }
         break 
       case 'Boolean':
         fld = { id: propId, label: lbl, type: 'checkbox', value: rec[ propId ] }
@@ -446,13 +441,20 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
         // do nothing
         break 
       case 'JSON':
-        fld = { id: propId, label: lbl, type: 'text', rows: 5, value: rec[ propId ] }
+        let jsonStr = ( rec[ propId ] ? JSON.stringify( rec[ propId ] , null, ' ' ) : '{}' )
+        fld = { id: propId, label: lbl, type: 'text', rows: "5", defaultVal: jsonStr }
         break 
       default:   // String, Number
         fld = { id: propId, label: lbl, type: 'text', value: rec[ propId ] }
         break 
     }
 
+    if ( prop.apiManaged ) { fld.readonly = true } 
+    if ( stateTransition ) {
+      if ( ! prop.stateTransition || ! prop.stateTransition[ stateTransition ] ) {
+        fld.readonly = true 
+      }
+    }
     if ( filter && filter.field == propId ) {
       fld.defaultVal = filter.value
       fld.readonly   = "true" 
@@ -477,7 +479,10 @@ function reformatDataReturn( entity, result  ) {
         try {
           log.debug( 'result[ propId ]',propId,result[ propId ] )
           result[ propId ] = ( result[ propId ] ? JSON.stringify( result[ propId ], null, ' ' ) : '{}' )
-        } catch ( exc ) { log.warn('getDoc nz id> stringify JSON', exc ) }
+        } catch ( exc ) { 
+          log.warn('getDoc nz id> stringify JSON', exc ) 
+          result[ propId ] = result[ propId ] + ''
+        }
       
       } else if ( entity.properties[ propId ].type == 'Date'  ) {
         
@@ -580,7 +585,20 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
         } else { tblRec[ propId ] = '' }
         break 
       case 'JSON': 
-        tblRec[ propId ] = ( rec[ propId ] ? JSON.stringify( rec[ propId ], null, ' ' ) : '{}' )
+        if ( ! rec[ propId ] ) {
+          tblRec[ propId + 'JSON' ] = '-'
+          tblRec[ propId ] =  'undefined'
+        } else if ( rec[ propId ].constructor === Object &&  Object.keys(rec[ propId ]).length === 0  ) {
+          tblRec[ propId + 'JSON' ] = '{}'
+          tblRec[ propId ] =  '{}'
+        } else {
+          tblRec[ propId + 'JSON' ] = propId + ' (JSON)'
+          let jsonStr = ''
+          try {
+            jsonStr = JSON.stringify( rec[ propId ], null, ' ' ) 
+          } catch ( exc ) { jsonStr = exc.message }
+          tblRec[ propId ] = jsonStr
+        }
         break 
       case 'Event': 
         let eventLnk = '<a href="'+url+'/'+propId+'">'+( prop.label ? prop.label : propId ) +'</a>'

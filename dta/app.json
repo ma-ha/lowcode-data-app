@@ -713,6 +713,17 @@
               "InProgress_RequestPayment": true,
               "PaymentPending_PaymentReceived": true
             }
+          },
+          "J1": {
+            "type": "JSON",
+            "noDelete": true,
+            "stateTransition": {
+              "null_Create": true
+            }
+          },
+          "id": {
+            "type": "UUID",
+            "noDelete": true
           }
         },
         "noDelete": true,

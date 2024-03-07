@@ -155,7 +155,7 @@ async function getScopeOpts( req, res ) {
     if ( a.id > b.id ) { return 1 }
     return -1
   })
-  log.info( 'getScopeOpts', scopeTbl )
+  log.debug( 'getScopeOpts', scopeTbl )
   res.send( scopeTbl )
 }
 

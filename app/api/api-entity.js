@@ -233,7 +233,13 @@ async function docStateChange( req, res ) {
   let entity = app.entity[ req.params.entityId ]
   if ( ! entity ) { return res.send( 'ERROR: Entity not found') }
 
-  await dta.addDataObj( req.params.tenantId + req.params.entityId, req.body.id, req.body, 'dta.stateUpdate', entity )
+  let rec = req.body
+  let parse = propHandler.reformatDataUpdateInput( entity, rec )
+  if ( parse.err ) {
+    return res.status(400).send( parse.err )
+  }
+
+  await dta.addDataObj( req.params.tenantId + req.params.entityId, rec.id, rec, 'dta.stateUpdate', entity )
 
   let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
 

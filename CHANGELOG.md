@@ -1,3 +1,7 @@
+# 0.15.3
+- JSON input only 2 lines in state create form
+- JSON preview in table
+
 # 0.15.2
 - event MultiSelectRef replace ids
 - State model: buttons to move box
