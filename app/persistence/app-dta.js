@@ -130,7 +130,7 @@ async function getApp( scopeId, appId ) {
 }
 
 async function getAppById( fullAppId ) {
-  log.info( 'getApp',fullAppId )
+  log.debug( 'getApp',fullAppId )
   await syncTbl( APP_TBL )
   if ( data.app[fullAppId] ) {
     return data.app[  fullAppId ]
@@ -139,7 +139,7 @@ async function getAppById( fullAppId ) {
 }
 
 async function addApp( fullAppId, app ) {
-  log.info( 'getApp',fullAppId )
+  log.debug( 'getApp',fullAppId )
   await syncTbl( APP_TBL )
   data.app[ fullAppId ] = app
   await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
@@ -156,7 +156,7 @@ async function saveApp( fullAppId, app ) {
 // ============================================================================
 
 async function getStateModelById( rootScopeId, stateModelId ) {
-  log.info( 'getStateModelById', rootScopeId, stateModelId  )
+  log.debug( 'getStateModelById', rootScopeId, stateModelId  )
   await syncTbl( 'state', true )
   // log.info( 'data.state', data.state )
   if ( data.state[ rootScopeId +'/'+ stateModelId ] ) {
@@ -246,7 +246,7 @@ async function idExists( tbl, id  ) {
 }
 
 async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams ) {
-  log.info( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams )
+  log.debug( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams )
   let tbl = rootScopeId + entityId
   await syncTbl( tbl )
   let inherit = await scopeInherited( rootScopeId, appId, appVersion, entityId )
@@ -412,7 +412,7 @@ async function syncTbl( tbl, always ) {
     await writeFile( dbFile, '{}' )
   }
   if ( ! data[ tbl ]  || always ) {
-    log.info('>> readFile', dbFile )
+    log.debug('>> readFile', dbFile )
     data[ tbl ] =  JSON.parse( await readFile( dbFile ) )
   } 
 }

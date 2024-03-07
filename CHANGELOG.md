@@ -1,6 +1,7 @@
 # 0.15.3
 - JSON input only 2 lines in state create form
 - JSON preview in table
+- reduce logs
 
 # 0.15.2
 - event MultiSelectRef replace ids

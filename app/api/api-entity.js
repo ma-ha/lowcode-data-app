@@ -95,7 +95,7 @@ async function getAppView( req, res ) {
 
 
 async function getDocArr( req, res ) {
-  log.info( 'GET entities', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
+  log.debug( 'GET entities', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
@@ -121,7 +121,7 @@ async function getDocArr( req, res ) {
 
 
 async function getDoc( req, res ) {
-  log.info( 'GET entity', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId, req.query )
+  log.debug( 'GET entity', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId, req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
@@ -132,7 +132,7 @@ async function getDoc( req, res ) {
   let entity = app.entity[ req.params.entityId ]
 
   if ( req.query.recId ) { // single doc by id
-    log.info( 'GET entity q/id', req.query.recId )
+    log.debug( 'GET entity q/id', req.query.recId )
 
     if ( req.query.recId == '_empty' ) {
       return res.send( propHandler.genEmptyDataReturn( entity ) )
