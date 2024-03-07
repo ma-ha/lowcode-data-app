@@ -1,6 +1,7 @@
 # 0.15.3
 - JSON input only 2 lines in state create form
 - JSON preview in table
+- Property description / tooltip help
 - reduce logs
 
 # 0.15.2

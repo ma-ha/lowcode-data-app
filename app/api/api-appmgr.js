@@ -298,6 +298,7 @@ async function getProperty( req, res ) {
       userDelete : ( entity.noDelete === true ? false : true ),
       noTable    : ( dbProp.noTable === true ? true : false ),
       apiManaged : ( dbProp.apiManaged ? true : false ),
+      description : ( dbProp.description ? dbProp.description : '' ),
     }
     propHandler.setPropRef( prop, dbProp )
 
@@ -485,6 +486,11 @@ async function addProperty ( req, res ) {
     entity.properties[ id ].noTable = true 
   } else {
     delete entity.properties[ id ].noTable
+  }
+  if ( req.body.description &&  req.body.description.trim() != '' ) { 
+    entity.properties[ id ].description = req.body.description 
+  } else {
+    delete entity.properties[ id ].description
   }
 
   await propHandler.addNewPropertyDef( entity.properties[ id ], req.body.type, req.body.ref )

@@ -358,7 +358,8 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
     // if ( prop.apiManaged ) {
     //   fld.readonly   = true
     // }
-    
+    if ( prop.description ) { fld.descr = renderTooltip( prop.description ) }
+
     if ( fld ) {
       cols.push({ formFields: [ fld ] })
     }
@@ -448,6 +449,8 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
         fld = { id: propId, label: lbl, type: 'text', value: rec[ propId ] }
         break 
     }
+
+    if ( prop.description ) { fld.descr = renderTooltip( prop.description ) }
 
     if ( prop.apiManaged ) { fld.readonly = true } 
     if ( stateTransition ) {
@@ -753,4 +756,10 @@ function getRefLabel( entity, recId, rec ) {
     return recId
   }
   return lbl.join(' ')
+}
+
+
+
+function renderTooltip( descr ) {
+  return descr.replaceAll('\"',"&quot;")
 }

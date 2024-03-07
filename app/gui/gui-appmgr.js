@@ -306,8 +306,11 @@ async function init( ) {
                             descr: "Will not appear in the GUI form." } 
                         ]},
           { formFields: [ 
-            { id: "refLbl", label: "Refs: Show instead of ID", type: "checkbox" },
+            { id: "refLbl", label: "Ref Label", descr: 'show instead of ID', type: "checkbox" },
             { id: "notNull", label: "Not Null", type: "checkbox" } 
+          ]},
+          { formFields: [ 
+            { id: "description", label: "Description / Help", type: "text", rows: 3 }
           ]}
 
         ] }],
