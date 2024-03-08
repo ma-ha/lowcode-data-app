@@ -77,12 +77,13 @@ async function getAppSubs( req, res ) {
 
 // ==========================================================================
 
-async function publishDataChgEvt( dtaOp, dtaId, dtaType, data ) {
+async function publishDataChgEvt( dtaOp, dtaId, uri, dtaType, data ) {
   if ( [ 'app','erm','event-subscriptions','oidc-session','user-auth','user-scope' ].includes( dtaType )) { return }
   let evt = {
     type : 'data',
     op   : dtaOp,
     id   : dtaId,
+    uri  : uri,
     type : dtaType,
     data : data,
     seqNo: ( seqNo++ ),

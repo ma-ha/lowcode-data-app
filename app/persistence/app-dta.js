@@ -19,7 +19,9 @@ exports: module.exports = {
   getDataObjX,
   idExists,
   addDataObj,
+  addDataObjNoEvent,
   delDataObj,
+  delDataObjNoEvent,
   delCollection,
   delRootScope
 }
@@ -143,14 +145,16 @@ async function addApp( fullAppId, app ) {
   await syncTbl( APP_TBL )
   data.app[ fullAppId ] = app
   await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
-  eh.publishDataChgEvt( 'app.add', fullAppId, APP_TBL, app )
+  let uri = '/adapter/app/' + fullAppId
+  eh.publishDataChgEvt( 'app.add', fullAppId, uri, APP_TBL, app )
 }
 
 async function saveApp( fullAppId, app ) {
   log.info( 'saveApp',fullAppId )
   data.app[ fullAppId ] = app
   await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
-  eh.publishDataChgEvt( 'app.chg', fullAppId, APP_TBL, app )
+  let uri = '/adapter/app/' + fullAppId
+  eh.publishDataChgEvt( 'app.chg', fullAppId, uri, APP_TBL, app )
 }
 
 // ============================================================================
@@ -299,8 +303,36 @@ function scopeOK( userScope, recScope, inherit ) {
 }
 
 
-async function addDataObj( tbl, id, obj, evt, entity ) {
-  log.info( 'addDataObj', tbl, id )
+async function addDataObj( tbl, id, obj, uri, evt, entity ) {
+  log.info( 'addDataObj',  tbl, id, obj, uri, evt, entity  )
+  await syncTbl( tbl )
+  let cre = null
+  let dtaEvt = 'dta.add'
+  if ( data[ tbl ][ id.trim() ] ) {
+    cre = data[ tbl ][ id.trim() ]._cre 
+    if ( ! evt ) {
+      dtaEvt = 'dta.update'
+    }
+  }
+  data[ tbl ][ id.trim() ] = obj
+  data[ tbl ][ id.trim() ].id  = id.trim()
+  if ( cre ) {
+    data[ tbl ][ id.trim() ]._cre = cre
+  } else {
+    data[ tbl ][ id.trim() ]._cre = Date.now()
+  }
+  data[ tbl ][ id.trim() ]._upd = Date.now()
+  let dbFile = fileName( tbl )
+  await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
+
+  let objCopy = await embedRefObjects( obj, entity )
+
+  eh.publishDataChgEvt( ( evt ? evt : dtaEvt ), id, uri, tbl, objCopy )
+  return true
+}
+
+async function addDataObjNoEvent( tbl, id, obj ) {
+  log.info( 'addDataObjNoEvent', tbl, id )
   await syncTbl( tbl )
   let cre = null
   let dtaEvt = 'dta.add'
@@ -318,9 +350,6 @@ async function addDataObj( tbl, id, obj, evt, entity ) {
   data[ tbl ][ id.trim() ]._upd = Date.now()
   let dbFile = fileName( tbl )
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
-
-  let objCopy = await embedRefObjects( obj, entity )
-  eh.publishDataChgEvt( ( evt ? evt : dtaEvt ), id, tbl, objCopy )
   return true
 }
 
@@ -332,12 +361,17 @@ async function embedRefObjects( origDta, entity ) {
     for ( let propId in entity.properties ) {
       if ( dta[ propId ] ) { // only care if opr is really present
         let prp = entity.properties[ propId ]
+        // log.info( '>>>',  propId, prp.type)
         if ( prp.type == 'SelectRef' ) {
           let ref = prp.selectRef.split('/')
           let refTbl = ref[0] + ref[3]
           let refDta = await getDataById( refTbl, dta[ propId ] )
           if ( refDta ) {
-            dta[ propId ] = refDta
+            let uri =  '/adapter/entity/'+ref[0]+'/'+ref[1]+'/'+ref[2]+'/'+ref[3]+'/'+dta[ propId ]
+            dta[ propId ] = JSON.parse( JSON.stringify( refDta ))
+            dta[ propId ]._uri = uri
+          } else {
+            log.warn( 'embedRefObjects NOT FOUND', propId, dta[ propId ] )
           }
         } else if ( prp.type == 'MultiSelectRef' ) {
           let ref = prp.multiSelectRef.split('/')
@@ -346,7 +380,9 @@ async function embedRefObjects( origDta, entity ) {
           for ( let refId of dta[ propId ] ) {
             let refDta = await getDataById( refTbl, refId )
             if ( refDta ) {
-              refObArr.push( refDta )
+              let refCpy = JSON.parse( JSON.stringify( refDta ))
+              refCpy._uri =  '/adapter/entity/'+ref[0]+'/'+ref[1]+'/'+ref[2]+'/'+ref[3]+'/'+refId
+              refObArr.push( refCpy )
             } else {
               refObArr.push({ id: refId })
               log.warn( 'embedRefObjects NOT FOUND', propId, refId )
@@ -362,7 +398,23 @@ async function embedRefObjects( origDta, entity ) {
 }
 
 
-async function delDataObj( tbl, id, ) {
+async function delDataObj( tbl, id, entity ) {
+  log.info( 'delDataObj', tbl, id )
+  await syncTbl( tbl )
+  let idT = id.trim() 
+  if ( ! data[ tbl ]  ||  ! data[ tbl ][ idT ] ) { return "Not found" }
+  log.info( 'delDataObj', tbl, data[ tbl ][ idT ] )
+  let cpyDta = await embedRefObjects( data[ tbl ][ idT ], entity )
+  //let cpyDta = JSON.parse( JSON.stringify( data[ tbl ][ idT ] ) )
+  delete  data[ tbl ][ idT ]
+  let dbFile = fileName( tbl )
+  await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
+  let uri = null
+  eh.publishDataChgEvt( 'dta.del', id, uri, tbl, cpyDta )
+  return "Deleted"
+}
+
+async function delDataObjNoEvent( tbl, id ) {
   log.info( 'delDataObj', tbl, id )
   await syncTbl( tbl )
   let idT = id.trim() 
@@ -372,8 +424,6 @@ async function delDataObj( tbl, id, ) {
   delete  data[ tbl ][ idT ]
   let dbFile = fileName( tbl )
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
-
-  eh.publishDataChgEvt( 'dta.del', id, tbl, cpyDta )
   return "Deleted"
 }
 

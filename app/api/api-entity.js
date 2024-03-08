@@ -215,8 +215,9 @@ async function addDoc( req, res )  {
       }
     }
   }
-
-  let result = await dta.addDataObj( dtaColl, rec.id, rec, null, entity )
+  let rp = req.params
+  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec.id
+  let result = await dta.addDataObj( dtaColl, rec.id, rec, uri, null, entity )
   // TODO check entity
   res.send( 'OK' )
 }
@@ -238,8 +239,9 @@ async function docStateChange( req, res ) {
   if ( parse.err ) {
     return res.status(400).send( parse.err )
   }
-
-  await dta.addDataObj( req.params.tenantId + req.params.entityId, rec.id, rec, 'dta.stateUpdate', entity )
+  let rp = req.params
+  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec.id
+    await dta.addDataObj( req.params.tenantId + req.params.entityId, rec.id, rec, uri, 'dta.stateUpdate', entity )
 
   let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
 
@@ -253,8 +255,14 @@ async function delDoc( req, res )  {
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   if ( ! req.query.recId ) { return res.send( 'ERROR: id required') }
+  
+  let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
+  let app = await dta.getAppById( appId )
+  if ( ! app ) { return res.send( 'ERROR: App not found') }
+  let entity = app.entity[ req.params.entityId ]
+
   let dtaColl = user.rootScopeId + req.params.entityId
-  let result = await dta.delDataObj( dtaColl, req.query.recId )
+  let result = await dta.delDataObj( dtaColl, req.query.recId, entity )
   res.send( result )
 }
 
@@ -286,7 +294,9 @@ async function docEvent( req, res )  {
     if ( ! rec.eventArr ) { rec.eventArr = [] }
     if ( rec.eventArr.indexOf( p.event ) == -1 ) {
       rec.eventArr.push( p.event )
-      await dta.addDataObj( user.rootScopeId+p.entityId,  p.recId, rec )
+      let rp = req.params
+      let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec.id
+      await dta.addDataObj( user.rootScopeId+p.entityId,  p.recId, rec, uri )
     } 
   }
   res.redirect( '../../../../../../../index.html?layout=AppEntity-nonav&id='+p.tenantId+'/'+p.appId+'/'+p.appVersion )

@@ -1,6 +1,6 @@
 # 0.16.0
 - Adapter API supports `PUT /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
--
+- Events contain URI of data document
 
 # 0.15.3
 - JSON input only 2 lines in state create form

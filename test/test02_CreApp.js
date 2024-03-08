@@ -40,6 +40,10 @@ const APP = {
           "label": "Name",
           "type": "String"
         },
+        "testRef": {
+          "type": "SelectRef",
+          "selectRef": "TODO"
+        },
         "id": {
           "type": "UUID"
         }
@@ -95,12 +99,12 @@ const STATE_MODEL = {
           "to": "Closed"
         }
       }
-    }
-  },
-  "Closed": {
-    "actions": {
-      "Reopen": {
-        "to": "Open"
+    },
+    "Closed": {
+      "actions": {
+        "Reopen": {
+          "to": "Open"
+        }
       }
     }
   }
@@ -118,6 +122,8 @@ describe( 'Create App', () => {
 
   it( 'Create a test app', async () => {
     let url = API_URL + scopeId + '/mocha-test-app/1.0.0'
+    APP.entity.testUUID.properties.testRef.selectRef = scopeId + '/mocha-test-app/1.0.0/test'
+    // console.log(  APP.entity.testUUID )
     let result = await axios.post( url, APP, { headers: HEADERS } )
     // console.log( result )
     assert.equal( result.status, 200 )

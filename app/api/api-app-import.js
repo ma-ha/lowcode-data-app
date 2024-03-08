@@ -138,7 +138,7 @@ async function uploadAppJSON( req, res ) {
           apps    : newApps,
           _expire : Date.now() + 1000*60*60*24
         }
-        await dta.addDataObj( 'app-temp', importId, appImp )
+        await dta.addDataObjNoEvent( 'app-temp', importId, appImp )
         uploadResult += '<p> Click to <a href="app/import/'+importId+'">IMPORT</a>'
       }
     } else {
@@ -175,7 +175,7 @@ async function importApp( req, res ) {
     log.info( 'GET /app/import IMPORT >>', appId  ) 
     await dta.addApp( user.rootScopeId +'/'+ appId, impDta.apps[ appId] )
   }
-  await dta.delDataObj( 'app-temp', req.params.uid )
+  await dta.delDataObjNoEvent( 'app-temp', req.params.uid )
 
   res.redirect( '../../index.html?layout=Customize' ) 
 }

@@ -104,7 +104,10 @@ describe( 'Data Ops', () => {
   let uid = null
 
   it( 'UUID: Add rec with auto id', async () => {
-    let rec = { name : 'test3' }
+    let rec = { 
+      name : 'test3', 
+      testRef : '2'
+    }
     let result = await axios.post( testUuidUrl, rec, { headers: HEADERS } )
     // console.log( result )
     assert.equal( result.status, 200 )

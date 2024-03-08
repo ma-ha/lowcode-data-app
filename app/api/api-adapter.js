@@ -50,7 +50,7 @@ async function setupAPI( app, oauthCfg ) {
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, getDoc )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, addDoc )
   svc.put(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, chgDoc )
-  svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:state/:action', apiAuthz, changeDocStatus )
+  svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:state/:action', apiAuthz, changeDocStatus ) // no recId since it mau also be a create
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:state', apiAuthz, getDocByStatus )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId',        apiAuthz, addDoc )
   svc.delete('/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, delDoc )
@@ -185,7 +185,8 @@ async function creStateModel( req, res ) {
   if ( stateModel ) {return sendErr( res, 'state model exists' ) }
   stateModel = req.body
   stateModel.scopeId = req.params.scopeId
-  await dta.addDataObj( 'state', stateModelId, stateModel )
+  let uri = '/adapter/state/' + stateModelId
+  await dta.addDataObjNoEvent( 'state', stateModelId, stateModel, uri )
   res.send({status: 'OK'})
 }
 
@@ -205,7 +206,7 @@ async function getDocArr( req, res ) {
   if ( ! await checkApp( req, res ) ) { return }
   let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
   let recs = await dta.getData( tbl, req.params.scopeId ) // TODO filter
-  log.info( 'recs',recs)
+  log.debug( 'recs',recs)
   res.send( recs )
 }
 
@@ -215,7 +216,7 @@ async function getDoc( req, res ) {
   if ( ! await checkApp( req, res ) ) { return }
   let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
   let rec = await dta.getDataById( tbl, req.params.recId )
-  log.info( 'rec',rec )
+  log.debug( 'rec',rec )
   res.send( rec )
 }
 
@@ -225,6 +226,7 @@ async function addDoc( req, res )  {
   let app = await checkApp( req, res )
   if ( ! app ) { return }
   let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+  let entity =  app.entity[ req.params.entityId ] // exists, checked in checkApp(...)
 
   let rec = req.body
   let recId = req.params.recId 
@@ -233,7 +235,7 @@ async function addDoc( req, res )  {
     rec.id = recId
   }
 
-  let properties = app.entity[ req.params.entityId ].properties
+  let properties = entity.properties
   // for ( let propId in req.body ) {
   //   if ( ! properties[ propId ] ) {
   //     log.warn( 'api-adapter: properties not defined', propId )
@@ -257,7 +259,9 @@ async function addDoc( req, res )  {
     }
   }
   rec.scopeId = req.params.scopeId
-  let result = await dta.addDataObj( tbl, recId, rec )
+  let rp = req.params
+  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+recId
+  let result = await dta.addDataObj( tbl, recId, rec, uri, null, entity )
   if ( result ) {
     res.send({ status: 'OK', id: recId })
   } else {
@@ -273,14 +277,16 @@ async function chgDoc( req, res )  {
   let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
   let doc = await dta.getDataById( tbl, req.params.recId )
   if ( ! doc ) { return sendErr( res, 'Not found' ) }
+  let entity = app.entity[ req.params.entityId ] // exists, checked in checkApp(...)
 
   let updates = req.body
   for ( let propId in updates ) {
     if ( [ 'id', 'scopeId', '_state' ].includes( propId ) ) { continue }
     doc[ propId ] = updates[ propId ]
   }
-
-  let result = await dta.addDataObj( tbl, req.params.recId, doc )
+  let rp = req.params
+  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rp.recId
+  let result = await dta.addDataObj( tbl, req.params.recId, doc, uri, 'dta.update', entity )
   if ( result ) {
     res.send({ status: 'OK', doc: doc })
   } else {
@@ -294,9 +300,10 @@ async function changeDocStatus( req, res )  {
   log.info( 'Change Status', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.state, req.params.action )
   log.debug( 'Change Status', req.body )
   let app = await checkApp( req, res )
-  let properties = app.entity[ req.params.entityId ].properties
   if ( ! app ) { return }
-  let stateModelId =  app.entity[ req.params.entityId ].stateModel
+  let entity =  app.entity[ req.params.entityId ] // exists, checked in checkApp(...)
+  let properties   = entity.properties
+  let stateModelId = entity.stateModel
   if ( ! stateModelId ) { return sendErr( res, 'Change Status: entity has no state' ) }
   let stateModel = await dta.getDataById( 'state', req.params.scopeId +'/'+ stateModelId )
   if ( ! stateModel ) { return sendErr( res, 'Change Status: state model error' ) } // should not happen, but...
@@ -365,8 +372,9 @@ async function changeDocStatus( req, res )  {
   }
   
   rec._state = stateAction.to
-
-  let result = await dta.addDataObj( tbl, rec.id, rec )
+  let rp = req.params
+  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec.id
+  let result = await dta.addDataObj( tbl, rec.id, rec, uri, 'dta.change-status', entity )
   if ( result ) {
     res.send({ status: 'OK', id: rec.id, doc: rec  })
   } else {
@@ -402,15 +410,17 @@ async function getDocByStatus( req, res )  {
 async function delDoc( req, res )  {
   log.info( 'Del data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
   let user = await userDta.getUserInfoFromReq( gui, req )
-  if ( ! await checkApp( req, res ) ) { return }
+  let app =  await checkApp( req, res )
+  if ( ! app ) { return }
   let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
-  let result = await dta.delDataObj( tbl, req.params.recId )
+  let entity = app.entity[ req.params.entityId ]
+  let result = await dta.delDataObj( tbl, req.params.recId, entity )
   res.send( result )
 }
 
 
 async function delCollection( req, res )  {
-  log.info( 'Del Collectinm', req.params.scopeId, req.params.entityId )
+  log.info( 'Del Collection', req.params.scopeId, req.params.entityId )
   await dta.delCollection( req.params.scopeId, req.params.entityId  )
   res.send({ status: 'OK'})
 }

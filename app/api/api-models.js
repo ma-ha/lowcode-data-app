@@ -155,7 +155,7 @@ async function saveERM( req, res ) {
         y : req.body.entity[ e ].y
       }
     }
-    await dta.addDataObj( 'erm', user.rootScopeId, ermCfg )
+    await dta.addDataObjNoEvent( 'erm', user.rootScopeId, ermCfg )
   } catch ( exc ) { log.error( 'POST erm', exc ) } 
   res.send( {} )
 }
@@ -217,7 +217,7 @@ async function addStateModel( req, res )  {
       null : { actions : { } }
     }
   }
-  let result = await dta.addDataObj( 'state', req.body.scopeId +'/'+id, newState ) 
+  let result = await dta.addDataObjNoEvent( 'state', req.body.scopeId +'/'+id, newState ) 
   res.send(( result ? 'OK' : 'FAILED!!' ))
 }
 
@@ -277,7 +277,7 @@ async function uploadStateModelJSON( req, res )  {
       stateModel : newStateModel,
       _expire    : Date.now() + 1000*60*60*24
     }
-    await dta.addDataObj( 'app-temp', importId, importModel )
+    await dta.addDataObjNoEvent( 'app-temp', importId, importModel )
     uploadStateResult += '<p> Click to <a href="state-model/import/'+importId+'">IMPORT</a>'
 
   } catch ( exc ) {  
@@ -308,8 +308,8 @@ async function importStateModel( req, res ) {
   if ( ! impDta ) { return res.status(400).send( 'UID not found' ) }
   if ( ! impDta.stateModel ) { return res.status(400).send( 'Temp Model not found' ) }
 
-  await dta.addDataObj( 'state', impDta.stateModel.id, impDta.stateModel, 'state-model.add' )
-  await dta.delDataObj( 'app-temp', req.params.uid )
+  await dta.addDataObjNoEvent( 'state', impDta.stateModel.id, impDta.stateModel )
+  await dta.delDataObjNoEvent( 'app-temp', req.params.uid )
 
   res.redirect( '../../index.html?layout=StateAdmin-nonav' ) 
 }
@@ -440,7 +440,7 @@ async function udpState( req, res )  {
       state.label = req.body.label
     }
 
-    await dta.addDataObj( 'state', req.body.stateModelId, stateModel ) 
+    await dta.addDataObjNoEvent( 'state', req.body.stateModelId, stateModel ) 
 
     return res.send( 'OK' )
   }
@@ -461,7 +461,7 @@ async function moveState( req, res ) {
     case 's': if ( state.y <  400 ) { state.y +=20 }; break
     default:  return res.status(400).send( 'Wrong dir' )
   }
-  await dta.addDataObj( 'state', stateModel.id, stateModel ) 
+  await dta.addDataObjNoEvent( 'state', stateModel.id, stateModel ) 
   res.send()
 }
 
@@ -635,7 +635,7 @@ async function setStateTransitions( req, res )  {
 
     log.info( 'action', action )
 
-    await dta.addDataObj( 'state', req.body.stateModelId, stateModel ) 
+    await dta.addDataObjNoEvent( 'state', req.body.stateModelId, stateModel ) 
 
     return res.send( 'OK' )
 
@@ -657,7 +657,7 @@ async function delStateTransitions( req, res )  {
       return res.status(400).send( 'ActionId not found' )
     }
     delete stateFrom.actions[ req.body.actionId ]
-    await dta.addDataObj( 'state', req.body.stateModelId, stateModel ) 
+    await dta.addDataObjNoEvent( 'state', req.body.stateModelId, stateModel ) 
     return res.send( 'OK' )
   }
   res.status(400).send( ) 
