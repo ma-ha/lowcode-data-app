@@ -49,6 +49,7 @@ async function setupAPI( app, oauthCfg ) {
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId',        apiAuthz, getDocArr )
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, getDoc )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, addDoc )
+  svc.put(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, chgDoc )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:state/:action', apiAuthz, changeDocStatus )
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:state', apiAuthz, getDocByStatus )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId',        apiAuthz, addDoc )
@@ -263,6 +264,30 @@ async function addDoc( req, res )  {
     res.send({ error: '?' })
   }
 }
+
+
+async function chgDoc( req, res )  {
+  log.info( 'Upd data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
+  let app = await checkApp( req, res )
+  if ( ! app ) { return }
+  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+  let doc = await dta.getDataById( tbl, req.params.recId )
+  if ( ! doc ) { return sendErr( res, 'Not found' ) }
+
+  let updates = req.body
+  for ( let propId in updates ) {
+    if ( [ 'id', 'scopeId', '_state' ].includes( propId ) ) { continue }
+    doc[ propId ] = updates[ propId ]
+  }
+
+  let result = await dta.addDataObj( tbl, req.params.recId, doc )
+  if ( result ) {
+    res.send({ status: 'OK', doc: doc })
+  } else {
+    res.send({ error: '?' })
+  }
+}
+
 
 // ----------------------------------------------------------------------------
 async function changeDocStatus( req, res )  {

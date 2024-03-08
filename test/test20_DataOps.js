@@ -67,11 +67,20 @@ describe( 'Data Ops', () => {
     // console.log( '5', result.data  )
   })
 
+  it( 'Update fields of 1st rec', async () => {
+    let rec = {  Name : 'test1' }
+    let result = await axios.put( dtaUrl+'/1', {a:'b'}, { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data.doc, null )
+    // console.log( '5', result.data  )
+  })
+
 
   it( 'get 1st rec', async () => {
     let result = await axios.get( dtaUrl+'/1', { headers: HEADERS } )
     assert.equal( result.status, 200 )
     assert.notEqual( result.data, null )
+    assert.equal( result.data.a, 'b' )
     // console.log( '6', result.data  )
   })
 

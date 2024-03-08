@@ -65,6 +65,9 @@ Add document or update document by id.
 
 *Warning*: If the entity has a state model, you have to take care that all operations are valid!
 
+## PUT /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
+
+Add update document properties. `id`, `scopeId` or `_state` are ignored.
 
 ## POST /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
 
