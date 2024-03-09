@@ -59,6 +59,14 @@ Get map of documents.
 
 Get document by id.
 
+## POST /adapter/entity/:scopeId/:appId/:appVersion/:entityId
+
+Add a single or multiple documents (array). 
+
+The document `id` is generated as UUIDs if not present.
+
+See [examples test cases](../test/test21_DataOps.js).
+
 ## POST /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
 
 Add document or update document by id.

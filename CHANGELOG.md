@@ -1,3 +1,6 @@
+# 0.17.0
+- Adapter API: bulk add
+
 # 0.16.0
 - Adapter API supports `PUT /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
 - Events contain URI of data document
