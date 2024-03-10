@@ -3,8 +3,9 @@
 Header:
 - `provisioning-key`
 
-The key must be set as `PROVISIONING_API_KEY` config param on start, 
-see [example code](../app/example-all-configs.js).
+The key must be set as `PROVISIONING_API_KEY` config param on start.
+
+Examples, see [test cases](https://github.com/ma-ha/lowcode-data-app/tree/main/test)
 
 
 ## POST /adapter/scope

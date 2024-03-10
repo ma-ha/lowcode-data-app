@@ -1,9 +1,10 @@
 # Persistence API
 
+Examples, see [test cases](https://github.com/ma-ha/lowcode-data-app/tree/main/test)
+
 Header:
 - `app-id`
 - `app-secret`
-
 
 # Scopes
 
@@ -11,16 +12,12 @@ Header:
 
 Get sub/scopes of scopeId
 
-See [examples API test cases](../test/helper.js).
-
 ## POST /adapter/scope/:scopeId
 
 Add/update a sub-scope
 
 
 # Apps
-
-See[app examples in API test cases](../test/test02_CreApp.js).
 
 ## GET /adapter/app/:scopeId
 
@@ -34,9 +31,8 @@ Get full app definition, including entity definitions.
 
 Add or update full app definition, including entity definitions.
 
-# State Models
 
-See [examples in API test cases](../test/test02_CreApp.js).
+# State Models
 
 ## POST /adapter/state/:scopeId/:stateId
 
@@ -48,8 +44,6 @@ Get a state model by id.
 
 
 # Entities
-
-See [examples in API test cases](../test/test20_DataOps.js).
 
 ## GET /adapter/entity/:scopeId/:appId/:appVersion/:entityId
 
@@ -65,8 +59,6 @@ Add a single or multiple documents (array).
 
 The document `id` is generated as UUIDs if not present.
 
-See [examples test cases](../test/test21_BulkDataOps.js).
-
 Result for OK/200:
 
     {
@@ -81,8 +73,6 @@ Result for OK/200:
 ## PUT /adapter/entity/:scopeId/:appId/:appVersion/:entityId
 
 Update properties of multiple documents (array)
-
-See [examples test cases](../test/test21_BulkDataOps.js).
 
 Result for OK/200:
 
@@ -120,8 +110,6 @@ Result for OK/200:
 
 # Entities with State
 
-See [examples in API test cases](../test/test30_DataState.js).
-
 ## POST /adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:stateid/:action
 
 Create (stateId = "null") or change data state. 
@@ -138,8 +126,6 @@ Get all documents in the specific state.
 
 
 # Collections
-
-See [examples in API test cases](../test/test90_DelCollection.js).
 
 ## DELETE /adapter/entity/:scopeId/:entityId
 

@@ -1,5 +1,7 @@
 # Event Subscription API
 
+Examples, see [event-subscriber-app.js](https://github.com/ma-ha/lowcode-data-app/blob/main/example-adapter/event-subscriber-app.js)
+
 ## POST /event/subscribe
 
 Header:

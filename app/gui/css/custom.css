@@ -602,6 +602,10 @@
    text-align: left;
  }
 
+ #navSubMenu5 {
+  width: 190px;
+ }
+
  /* All Forms --------------------------------------------- */
  .pongFormField label {
    font-size: 0.9em;

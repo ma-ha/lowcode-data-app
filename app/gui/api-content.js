@@ -91,7 +91,10 @@ async function initDbCache() {
 const VALID_PG = [
   'get-started',
   'administration',
-  'customize'
+  'customize',
+  'API-Data',
+  'API-EventSubscription',
+  'API-Provisioning'
 ]
 
 async function getPage( type, file, lang ) {
