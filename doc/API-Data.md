@@ -65,11 +65,43 @@ Add a single or multiple documents (array).
 
 The document `id` is generated as UUIDs if not present.
 
-See [examples test cases](../test/test21_DataOps.js).
+See [examples test cases](../test/test21_BulkDataOps.js).
+
+Result for OK/200:
+
+    {
+       "status": 'OK', 
+       "idArr": [ ... ids ... ], 
+       "docMap": {
+        "<id1>" : { ... doc1 ...  },
+        "<id2>" : ...
+      } 
+    }
+
+## PUT /adapter/entity/:scopeId/:appId/:appVersion/:entityId
+
+Update properties of multiple documents (array)
+
+See [examples test cases](../test/test21_BulkDataOps.js).
+
+Result for OK/200:
+
+    { 
+      "status": 'OK', 
+      "docMap": {
+        "<id1>" : { ... doc1 ...  },
+        "<id2>" : { ... doc1 ...  },
+        ...
+      } 
+    }
 
 ## POST /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
 
 Add document or update document by id.
+
+Result for OK/200:
+
+    { "status": "O", "id": "...id..." }
 
 *Warning*: If the entity has a state model, you have to take care that all operations are valid!
 
@@ -77,10 +109,13 @@ Add document or update document by id.
 
 Add update document properties. `id`, `scopeId` or `_state` are ignored.
 
-## POST /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
+## DELETE /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId
 
 Delete document by id.
 
+Result for OK/200:
+
+    { "status": "deleed" }
 
 # Entities with State
 

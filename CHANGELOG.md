@@ -1,5 +1,6 @@
 # 0.17.0
 - Adapter API: bulk add
+- Adapter API: bulk update
 
 # 0.16.0
 - Adapter API supports `PUT /adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId

@@ -51,6 +51,7 @@ async function setupAPI( app, oauthCfg ) {
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, addDoc )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId', apiAuthz, addDocs )
   svc.put(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/:recId', apiAuthz, chgDoc )
+  svc.put(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId', apiAuthz, chgDocs )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:state/:action', apiAuthz, changeDocStatus ) // no recId since it mau also be a create
   svc.get(   '/adapter/entity/:scopeId/:appId/:appVersion/:entityId/state/:state', apiAuthz, getDocByStatus )
   svc.post(  '/adapter/entity/:scopeId/:appId/:appVersion/:entityId',        apiAuthz, addDoc )
@@ -232,6 +233,7 @@ async function addDocs( req, res ) { // add doc w/o id or list
   let rp = req.params
   let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'
 
+  let docMap = {}
   if ( Array.isArray( req.body ) ) {
   
     let idArr = []
@@ -242,8 +244,9 @@ async function addDocs( req, res ) { // add doc w/o id or list
     for ( let rec of req.body ) {
       await dta.addDataObj( tbl, rec.id, rec, uri + rec.id, null, entity )
       idArr.push( rec.id )
+      docMap[ rec.id ] = rec
     }
-    return res.send({ status: 'OK', idArr: idArr })
+    return res.send({ status: 'OK', idArr: idArr, docMap: docMap })
 
   } else {
 
@@ -324,6 +327,40 @@ async function chgDoc( req, res )  {
   }
 }
 
+
+async function chgDocs( req, res )  {
+  log.info( 'Upd data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
+  let app = await checkApp( req, res )
+  if ( ! app ) { return }
+  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+  let entity = app.entity[ req.params.entityId ] // exists, checked in checkApp(...)
+  let rp = req.params
+  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'
+
+  if ( ! Array.isArray( req.body ) ) { return sendErr( res, 'array required' ) }
+
+  let docMap = {}
+  for ( let updates of req.body ) { // first check all
+    let doc = await dta.getDataById( tbl,updates.id )
+    if ( ! doc ) { return sendErr( res, 'Not found' ) }
+  }
+  
+  for ( let updates of req.body ) { // now do all updates
+    let doc = await dta.getDataById( tbl, updates.id )
+    let containUpdates = false
+    if ( ! doc ) { return sendErr( res, 'Not found' ) }
+    for ( let propId in updates ) {
+      if ( [ 'id', 'scopeId', '_state' ].includes( propId ) ) { continue }
+      doc[ propId ] = updates[ propId ]
+      containUpdates = true
+    }
+    if ( containUpdates ) {
+      await dta.addDataObj( tbl, updates.id, doc, uri + updates.id, 'dta.update', entity )
+    }
+    docMap[ updates.id ] = doc
+  }
+  res.send({ status: 'OK', docMap: docMap })
+}
 
 // ----------------------------------------------------------------------------
 async function changeDocStatus( req, res )  {
@@ -445,7 +482,7 @@ async function delDoc( req, res )  {
   let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
   let entity = app.entity[ req.params.entityId ]
   let result = await dta.delDataObj( tbl, req.params.recId, entity )
-  res.send( result )
+  res.send({ status: result })
 }
 
 
