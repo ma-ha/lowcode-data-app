@@ -5,4 +5,3 @@
 - [ ] Metrics field type
 - [ ] BLOB field type
 - [ ] fix session timeout handling
-- [ ] bulk change
