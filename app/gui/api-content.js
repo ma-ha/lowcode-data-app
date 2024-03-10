@@ -16,7 +16,7 @@ async function init( svc, appConfig ) {
   cfg = appConfig
 
   svc.get( '/get-free-trial', async (req, res) => {
-    res.redirect( cfg.GUI_URL + 'index.html?layout=trial-nonav' ) 
+    res.redirect( 'https://github.com/ma-ha/lowcode-data-app/tree/main' ) 
   })
 
   svc.get( '/sitemap.txt',  async ( req, res ) => {
@@ -55,7 +55,7 @@ async function init( svc, appConfig ) {
 
   svc.get( '/docuhead/:title/html', async (req, res) => {
     let html = '<div id="welcome1" class="welcomediv">'
-      +'<span class="pre-h1">Kubernetes Cluster Monitoring</span>'
+      +'<span class="pre-h1">LowCode Data App</span>'
       +'<h1>'+req.params.title+'</h1>'
       +'<a href="get-free-trial" class="linkbtn" target="_parent">TRY IT NOW</a>'
       +'</div>'
