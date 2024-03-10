@@ -115,7 +115,8 @@ Delete document by id.
 
 Result for OK/200:
 
-    { "status": "deleed" }
+    { "status": "deleted" }
+
 
 # Entities with State
 

@@ -23,9 +23,9 @@ Post data:
 
 Return: 
 
-  {
-    scopeId : NEW_SCOPE_ID
-  }
+    {
+      scopeId : NEW_SCOPE_ID
+    }
 
 ## GET /adapter/scope
 
