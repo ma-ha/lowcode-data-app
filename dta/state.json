@@ -248,5 +248,44 @@
     },
     "_cre": 1708271764173,
     "_upd": 1709652949169
+  },
+  "1000/Test": {
+    "id": "1000/Test",
+    "scopeId": "1000",
+    "state": {
+      "null": {
+        "actions": {
+          "Create1": {
+            "to": "Created",
+            "label": "Create 1"
+          },
+          "Create2": {
+            "to": "Created",
+            "label": "Create 2",
+            "line": [
+              {
+                "x": 100,
+                "y": 150
+              },
+              {
+                "x": 400,
+                "y": 150
+              }
+            ],
+            "labelPos": {
+              "x": 250,
+              "y": 150
+            }
+          }
+        }
+      },
+      "Created": {
+        "actions": {},
+        "x": 400,
+        "y": 100
+      }
+    },
+    "_cre": 1710145679644,
+    "_upd": 1710145888297
   }
 }

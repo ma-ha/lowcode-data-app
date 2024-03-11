@@ -592,10 +592,54 @@
             "noDelete": true
           }
         }
+      },
+      "Test": {
+        "title": "",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "A1": {
+            "type": "String",
+            "noDelete": true,
+            "stateTransition": {
+              "null_Create1": true
+            },
+            "filter": true
+          },
+          "A2": {
+            "type": "String",
+            "noDelete": true,
+            "stateTransition": {
+              "null_Create2": true
+            },
+            "filter": true
+          },
+          "A3": {
+            "type": "String",
+            "noDelete": true,
+            "stateTransition": {
+              "null_Create2": true
+            }
+          },
+          "A4": {
+            "type": "String",
+            "noDelete": true
+          },
+          "id": {
+            "type": "UUID",
+            "noDelete": true
+          }
+        },
+        "noDelete": true,
+        "noEdit": true,
+        "stateModel": "Test"
       }
     },
     "startPage": [
-      "region"
+      "region",
+      "Test"
     ],
     "role": [
       "admin"

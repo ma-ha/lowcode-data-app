@@ -1,3 +1,6 @@
+# 0.18.0
+- State: Multiple create action in GUI
+
 # 0.17.0
 - Adapter API: bulk add
 - Adapter API: bulk update

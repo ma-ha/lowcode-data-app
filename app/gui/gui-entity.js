@@ -85,60 +85,20 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
 async function renderEntityRows( app, appId, entityId, filterParam, user ) {
   // log.info( 'renderEntityRows', app, appId, entityId )
   let rows = []
-  let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
+  //let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
   let entity = app.entity[ entityId ]
   if ( ! entity ) { log.error( 'Entity not found: ', entity ); return [] }
 
   let stateModel = null
   if ( entity.stateModel ) {
-    stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
-    if ( ! stateModel ) { log.warn('renderEntityRows: stateModel not found'); return [] }
-    let initState = stateModel.state[ 'null' ]
-    if ( ! initState || ! initState.actions ) { log.warn('renderEntityRows: stateModel not found'); return [] }
-    for ( let actionId in initState.actions ) {
-      let actionFields = await propHandler.genGuiFormFieldsDef( entity, null, user, 'null_'+actionId, 'small' )
-      actionFields.push({ formFields: [{ id: '_state', type: "text", value: initState.actions[actionId].to, hidden: true }] } )
-
-      rows.push({ 
-        title  : 'New ' + ( entity.title ? entity.title : entityId),
-        rowId : 'EntityNewFrm'+entityId, 
-        type : 'pong-form', 
-        resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
-        height : 'auto', decor : "decor",
-        moduleConfig : {
-          fieldGroups:[{ columns: actionFields }],
-          actions : [ 
-            { id: "BtnNew"+entityId, actionName: actionId,
-              actionURL: 'guiapp/'+appId+'/entity/'+entityId,
-              update: [{ resId : 'EntityList' + entityId }], target: "modal" }
-          ]
-        }
-      })
-      break // TODO allow more than only one 1st state
-    }
+    stateModel = await stateCreateFormRow( rows, app, appId, entityId, user ) 
+    if ( ! stateModel ) { return [] }
   }
-
 
   let filter = null
   if ( filterParam ) {
-    filter = {
-      field: filterParam.split('=')[0],
-      value: filterParam.split('=')[1]
-    }
-    // TODO render short info
-    rows.push({ 
-      title  : filter.field,
-      rowId : 'EntityInfo' + entityId, type : 'pong-form', 
-      resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
-      height : '60px', decor : "decor",
-      moduleConfig : {
-        id: 'EntityTableInfoForm',
-        fieldGroups:[{ columns: [
-          { formFields: [{ id: "title",   type: "text", defaultVal: filter.value }] },
-          { formFields: [{ id: "backLnk", linkText:"Back", type: "link", defaultVal: 'javascript:history.back()' }] }
-        ] }]
-      }
-    })
+    let filterForm = tableFilterFrom( filterParam, appId, entityId )
+    rows.push( filterForm )
   }
 
   let tblHeight = ( entity.noEdit ? '780px' : '550px' )
@@ -161,9 +121,91 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
       )
     )
   }
-  
-  
   return rows
+}
+
+
+async function stateCreateFormRow( rows, app, appId, entityId, user ) {
+  let entity = app.entity[ entityId ]
+  let stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
+  if ( ! stateModel ) { log.warn('renderEntityRows: stateModel not found'); return null }
+  let initState = stateModel.state[ 'null' ]
+  if ( ! initState || ! initState.actions ) { log.warn('renderEntityRows: stateModel not found'); return null }
+  let intiActionCnt = 0 
+  for ( let actionId in initState.actions ) { intiActionCnt++ }
+
+  if ( intiActionCnt > 1 ) {
+    let tabRow = {
+      rowId  : 'CreateStateTabs',
+      height : "170px",
+      tabs   : [] 
+    }
+    for ( let actionId in initState.actions ) {
+      let creForm = await stateCreateForm( appId, entity, entityId, initState, actionId, user )
+      let action = initState.actions[ actionId ]
+      let tabSpec = {
+        tabId  : 'Tab' + actionId, 
+        title  : ( action.label ? action.label : actionId ),
+        rows   : [ creForm ]
+      }
+      tabRow.tabs.push( tabSpec )
+    }
+    rows.push( tabRow )
+
+  } else {
+    for ( let actionId in initState.actions ) {
+      let creForm = await stateCreateForm( appId, entity, entityId, initState, actionId, user )
+      rows.push( creForm )
+      break // its only one 1st state
+    }
+  }
+  // console.log( JSON.stringify( rows, null, '  ' ) )
+  return stateModel
+}
+
+async function stateCreateForm( appId, entity, entityId, initState, actionId, user ) {
+  let actionFields = await propHandler.genGuiFormFieldsDef( entity, null, user, 'null_'+actionId, 'small' )
+  actionFields.push({ formFields: [{ id: '_state', type: "text", value: initState.actions[ actionId ].to, hidden: true }] } )
+
+  let form = { 
+    title  : 'New ' + ( entity.title ? entity.title : entityId),
+    rowId : 'EntityNewFrm'+entityId+actionId, 
+    type : 'pong-form', 
+    resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
+    height : 'auto', decor : "decor",
+    moduleConfig : {
+      fieldGroups:[{ columns: actionFields }],
+      actions : [ 
+        { id: "BtnNew"+entityId, actionName: actionId,
+          actionURL: 'guiapp/'+appId+'/entity/'+entityId,
+          update: [{ resId : 'EntityList' + entityId }], target: "modal" }
+      ]
+    }
+  }
+  return form
+}
+
+
+function tableFilterFrom( filterParam, appId, entityId ) {
+  filter = {
+    field: filterParam.split('=')[0],
+    value: filterParam.split('=')[1]
+  }
+  // TODO render short info
+  let filterForm = { 
+    title  : filter.field,
+    rowId : 'EntityInfo' + entityId, type : 'pong-form', 
+    resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
+    height : '60px', decor : "decor",
+    moduleConfig : {
+      id: 'EntityTableInfoForm',
+      fieldGroups:[{ columns: [
+        { formFields: [{ id: "title",   type: "text", defaultVal: filter.value }] },
+        { formFields: [{ id: "backLnk", linkText:"Back", type: "link", defaultVal: 'javascript:history.back()' }] }
+      ] }]
+    }
+  }
+  return filterForm
 }
 
 // ============================================================================
