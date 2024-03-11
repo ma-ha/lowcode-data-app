@@ -272,7 +272,14 @@ async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeI
         if ( filterParams ) {  // only not null if there are params set
           let hit = false
           for ( let f in filterParams ) {
-            if ( rec[f] && rec[f].indexOf( filterParams[f] ) >= 0 ) {
+            if ( f.indexOf('_') > 0 ) { // search in JSON
+              let jsonId = f.split('_')[0]
+              let subId  = f.split('_')[1]
+              if ( rec[jsonId] && rec[jsonId][subId] && rec[jsonId][subId].indexOf( filterParams[f] ) >= 0 ) {
+                hit = true
+                break
+              }
+            } else if ( rec[f] && rec[f].indexOf( filterParams[f] ) >= 0 ) { // normal search
               hit = true
               break
             }

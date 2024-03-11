@@ -192,14 +192,15 @@ function genGuiTableFilterDef( entityMap ) {
     let prop =  entityMap[ propId ]
     let label = ( prop.label ? prop.label : propId )
     if ( prop.filter ) {
+      let pId = propId.replaceAll('.','_')
       if ( prop.type == 'Select' ) {
         let optArr = [{ option: ' ', value: ' ' }]
         for ( let val of prop.options ) { 
           optArr.push( { option: val, value: val })
         }
-        filter.push({ id: propId, label: label, type: 'select', options: optArr  })
+        filter.push({ id: pId, label: label, type: 'select', options: optArr  })
       } else {
-        filter.push({ id: propId, label: label })
+        filter.push({ id: pId, label: label })
       }
     }
   }
@@ -215,6 +216,7 @@ function genGuiTableColsDef( entityMap ) {
   let cols = []
   for ( let propId in entityMap ) {
     let prop =  entityMap[ propId ]
+    let pId = propId.replaceAll('.','_')
     if ( prop.noTable ) { continue }
     let label = ( prop.label ? prop.label : propId )
 
@@ -222,7 +224,7 @@ function genGuiTableColsDef( entityMap ) {
 
     switch ( prop.type ) {
       case 'Boolean':
-        cols.push({ id: propId, label : label, cellType: 'checkbox', width:width })
+        cols.push({ id: pId, label : label, cellType: 'checkbox', width:width })
         break 
       // case 'Date':
       //   cols.push({ id: propId, label : label, cellType: 'date', width:width }) 
@@ -232,7 +234,7 @@ function genGuiTableColsDef( entityMap ) {
         cols.push({ id: propId, label : propId+'JSON', cellType: 'tooltip' }) 
         break 
       default:  // String, Number, Select, Event, Link, RefArray, Ref, DocMap, SelectRef
-        cols.push({ id: propId, label : label, cellType: 'text', width:width }) 
+        cols.push({ id: pId, label : label, cellType: 'text', width:width }) 
         break 
     }
   }
@@ -261,6 +263,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
     let prop = entity.properties[ propId ]
     if ( prop.noEdit && ! stateTransition ) { continue }
     let lbl  = ( prop.label ? prop.label : propId )
+    let fldId = propId.replaceAll('.','_')
     // console.log( 'LBL', lbl)
 
     if ( stateTransition ) {
@@ -268,7 +271,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         continue
       }
     } else if ( prop.apiManaged ) { 
-      cols.push({ formFields: [ { id: propId, label: lbl, type: 'text', readonly: true } ] })
+      cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', readonly: true } ] })
       continue 
     }
 
@@ -277,23 +280,23 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
     switch ( prop.type ) {
       case 'Text':
         if ( render && render == 'small') {
-          fld = { id: propId, label: lbl, type: 'text', rows: 1 }
+          fld = { id: fldId, label: lbl, type: 'text', rows: 1 }
         } else {
-          fld = { id: propId, label: lbl, type: 'text', rows: prop.lines }
+          fld = { id: fldId, label: lbl, type: 'text', rows: prop.lines }
         }
         break 
       case 'Boolean':
-        fld = { id: propId, label: lbl, type: 'checkbox' }
+        fld = { id: fldId, label: lbl, type: 'checkbox' }
         break 
       case 'Date':
-        fld = { id: propId, label: lbl, type: 'date' }
+        fld = { id: fldId, label: lbl, type: 'date' }
         break 
       case 'Select':
-        fld = { id: propId, label: lbl, type: 'select', options: [] }
+        fld = { id: fldId, label: lbl, type: 'select', options: [] }
         for ( let val of prop.options ) { fld.options.push({ option: val }) }
         break 
       case 'SelectRef':
-        fld = { id: propId, label: lbl, type: 'select', options: [] }
+        fld = { id: fldId, label: lbl, type: 'select', options: [] }
         try {
           let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
           let refEntity = await getEntity( prop.selectRef, propId )
@@ -306,7 +309,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
         break 
       case 'MultiSelectRef':
-        fld = { id: propId, label: lbl, type: 'select', options: [], multiple: true }
+        fld = { id: fldId, label: lbl, type: 'select', options: [], multiple: true }
         try {
           let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
           let refEntity = await getEntity( prop.multiSelectRef, propId )
@@ -325,7 +328,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         // TODO
         break 
       case 'UUID':
-        fld = { id: propId, label: lbl, type: 'text', readonly: true }
+        fld = { id: fldId, label: lbl, type: 'text', readonly: true }
         break 
       case 'Link': 
         // do nothing
@@ -341,13 +344,13 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         break 
       case 'JSON':
         if ( render && render == 'small') {
-          fld = { id: propId, label: lbl, type: 'text', rows: 2 }
+          fld = { id: fldId, label: lbl, type: 'text', rows: 2 }
         } else {
-          fld = { id: propId, label: lbl, type: 'text', rows: 5 }
+          fld = { id: fldId, label: lbl, type: 'text', rows: 5 }
         }
         break 
       default:   // String, Number
-        fld = { id: propId, label: lbl, type: 'text' }
+        fld = { id: fldId, label: lbl, type: 'text' }
         break 
     }
 
@@ -547,34 +550,44 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
 
   for ( let propId in entity.properties ) {
     let prop = entity.properties[ propId ]
+    let pId = propId.replaceAll('.','_')
     let label = ( prop.label ? prop.label : propId )
+
+    let recDta = null
+    if ( prop.jsonId ) {
+      if ( rec[ prop.jsonId ] && rec[ prop.jsonId ][ prop.subId ] ) {
+        recDta = rec[ prop.jsonId ][ prop.subId ]
+      }
+    } else {
+      recDta = rec[ propId ]
+    }
     log.debug( 'getDoc', propId, prop.type )
 
     switch ( prop.type ) {
       case 'Text':
-        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) 
-        if ( tblRec[ propId ].length > 100 ) { tblRec[ propId ] = tblRec[ propId ].substr(0,100) +'...' }
+        tblRec[ pId ] = ( recDta ? recDta : '' ) 
+        if ( tblRec[ pId ].length > 100 ) { tblRec[ pId ] = tblRec[ pId ].substr(0,100) +'...' }
         break 
       case 'SelectRef':
-        tblRec[ propId ] = ''
-        if ( rec[ propId ]  && rec[ propId ]  != '' ) {
+        tblRec[ pId ] = ''
+        if ( recDta  && recDta  != '' ) {
           let refEntity = await getEntity( prop.selectRef, propId )
           let refParts = prop.selectRef.split('/')
-          let refDta = await dta.getDataById( refParts[0]+refParts[3], rec[ propId ] )
-          tblRec[ propId ] = getRefLabel( refEntity, rec[ propId ], refDta ) 
+          let refDta = await dta.getDataById( refParts[0]+refParts[3], recDta )
+          tblRec[ pId ] = getRefLabel( refEntity, recDta, refDta ) 
         }
-        // tblRec[ propId ] = 'X'+ ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+        // tblRec[ pId ] = 'X'+ ( recDta ? recDta : '' ) // TODO
         break 
       case 'DocMap':
         let params = prop.docMap.split('/')
         let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ params[4] +'='+ rec.id
-        tblRec[ propId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
+        tblRec[ pId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
         break 
       case 'Ref':
-        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+        tblRec[ pId ] = ( recDta ? recDta : '' ) // TODO
         break 
       case 'RefArray':
-        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' ) // TODO
+        tblRec[ pId ] = ( recDta ? recDta : '' ) // TODO
         break 
       case 'Link': 
         if ( prop.link ) {
@@ -584,23 +597,23 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
           for ( let replaceId in entity.properties ) {
             href = href.replaceAll( '${'+replaceId+'}', rec[ replaceId ] )
           }
-          tblRec[ propId ] = '<a href="'+href+'" target="_blank">'+label+'</a>'
-        } else { tblRec[ propId ] = '' }
+          tblRec[ pId ] = '<a href="'+href+'" target="_blank">'+label+'</a>'
+        } else { tblRec[ pId ] = '' }
         break 
       case 'JSON': 
-        if ( ! rec[ propId ] ) {
-          tblRec[ propId + 'JSON' ] = '-'
-          tblRec[ propId ] =  'undefined'
-        } else if ( rec[ propId ].constructor === Object &&  Object.keys(rec[ propId ]).length === 0  ) {
-          tblRec[ propId + 'JSON' ] = '{}'
-          tblRec[ propId ] =  '{}'
+        if ( ! recDta ) {
+          tblRec[ pId + 'JSON' ] = '-'
+          tblRec[ pId ] =  'undefined'
+        } else if ( recDta.constructor === Object &&  Object.keys(recDta).length === 0  ) {
+          tblRec[ pId + 'JSON' ] = '{}'
+          tblRec[ pId ] =  '{}'
         } else {
-          tblRec[ propId + 'JSON' ] = propId + ' (JSON)'
+          tblRec[ pId + 'JSON' ] = '{...}'
           let jsonStr = ''
           try {
-            jsonStr = JSON.stringify( rec[ propId ], null, ' ' ) 
+            jsonStr = JSON.stringify( recDta, null, ' ' ) 
           } catch ( exc ) { jsonStr = exc.message }
-          tblRec[ propId ] = jsonStr
+          tblRec[ pId ] = jsonStr
         }
         break 
       case 'Event': 
@@ -627,10 +640,10 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
           }
         } 
 
-        tblRec[ propId ] = eventLnk //rec[ propId ].event
+        tblRec[ pId ] = eventLnk //recDta.event
         break 
       default:   // String, Number, Select
-        tblRec[ propId ] = ( rec[ propId ] ? rec[ propId ] : '' )
+        tblRec[ pId ] = ( recDta ? recDta : '' )
         break 
     }
   }
@@ -650,9 +663,10 @@ function reformatDataUpdateInput( entity, rec ) {
 
 
   for ( let propId in entity.properties ) try {
+    if ( entity.properties[ propId ].jsonId ) { continue } // need to do JSON first
 
     // JSOM input must be parsed to obj tree
-    if (entity.properties[ propId ].type == 'JSON' ) { 
+    if ( entity.properties[ propId ].type == 'JSON' ) { 
 
       try {
         log.debug( 'JSON', propId, rec[ propId ], rec )
@@ -685,7 +699,28 @@ function reformatDataUpdateInput( entity, rec ) {
       }
     }
 
-  } catch ( exc ) { log.warn( 'reformatDataUpdateInput', exc ) }
+  } catch ( exc ) { 
+    log.warn( 'reformatDataUpdateInput', exc ) 
+    return { err: exc.message }
+  }
+
+  for ( let propId in entity.properties ) try {
+    if ( ! entity.properties[ propId ].jsonId ) { continue } //now do onlyJSON sub elements
+    let jsonId = entity.properties[ propId ].jsonId
+    let subId  = entity.properties[ propId ].subId
+    if ( rec[  jsonId +'_'+ subId ] ) {
+      if ( ! rec[ jsonId ] ) {
+        rec[ jsonId ] = {}
+      }
+      rec[ jsonId ][ subId ] = rec[ jsonId +'_'+ subId ]
+      delete rec[ jsonId +'_'+ subId ]
+    }
+
+  } catch ( exc ) { 
+    log.warn( 'reformatDataUpdateInput', exc ) 
+    return { err: exc.message }
+  }
+
   return {}
 }
 

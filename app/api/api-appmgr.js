@@ -434,10 +434,24 @@ async function addProperty ( req, res ) {
   let id = req.body.propId
   let addResultTxt = ''
   if ( ! id ) { log.warn('POST /entity/property: id required'); return res.status(400).send("Id required") }
-  if ( ! isValidId( id ) ) { log.warn('POST /entity/property: id invalid'); return res.status(400).send("Id invalid") }
 
   let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
   if ( ! allOK ) { return }
+
+  // TODO
+  let jsonId = null
+  let subId  = null
+  if ( id.indexOf( '.' ) > 0 ) {  //  JSON sub fields
+    jsonId = id.split( '.' )[0]
+    subId  = id.split( '.' )[1]
+    if ( ! entity.properties[ jsonId ] ) { log.warn('POST /entity/property: JSON id not found'); return res.status(400).send("JSON id not found") }
+    if ( entity.properties[ jsonId ].type != 'JSON' ) { log.warn('POST /entity/property: JSON id not found'); return res.status(400).send("JSON id invalid") }
+    if ( ! isValidId( subId ) ) { log.warn('POST /entity/property: JSON sub-id invalid'); return res.status(400).send("JSON sub-id invalid") }
+    if ( ! [ 'String', 'Text','Boolean','Date','Select' ].includes( req.body.type  ) ) { log.warn('POST /entity/property: JSON sub type invalid'); return res.status(400).send("JSON sub-type invalid") }
+  } else { // simple ID
+    if ( ! isValidId( id ) ) { log.warn('POST /entity/property: id invalid'); return res.status(400).send("Id invalid") }
+  }
+
 
   if ( !  entity.properties[ id ] )  {
     entity.properties[ id ] = {}
@@ -445,6 +459,11 @@ async function addProperty ( req, res ) {
  
   if ( req.body.label ) { entity.properties[ id ].label = req.body.label }
   entity.properties[ id ].type = req.body.type 
+
+  if ( jsonId ) {
+    entity.properties[ id ].jsonId = jsonId
+    entity.properties[ id ].subId  = subId
+  }
 
   if ( req.body.filter  ) { 
     entity.properties[ id ].filter = true 
@@ -507,6 +526,15 @@ async function delProperty( req, res ) {
   let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
   if ( ! allOK ) { return }
 
+  // TODO: Check JSON sub prop exists
+  if ( entity.properties[ req.query.propId ].type == 'JSON' ) {
+    for ( let propId in entity.properties ) {
+      if (  entity.properties[ propId ].jsonId == req.query.propId ) {
+        log.warn( 'JSON Sub id', propId )
+        return res.status(400).send( 'JSON sub property exists' )
+      }
+    }
+  }
   if ( entity.properties[ req.query.propId ] ) {
     delete entity.properties[ req.query.propId ]
     await dta.saveApp( appId, app )

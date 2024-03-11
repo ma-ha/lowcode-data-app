@@ -600,6 +600,11 @@
           "appUser"
         ],
         "properties": {
+          "id": {
+            "type": "UUID",
+            "noDelete": true,
+            "noTable": true
+          },
           "A1": {
             "type": "String",
             "noDelete": true,
@@ -624,12 +629,29 @@
             }
           },
           "A4": {
-            "type": "String",
+            "type": "JSON",
             "noDelete": true
           },
-          "id": {
-            "type": "UUID",
-            "noDelete": true
+          "A4.abc": {
+            "type": "String",
+            "jsonId": "A4",
+            "subId": "abc",
+            "noDelete": true,
+            "label": "ABC",
+            "stateTransition": {
+              "null_Create1": true
+            }
+          },
+          "A4.xy": {
+            "type": "String",
+            "jsonId": "A4",
+            "subId": "xy",
+            "noDelete": true,
+            "label": "XY",
+            "stateTransition": {
+              "null_Create2": true
+            },
+            "filter": true
           }
         },
         "noDelete": true,

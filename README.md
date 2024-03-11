@@ -112,6 +112,8 @@ So relations are
 
 Entities can be attached to a "State Model". 
 
+Entity Ids must be alphanumeric, min length is 2.
+
 ![sceenshot](doc/locode-statemodel.png)
 
 Property features:
@@ -122,6 +124,8 @@ Property features:
 *Important:* The entity id scope is globally within a top level scope between apps. 
 This enables different views on the same data in different apps (if different apps have the same entity, but different properties). 
 But: Please choose your entity ids wisely, if you don't want this behavior.
+
+For JSON properties sub-elements can be defined with a dot-notation (e.g. "JsonProp.MySubField"). Allowed types: 'String', 'Text','Boolean','Date','Select'.
 
 # Add New Root Scope (aka "Tenant")
 
