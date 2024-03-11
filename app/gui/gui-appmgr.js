@@ -87,7 +87,7 @@ async function init( ) {
           { id: "role",        label: "Role",      width: "10%", cellType: "text" },
           { id: "entitiesLnk", label: "Entities",  width: "10%", cellType: "text" },
           // { id: "pagesLnk",    label: "App Pages", width: "20%", cellType: "text" },
-          { id: "appLnk",      label: "Test App",  width: "10%", cellType: "text" },
+          { id: "appLnk",      label: "Test&nbsp;it",  width: "10%", cellType: "text" },
           { id: "expLnk",      label: "Export",    width: "10%", cellType: "text" }
         ]
       }

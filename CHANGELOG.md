@@ -1,6 +1,7 @@
 # 0.18.0
 - State: Multiple create action in GUI
 - JSON properties: define sub fields
+- App table: GUI improvements
 
 # 0.17.0
 - Adapter API: bulk add
