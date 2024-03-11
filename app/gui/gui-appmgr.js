@@ -383,16 +383,30 @@ async function init( ) {
     let w = 85
     for ( let propId in entity.properties ) {
       let prop = entity.properties[ propId ]
+      if ( propId == 'id' && prop.type == 'UUID' ) { continue }
+      let pId = propId.replaceAll('.','_')
       cols.push({ 
-        id       : 'prop/' + propId,  
+        id       : 'prop/' + pId,  
         label    : ( prop.label ? prop.label : propId ),
-        width    : "5%", 
+        width    : "3%", 
         cellType : "checkbox", editable: true
       })
-      w -= 5
+      cols.push({ 
+        id       : 'prop/' + pId +'/default',  
+        label    : 'default',
+        width    : "7%", 
+        cellType : "text", editable: true
+      })
+      w -= 10
     }
-    cols[ cols.length - 1 ].width = w +'%'
-
+    if ( w > 0 ) {
+      cols.push({ 
+        id       : '__',  
+        label    : '',
+        width    : w+"%", 
+        cellType : "text"
+      })
+    }
 
     rows.push({
       id: 'AppEntityStatus', rowId: 'AppEntityStatus', title: ' State Action > Field Change',  height: '500px', 

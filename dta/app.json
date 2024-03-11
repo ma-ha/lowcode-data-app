@@ -609,7 +609,9 @@
             "type": "String",
             "noDelete": true,
             "stateTransition": {
-              "null_Create1": true
+              "null_Create1_default": "test",
+              "Created_SetDone": true,
+              "Created_SetDone_default": "test done"
             },
             "filter": true
           },
@@ -652,6 +654,19 @@
               "null_Create2": true
             },
             "filter": true
+          },
+          "A5": {
+            "type": "Select",
+            "noDelete": true,
+            "options": [
+              "one",
+              "two",
+              "three"
+            ],
+            "stateTransition": {
+              "null_Create1": true,
+              "null_Create1_default": "two"
+            }
           }
         },
         "noDelete": true,

@@ -280,12 +280,23 @@
         }
       },
       "Created": {
-        "actions": {},
+        "actions": {
+          "SetDone": {
+            "to": "Done",
+            "label": "Set Done"
+          }
+        },
         "x": 400,
         "y": 100
+      },
+      "Done": {
+        "actions": {},
+        "x": 660,
+        "y": 100,
+        "label": "Done"
       }
     },
     "_cre": 1710145679644,
-    "_upd": 1710145888297
+    "_upd": 1710173542435
   }
 }

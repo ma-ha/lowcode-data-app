@@ -1,5 +1,6 @@
 # 0.18.0
 - State: Multiple create action in GUI
+- State: Create default values
 - JSON properties: define sub fields
 - App table: GUI improvements
 

@@ -266,8 +266,22 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
     let fldId = propId.replaceAll('.','_')
     // console.log( 'LBL', lbl)
 
+    let defaultVal = null
     if ( stateTransition ) {
-      if ( ! prop.stateTransition || ! prop.stateTransition[ stateTransition ] ) {
+      if ( prop.stateTransition ) {
+        if ( prop.stateTransition[ stateTransition+'_default' ] ) {
+          defaultVal = prop.stateTransition[ stateTransition +'_default' ]
+        }
+        if ( ! prop.stateTransition[ stateTransition ] ) {
+          if ( defaultVal ) {  
+            cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', defaultVal: defaultVal, readonly: true } ] })
+          }
+          continue
+        }
+        if ( prop.stateTransition[ stateTransition+'_default' ] ) {
+          defaultVal = prop.stateTransition[ stateTransition +'_default' ]
+        }
+      } else {
         continue
       }
     } else if ( prop.apiManaged ) { 
@@ -293,7 +307,11 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         break 
       case 'Select':
         fld = { id: fldId, label: lbl, type: 'select', options: [] }
-        for ( let val of prop.options ) { fld.options.push({ option: val }) }
+        for ( let val of prop.options ) {
+          let opt = { option: val }
+          if ( val == defaultVal ) { opt.selected = true }
+          fld.options.push( opt )
+        }
         break 
       case 'SelectRef':
         fld = { id: fldId, label: lbl, type: 'select', options: [] }
@@ -351,6 +369,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         break 
       default:   // String, Number
         fld = { id: fldId, label: lbl, type: 'text' }
+        if ( defaultVal ) { fld.defaultVal = defaultVal }
         break 
     }
 
@@ -375,20 +394,23 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
   log.info( 'genGuiFormStateChangeDef', entity, stateTransition )
   let fields = []
 
-  fields.push({ id: "id", label: "Id", type: "text", readonly: true, value: rec.id })
   let stateId = stateTransition.split('_')[0] 
   let actionId = stateTransition.split('_')[1] 
   let newState = stateModel.state[ stateId ].actions[ actionId ].to
-  fields.push({ id: "_state", label: "New State", type: "text", readonly: true, value: newState})
-  fields.push({ id: "scopeId", label: "New State", type: "text", hidden: true, value: rec.scopeId })
+  fields.push({ id: "_state", label: "<b>New State</b>", type: "text", readonly: true, value: newState})
+  fields.push({ id: "id", label: "Id", type: "text", readonly: true, value: rec.id })
+  fields.push({ id: "scopeId", label: "Scope", type: "text", hidden: true, value: rec.scopeId })
 
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
     let lbl  = ( prop.label ? prop.label : propId )
-    
+    let defaultVal = null 
+    if ( prop.stateTransition && prop.stateTransition[ stateTransition+'_default' ] ) {
+      defaultVal = prop.stateTransition[ stateTransition+'_default' ] 
+    }
     // console.log( 'LBL', lbl)
-
+    // TODO
     let fld = null
 
     switch ( prop.type ) {
@@ -403,7 +425,15 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
         break 
       case 'Select':
         fld = { id: propId, label: lbl, type: 'select', options: [] }
-        for ( let val of prop.options ) { fld.options.push({ option: val }) }
+        for ( let val of prop.options ) { 
+          let opt = { option: val }
+          if ( defaultVal ) {
+            if ( val == defaultVal ) { opt.selected = true }
+          } else {
+            if ( val == rec[ propId ] ) { opt.selected = true }
+          }
+          fld.options.push( opt )
+        }
         break 
       case 'SelectRef':
         fld = { id: propId, label: lbl, type: 'select', options: [] }
@@ -450,6 +480,7 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
         break 
       default:   // String, Number
         fld = { id: propId, label: lbl, type: 'text', value: rec[ propId ] }
+        if ( defaultVal ) { fld.value = defaultVal }
         break 
     }
 
@@ -466,6 +497,12 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
       fld.readonly   = "true" 
     }
     
+    if ( fld.readonly  && fld.type == 'select' ) { 
+      fld.type  = 'text'
+      fld.value = ( defaultVal ? defaultVal : rec[ propId ] )
+      delete fld.options
+    }
+
     if ( fld ) {
       // cols.push({ formFields: [ fld ] })
       fields.push( fld )
