@@ -474,6 +474,8 @@
  
  .pong-table {
    overflow: auto;
+   float: left;
+   width: 98%;
  }
  
  /* ==== App Page ====================================== */
