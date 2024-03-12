@@ -416,7 +416,7 @@ async function setPropertyStatus( req, res ) {
     if ( p.startsWith( 'prop/') ) {
       let pParts = p.split('/')
       propId = pParts[ 1 ]
-      propId.replaceAll('_','.')
+      propId = propId.replaceAll('_','.')
       if ( pParts[2] == 'default' ) { defaultVal = req.body[ p ] }
       if ( req.body[ p ] == 'true' ) { inclProp = true }
       break
@@ -565,7 +565,7 @@ async function delProperty( req, res ) {
 // ============================================================================
 
 function isValidId( str ) {
-  return /^[a-zA-Z]+[a-zA-Z0-9]+$/.test( str )
+  return /^[a-zA-Z]+[a-zA-Z0-9\-]+$/.test( str )
 }
 
 

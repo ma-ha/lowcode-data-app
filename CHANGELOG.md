@@ -1,3 +1,6 @@
+# 0.18.1
+- State: matrix fix 
+
 # 0.18.0
 - State: Multiple create action in GUI
 - State: Create default values

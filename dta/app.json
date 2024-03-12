@@ -667,6 +667,15 @@
               "null_Create1": true,
               "null_Create1_default": "two"
             }
+          },
+          "A4.qw-ert": {
+            "type": "String",
+            "jsonId": "A4",
+            "subId": "qw-ert",
+            "noDelete": true,
+            "stateTransition": {
+              "null_Create1": true
+            }
           }
         },
         "noDelete": true,
