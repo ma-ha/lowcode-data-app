@@ -44,7 +44,7 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
   let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
 
   let user = await userDta.getUserInfoFromReq( gui, req )
-  let rowArr = []
+  let rowArr = [] 
   if ( ! params[1] ) { // log.warn( 'appEntityPage.dynamicRow entityId not set', req.query.id  ); return [] }
 
     if ( typeof app.startPage === 'string' || app.startPage instanceof String ) {
@@ -53,7 +53,14 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
       rowArr = renderEntityRows( app, appId, entityId, null, user )
     
     } else if ( typeof app.startPage === 'array' || app.startPage instanceof Array ) {
-    
+  
+      if (  app.startPage.length == 1 ) {
+        // render simple entity page
+        let entityId  = app.startPage[0]
+        rowArr = renderEntityRows( app, appId, entityId, null, user )
+        return rowArr
+      }
+      
       // multiple tabs per entity in array
       let tabRow = {
         rowId  : 'Tabs' + appIdX,

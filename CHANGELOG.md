@@ -1,3 +1,6 @@
+# 0.19.0
+- App page: hide tabs if it's only one entity 
+
 # 0.18.1
 - State: matrix fix 
 
