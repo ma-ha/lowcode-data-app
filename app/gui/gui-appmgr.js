@@ -252,7 +252,7 @@ async function init( ) {
     
     // Property table:
     rows.push({
-      id: 'AppEntityProp', rowId: 'AppEntityProp', title: 'App Entity Properties',  height: '550px', 
+      id: 'AppEntityProp', rowId: 'AppEntityProp', title: 'App Entity Properties',  height: '500px', 
       type : 'pong-table', resourceURL: 'app/entity/property', decor: 'decor', 
       moduleConfig : {
         dataURL: "",
@@ -329,7 +329,7 @@ async function init( ) {
     }
     
     rows.push({ 
-      id: 'AppEntityConfig', rowId: 'AppEntityConfig', title: 'Config',  height: '120px', 
+      id: 'AppEntityConfig', rowId: 'AppEntityConfig', title: 'Entity GUI Config',  height: '120px', 
       type : 'pong-form', resourceURL: 'app/entity/config', decor: 'decor',
       moduleConfig : {
         description: "AppEntityInfo",
@@ -458,7 +458,7 @@ async function init( ) {
     }
     
     rows.push({ 
-      id: 'AppEntityConfig', rowId: 'AppEntityConfig', title: 'Config',  height: '120px', 
+      id: 'AppEntityConfig', rowId: 'AppEntityConfig', title: 'Entity GUI Config',  height: '120px', 
       type : 'pong-form', resourceURL: 'app/entity/config', decor: 'decor',
       moduleConfig : {
         description: "AppEntityInfo",
