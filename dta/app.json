@@ -676,6 +676,25 @@
             "stateTransition": {
               "null_Create1": true
             }
+          },
+          "col": {
+            "type": "String",
+            "noDelete": true,
+            "stateTransition": {
+              "null_Create1_default": "red",
+              "null_Create2_default": "blue"
+            }
+          },
+          "Tag": {
+            "type": "SelectRef",
+            "noDelete": true,
+            "selectRef": "1000/region-mgr/1.0.0/SomeTag",
+            "stateTransition": {
+              "null_Create1": true,
+              "null_Create2": true,
+              "null_Create1_default": "TagType $eq col",
+              "null_Create2_default": "TagType $eq 'blue'"
+            }
           }
         },
         "noDelete": true,
@@ -683,11 +702,35 @@
         "stateModel": "Test",
         "creFromHeight": "170px",
         "tableHeight": "1780px"
+      },
+      "SomeTag": {
+        "title": "",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "id": {
+            "type": "UUID",
+            "noDelete": true
+          },
+          "TagType": {
+            "type": "String",
+            "noDelete": true
+          },
+          "TagName": {
+            "type": "String",
+            "refLbl": true,
+            "noDelete": true
+          }
+        },
+        "noDelete": true
       }
     },
     "startPage": [
       "region",
-      "Test"
+      "Test",
+      "SomeTag"
     ],
     "role": [
       "admin"

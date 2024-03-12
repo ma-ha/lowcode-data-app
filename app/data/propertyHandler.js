@@ -258,6 +258,18 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
     cols.push({ formFields: [{ id: "id", label: "Id", type: "text" } ]})
   }
 
+  let fieldDefault = {}
+  for ( let propId in entity.properties ) { // to fill fieldDefault
+    let defaultVal = null
+    let prop = entity.properties[ propId ]
+    if ( stateTransition && prop.stateTransition ) {
+      if ( prop.stateTransition[ stateTransition+'_default' ] ) {
+        defaultVal = prop.stateTransition[ stateTransition +'_default' ]
+      }
+    }
+    fieldDefault[ propId ] = defaultVal
+  }
+
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
@@ -269,22 +281,22 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
     let defaultVal = null
     if ( stateTransition ) {
       if ( prop.stateTransition ) {
-        if ( prop.stateTransition[ stateTransition+'_default' ] ) {
-          defaultVal = prop.stateTransition[ stateTransition +'_default' ]
-        }
+        // if ( prop.stateTransition[ stateTransition+'_default' ] ) {
+        //   defaultVal = prop.stateTransition[ stateTransition +'_default' ]
+        // }
+        defaultVal = fieldDefault[ propId ]
         if ( ! prop.stateTransition[ stateTransition ] ) {
           if ( defaultVal ) {  
             cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', defaultVal: defaultVal, readonly: true } ] })
           }
           continue
         }
-        if ( prop.stateTransition[ stateTransition+'_default' ] ) {
-          defaultVal = prop.stateTransition[ stateTransition +'_default' ]
-        }
       } else {
         continue
       }
-    } else if ( prop.apiManaged ) { 
+    } 
+    
+    if ( prop.apiManaged ) { 
       cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', readonly: true } ] })
       continue 
     }
@@ -310,7 +322,9 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         for ( let val of prop.options ) {
           let opt = { option: val }
           if ( val == defaultVal ) { opt.selected = true }
-          fld.options.push( opt )
+          if ( filterMatch( defaultVal, { val: val }, fieldDefault ) ) {
+            fld.options.push( opt )
+          }
         }
         break 
       case 'SelectRef':
@@ -319,10 +333,12 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
           let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
           let refEntity = await getEntity( prop.selectRef, propId )
           for ( let recId in opdTbl ) { 
-            fld.options.push({ 
-              value  : recId, 
-              option : getRefLabel( refEntity, recId, opdTbl[recId] ) 
-            }) 
+            if ( filterMatch( defaultVal, opdTbl[recId], fieldDefault ) ) {
+              fld.options.push({ 
+                value  : recId, 
+                option : getRefLabel( refEntity, recId, opdTbl[recId] ) 
+              }) 
+            }
           }
         } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
         break 
@@ -332,10 +348,12 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
           let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
           let refEntity = await getEntity( prop.multiSelectRef, propId )
           for ( let recId in opdTbl ) { 
-            fld.options.push({ 
-              value: recId, 
-              option: getRefLabel( refEntity, recId, opdTbl[recId] ) 
-            }) 
+            if ( filterMatch( defaultVal, opdTbl[recId], fieldDefault ) ) {
+              fld.options.push({ 
+                value: recId, 
+                option: getRefLabel( refEntity, recId, opdTbl[recId] ) 
+              }) 
+            }
           }
         } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
         break 
@@ -389,6 +407,40 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
   return cols
 }
 
+function filterMatch( filter, dta, fieldDefault ) {
+  if ( ! filter || filter == '' ) { return true }
+  //log.info( 'filterMatch', filter, dta, fieldDefault )
+  try {
+    if ( filter.indexOf(' $eq ') > 0 ) {
+      let { ref1, ref2 } = splitQry( filter, ' $eq ' )
+      let val1 = getVal( ref1, dta, fieldDefault )
+      let val2 = getVal( ref2, fieldDefault, dta )
+      log.info( 'filterMatch >', filter, '"'+ref1+'"', '"'+ref2+'"', '"'+val1+'"', '"'+val2+'"' )
+      return ( val1 == val2 ) 
+    } else {
+      return true
+    } 
+  } catch ( exc ) { log.warn( '', exc.message ) }
+  return true
+}
+
+function splitQry( filter, cmpStr ) {
+  let pos = filter.indexOf( cmpStr )
+  let ref1 = filter.substr( 0, pos  )
+  let ref2 = filter.substr( pos + cmpStr.length )
+  return { ref1: ref1, ref2: ref2 }
+}
+
+function getVal( ref, dta1, dta2 ) {
+  if ( ref.startsWith("'") || ref.endsWith("'") ) {
+    return ref.substr( 1, ref.length-2 )
+  } else if ( dta1[ ref ] ) {
+    return dta1[ ref ]
+  } else if ( dta2[ ref ] ) {
+    return dta2[ ref ] 
+  }
+  return ref
+}
 
 async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, rec, stateModel ) {
   log.info( 'genGuiFormStateChangeDef', entity, stateTransition )

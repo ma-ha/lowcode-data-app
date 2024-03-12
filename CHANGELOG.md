@@ -1,6 +1,8 @@
 # 0.19.0
 - App page: hide tabs if it's only one entity 
 - Entity: Configs
+- State Matrix: Default values
+- State Matrix: Filters for "select", "selectRef" and "multiSelectRef" 
 
 # 0.18.1
 - State: matrix fix 

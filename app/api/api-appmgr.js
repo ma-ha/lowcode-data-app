@@ -410,6 +410,7 @@ async function getPropertyStatus( req, res ) {
         // log.info( ' >>', propId )
         if ( ! prop.stateTransition ) { // default: all fields
           propRow[ 'prop/'+pId ] = false 
+          propRow[ 'prop/'+pId+'/default' ] = '-'
         } else {
           if ( prop.stateTransition[ statesId +'_'+ transitionId ] ) {
             propRow[ 'prop/'+pId ] = true
