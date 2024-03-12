@@ -33,6 +33,7 @@ async function setupAPI( app ) {
   
   svc.get(    '/app/entity', guiAuthz, getEntity )
   svc.post(   '/app/entity', guiAuthz, addEntity )
+  svc.post(   '/app/entity/config', guiAuthz, chgEntity )
   svc.delete( '/app/entity', guiAuthz, delEntity )
 
   svc.get(    '/app/entity/property', guiAuthz, getProperty )
@@ -261,6 +262,31 @@ async function addEntity( req, res ) {
   app.entity[ req.body.entityId ] = newEntity
   await dta.saveApp( req.body.appId, app )
   res.send( resultTxt )
+}
+
+
+async function chgEntity( req, res ) {
+  log.info( 'POST entity/config', req.body )
+  let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
+  if ( ! allOK ) { return }
+
+  changeEntityCfg( entity, 'creFromHeight', req ) 
+  changeEntityCfg( entity, 'tableHeight', req ) 
+
+  await dta.saveApp( appId, app )
+  res.send( 'OK' )
+}
+
+function changeEntityCfg( entity, config, req ) {
+  if ( req.body[ config ] ) {
+    if ( req.body[ config ] == '' ) {
+      if ( entity[ config ] ) {
+        delete entity[ config ]
+      }
+    } else {
+      entity[ config ] = req.body[ config ]
+    }
+  } 
 }
 
 

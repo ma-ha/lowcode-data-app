@@ -680,7 +680,9 @@
         },
         "noDelete": true,
         "noEdit": true,
-        "stateModel": "Test"
+        "stateModel": "Test",
+        "creFromHeight": "170px",
+        "tableHeight": "1780px"
       }
     },
     "startPage": [
@@ -924,7 +926,9 @@
           }
         },
         "noDelete": true,
-        "stateModel": "Ticket"
+        "stateModel": "Ticket",
+        "creFromHeight": "180px",
+        "tableHeight": "600px"
       }
     },
     "page": {},

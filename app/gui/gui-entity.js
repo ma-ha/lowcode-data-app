@@ -109,7 +109,8 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
   }
 
   let tblHeight = ( entity.noEdit ? '780px' : '550px' )
-  
+  if ( entity.tableHeight ) { tblHeight = entity.tableHeight }
+
   if ( entity.divs ) {
     rows.push( genListTable( app, appId, entityId, entity, user, tblHeight, stateModel ) )
   } else {
@@ -144,7 +145,7 @@ async function stateCreateFormRow( rows, app, appId, entityId, user ) {
   if ( intiActionCnt > 1 ) {
     let tabRow = {
       rowId  : 'CreateStateTabs',
-      height : "170px",
+      height : ( entity.creFromHeight ?  entity.creFromHeight : "170px" ),
       tabs   : [] 
     }
     for ( let actionId in initState.actions ) {
@@ -179,7 +180,8 @@ async function stateCreateForm( appId, entity, entityId, initState, actionId, us
     rowId : 'EntityNewFrm'+entityId+actionId, 
     type : 'pong-form', 
     resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
-    height : 'auto', decor : "decor",
+    height : 'auto', 
+    decor : "decor",
     moduleConfig : {
       fieldGroups:[{ columns: actionFields }],
       actions : [ 

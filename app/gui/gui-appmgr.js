@@ -321,6 +321,30 @@ async function init( ) {
       }
     })
 
+
+    let entity = app.entity[ entityId ]
+    let tableHeight = ( entity.noEdit ? '780px' : '550px' )
+    if ( entity.tableHeight ) {
+      tableHeight = entity.tableHeight 
+    }
+    
+    rows.push({ 
+      id: 'AppEntityConfig', rowId: 'AppEntityConfig', title: 'Config',  height: '120px', 
+      type : 'pong-form', resourceURL: 'app/entity/config', decor: 'decor',
+      moduleConfig : {
+        description: "AppEntityInfo",
+        id: 'AppEntityInfoForm',
+        fieldGroups:[{ columns: [
+          { formFields: [{ id: "appId",    type: "text", value: appId,    hidden: true } ]},
+          { formFields: [{ id: "entityId", type: "text", value: entityId, hidden: true } ]},
+          { formFields: [{ id: "tableHeight",   label: "Table Height", type: "text", defaultVal: tableHeight } ]}
+        ] }],
+        actions : [ 
+          { id: "AppEntityConfigBtn", actionName: "Change Config", actionURL: 'app/entity/config', target: "modal" }
+        ]
+      }
+    })
+
     return rows
   })
 
@@ -363,7 +387,7 @@ async function init( ) {
     
     // Entity info:
     let rows = [{ 
-      id: 'pApEntityInfo', rowId: 'AppEntityInfo', title: 'Entity',  height: '80px', 
+      id: 'AppEntityInfo', rowId: 'AppEntityInfo', title: 'Entity',  height: '80px', 
       type : 'pong-form', resourceURL: 'app', decor: 'decor',
       moduleConfig : {
         description: "AppEntityInfo",
@@ -427,6 +451,30 @@ async function init( ) {
       moduleConfig : {}
     })
 
+    let creFromHeight = ( entity.creFromHeight ?  entity.creFromHeight : '180px' )
+    let tableHeight = ( entity.noEdit ? '780px' : '550px' )
+    if ( entity.tableHeight ) {
+      tableHeight = entity.tableHeight 
+    }
+    
+    rows.push({ 
+      id: 'AppEntityConfig', rowId: 'AppEntityConfig', title: 'Config',  height: '120px', 
+      type : 'pong-form', resourceURL: 'app/entity/config', decor: 'decor',
+      moduleConfig : {
+        description: "AppEntityInfo",
+        id: 'AppEntityInfoForm',
+        fieldGroups:[{ columns: [
+          { formFields: [{ id: "appId",    type: "text", value: appId,    hidden: true } ]},
+          { formFields: [{ id: "entityId", type: "text", value: entityId, hidden: true } ]},
+          { formFields: [{ id: "creFromHeight", label: "Entity Create Form Height", type: "text", defaultVal: creFromHeight } ]},
+          { formFields: [{ id: "tableHeight",   label: "Table Height", type: "text", defaultVal: tableHeight } ]}
+        ] }],
+        actions : [ 
+          { id: "AppEntityConfigBtn", actionName: "Change Config", actionURL: 'app/entity/config', target: "modal" }
+        ]
+      }
+    })
+
     return rows
   })
  
@@ -463,7 +511,7 @@ async function init( ) {
         { id: "AddStatusBtn", actionName: "Add State", update: [{ resId:'StateLst' }], 
           actionURL: 'state-model', target: "modal" },
         { id: "ImportLink", link: 'Import JSON', linkURL: 'index.html?layout=UploadStateModel-nonav' }
-    ]
+      ]
     }
   })
 
