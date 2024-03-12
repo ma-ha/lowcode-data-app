@@ -591,7 +591,8 @@
             "refLbl": true,
             "noDelete": true
           }
-        }
+        },
+        "tableHeight": "680px"
       },
       "Test": {
         "title": "",
@@ -700,8 +701,8 @@
         "noDelete": true,
         "noEdit": true,
         "stateModel": "Test",
-        "creFromHeight": "170px",
-        "tableHeight": "1780px"
+        "creFromHeight": "200px",
+        "tableHeight": "600px"
       },
       "SomeTag": {
         "title": "",
@@ -724,7 +725,8 @@
             "noDelete": true
           }
         },
-        "noDelete": true
+        "noDelete": true,
+        "tableHeight": "680px"
       }
     },
     "startPage": [
