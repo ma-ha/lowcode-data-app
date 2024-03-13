@@ -80,7 +80,7 @@ async function initPages( ) {
 
   // ..........................................................................
 
-   gui.dynamicTitle( async ( title, req, page ) => {  return 'Low Code App' } )
+   gui.dynamicTitle( async ( title, req, page ) => {  return ( cfg.TITLE ? cfg.TITLE : 'Low Code App' ) } )
 
   // ..........................................................................
 

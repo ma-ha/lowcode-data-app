@@ -8,6 +8,7 @@ let lowCodeApp = require( './index' )
 
 lowCodeApp.init({
 
+  TITLE: "Low Code App",
   PROVISIONING_API_KEY : 'CHANGE_ME',
 
   // file based persistence goes into this folder
