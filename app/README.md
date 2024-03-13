@@ -52,7 +52,6 @@ Standalone mode using it as npm package: https://www.npmjs.com/package/lowcode-d
       OIDC_SERVER : true
     })
 
-
 The `init(...)` returns the `easy-web-app`, so the whole [API](https://github.com/ma-ha/easy-web-app/blob/master/API-Reference.md) is open for customizing,
 e.g. `app.getExpress()` to add API routes or ` gui.pages['main'].addFooterLink(...)` to modify the footer.
 
@@ -107,11 +106,7 @@ So relations are
 - **n:1** = `SelectRef`
 - **n:m** = `MultiSelectRef`
 
-Entities can be attached to a "State Model". 
-
 Entity Ids must be alphanumeric, min length is 2.
-
-![sceenshot](doc/locode-statemodel.png)
 
 Property features:
 - you can select a property for the data table filter
@@ -122,7 +117,51 @@ Property features:
 This enables different views on the same data in different apps (if different apps have the same entity, but different properties). 
 But: Please choose your entity ids wisely, if you don't want this behavior.
 
-For JSON properties sub-elements can be defined with a dot-notation (e.g. "JsonProp.MySubField"). Allowed types: 'String', 'Text','Boolean','Date','Select'.
+For JSON properties sub-elements can be defined with a dot-notation (e.g. "MyJsonProp.MySubField"). Allowed types: 'String', 'Text','Boolean','Date','Select'.
+
+# Add New Root Scope (aka "Tenant")
+
+This should be done via API ... but it's simple:
+
+    const axios  = require( 'axios' )
+    let result = await axios.post( 
+      'http://localhost:8888/app/adapter/scope', // or whatever you've configured
+      {
+        name          : 'ROOD SCOPE NAME',
+        adminEmail    : 'FOR NEW ADMIN USER',
+        adminPassword : 'FOR NEW ADMIN USER', 
+        apiId         : 'FOR NEW API CREDENTIALS',
+        apiKey        : 'FOR NEW API CREDENTIALS',
+        owner         : 'SOME NAME'
+      }, 
+      { headers:  { 'provisioning-key': 'PROVISIONING KEY' } } 
+    )
+
+The new admin credentials are required, since the app can't send out emails (yet).
+
+The API credentials can be used to bootstrap the new tenant and create apps, their entities and upload some initial data documents.
+
+A new tenant (root scope) can also be added via GUI. 
+The user must be in the `SUPER_TENANT_ADMIN` list (comma separated user ids).
+In the add scope form simple put a `#` into the scope id. 
+
+# Entities with State
+
+Entities can be attached to a "State Model". 
+
+The state model defines all states and the allowed transitions and their action name. 
+State models can be created or customized  in the browser.
+
+For all actions you select the properties which need to be set in the state transition. In the GUI the user get  entity create form(s) and action links for the state changes. Forms will be generated for each action to change the selected properties.
+
+![sceenshot](doc/locode-statemodel.png)
+
+For the action you can also define default values for properties. If the property is not selected for the action but has a default value, this value is set always. 
+
+The default value for "select", "selectRef" and "multiSelectRef" properties can contain a condition to filter the allowed options, e.g.: `color $eq 'red'`. 
+Currently only `$eq` is allowed. The compared values can be a String (in single quotes) or a property. 
+The left value is prioritized taken from the select values and the right from the entity default values. 
+For "select" the condition can be `val $eq ...`.
 
 # Integration 
 
@@ -151,7 +190,7 @@ State models can be added or customized to your needs.
 
 ![sceenshot](doc/locode-statemodel-admin.png)
 
-The start stateId is `null`. Currently only the first action is used for `null`.
+The start stateId is `null`. 
 
 ## Persistence
 

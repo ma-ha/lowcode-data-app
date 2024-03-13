@@ -190,11 +190,11 @@ The GUI framework is "easy-web-app" and the underlying api server is "express".
 
 ## State Model
 
-State model can be added or customized to your needs.
+State models can be added or customized to your needs.
 
 ![sceenshot](doc/locode-statemodel-admin.png)
 
-The start stateId is `null`. Currently only the first action is used for `null`.
+The start stateId is `null`.
 
 ## Persistence
 
