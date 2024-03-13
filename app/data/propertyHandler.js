@@ -273,7 +273,6 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
-    if ( prop.noEdit && ! stateTransition ) { continue }
     let lbl  = ( prop.label ? prop.label : propId )
     let fldId = propId.replaceAll('.','_')
     // console.log( 'LBL', lbl)
@@ -287,7 +286,11 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         defaultVal = fieldDefault[ propId ]
         if ( ! prop.stateTransition[ stateTransition ] ) {
           if ( defaultVal ) {  
-            cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', defaultVal: defaultVal, readonly: true } ] })
+            if ( prop.noEdit ) { 
+              cols.push({ formFields: [ { id: fldId, type: 'text', value: defaultVal, hidden: true } ] })
+            } else {
+              cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', defaultVal: defaultVal, readonly: true } ] })
+            }
           }
           continue
         }
@@ -296,6 +299,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
       }
     } 
     
+    if ( prop.noEdit ) { continue }
     if ( prop.apiManaged ) { 
       cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', readonly: true } ] })
       continue 

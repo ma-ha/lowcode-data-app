@@ -1,3 +1,6 @@
+# 0.19.1
+- State: Create form hide noEdit fields
+
 # 0.19.0
 - App page: hide tabs if it's only one entity 
 - Entity: Configs
