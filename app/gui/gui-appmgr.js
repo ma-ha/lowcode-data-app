@@ -383,7 +383,8 @@ async function init( ) {
     if ( ! app ) { return [] }
     let entityId = ids.split(',')[1]
     let entity = app.entity[ entityId ]
-    if ( ! entity ) { return [] }
+    if ( ! entity || ! entity.stateModel ) { return [] }
+    let stateModelId = user.rootScopeId +'/'+ entity.stateModel
     
     // Entity info:
     let rows = [{ 
@@ -397,7 +398,8 @@ async function init( ) {
           // { formFields: [{ id: "name", label: "Name", type: "text", defaultVal: app.title, readonly: true } ]},
           { formFields: [{ id: "name", label: "Entity Id", type: "text", defaultVal: entityId, readonly: true } ]},
           { formFields: [{ id: "title", label: "Entity Title", type: "text", defaultVal: entityId, readonly: true } ]},
-          { formFields: [{ id: "lnk", label: "", linkText:"Back to Entities", type: "link", defaultVal: "index.html?layout=AppEntities-nonav&id="+appId } ]}
+          { formFields: [{ id: "lnk", label: "", linkText:"Back to Entities", type: "link", defaultVal: "index.html?layout=AppEntities-nonav&id="+appId } ]},
+          { formFields: [{ id: "lnk2", label: "", linkText:"Edit State Model", type: "link", defaultVal: 'index.html?layout=EditState-nonav&id='+stateModelId } ]}
         ] }]
       }
     }]

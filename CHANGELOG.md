@@ -1,5 +1,6 @@
 # 0.19.2
 - Action conditions
+- State action matrix: Link to State Editor
 
 # 0.19.1
 - Config: TITLE
