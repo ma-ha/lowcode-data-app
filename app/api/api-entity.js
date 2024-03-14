@@ -239,6 +239,8 @@ async function docStateChange( req, res ) {
   if ( parse.err ) {
     return res.status(400).send( parse.err )
   }
+  // TODO: check condition OK: entity.stateTransition
+
   let rp = req.params
   let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec.id
     await dta.addDataObj( req.params.tenantId + req.params.entityId, rec.id, rec, uri, 'dta.stateUpdate', entity )

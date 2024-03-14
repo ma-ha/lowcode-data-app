@@ -704,7 +704,10 @@
         "noEdit": true,
         "stateModel": "Test",
         "creFromHeight": "200px",
-        "tableHeight": "600px"
+        "tableHeight": "600px",
+        "stateTransition": {
+          "Created_SetDone_condition": "A5 $eq 'two'"
+        }
       },
       "SomeTag": {
         "title": "",

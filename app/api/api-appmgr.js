@@ -398,11 +398,16 @@ async function getPropertyStatus( req, res ) {
   for ( let statesId in stateModel ) try {
     // log.info( ' >>>', statesId )
     for ( let transitionId in stateModel[ statesId ].actions ) {
+      let actionId = statesId +'_'+ transitionId
       let propRow = { 
         appId        : appId, 
         entityId     : entityId, 
-        transitionId : statesId +'_'+ transitionId,
-        transition   : ( statesId === 'null' ? transitionId : statesId+' > '+transitionId )
+        transitionId : actionId,
+        transition   : ( statesId === 'null' ? transitionId : statesId+' > '+transitionId ),
+        transitionCondition : '-'
+      }
+      if (  entity.stateTransition && entity.stateTransition[ actionId +'_condition' ] ) {
+        propRow.transitionCondition =  entity.stateTransition[ actionId +'_condition' ]
       }
       for ( let propId in entity.properties ) {
         let pId = propId.replaceAll('.','_')
@@ -412,13 +417,13 @@ async function getPropertyStatus( req, res ) {
           propRow[ 'prop/'+pId ] = false 
           propRow[ 'prop/'+pId+'/default' ] = '-'
         } else {
-          if ( prop.stateTransition[ statesId +'_'+ transitionId ] ) {
+          if ( prop.stateTransition[ actionId ] ) {
             propRow[ 'prop/'+pId ] = true
           } else {
             propRow[ 'prop/'+pId ] = false
           }
-          if ( prop.stateTransition[ statesId +'_'+ transitionId +'_default' ] ) {
-            propRow[ 'prop/'+pId+'/default' ] = prop.stateTransition[ statesId +'_'+ transitionId +'_default' ]
+          if ( prop.stateTransition[ actionId +'_default' ] ) {
+            propRow[ 'prop/'+pId+'/default' ] = prop.stateTransition[ actionId +'_default' ]
           } else {
             propRow[ 'prop/'+pId+'/default' ] = '-'
           }
@@ -449,24 +454,32 @@ async function setPropertyStatus( req, res ) {
       break
     } 
   }
-  if ( ! propId ) { return res.status(400).send('propId missing') }
-  if ( ! entity.properties[ propId ] ){ return res.status(400).send('propId not found') }
+  if ( propId && ! entity.properties[ propId ] ){ return res.status(400).send('propId not found') }
 
-  if ( ! entity.properties[ propId ].stateTransition ) { 
+  if ( ! entity.stateTransition ) {  entity.stateTransition = {} }
+  if ( propId && ! entity.properties[ propId ].stateTransition ) { 
     entity.properties[ propId ].stateTransition = {} 
   }
 
-  // finally all checks done
-  if ( defaultVal ) {
-    entity.properties[ propId ].stateTransition[ req.body.transitionId + '_default' ] = defaultVal
+  if (  req.body.transitionCondition && req.body.transitionCondition != '-' ) { 
+    entity.stateTransition[ req.body.transitionId + '_condition' ] = req.body.transitionCondition
   } else {
-    if ( inclProp ) {
-      entity.properties[ propId ].stateTransition[ req.body.transitionId ] = inclProp
+    delete entity.stateTransition[ req.body.transitionId + '_condition' ]
+  }
+
+  if ( propId ) {
+    // finally all checks done
+    if ( defaultVal ) {
+      entity.properties[ propId ].stateTransition[ req.body.transitionId + '_default' ] = defaultVal
     } else {
-      if ( entity.properties[ propId ].stateTransition[ req.body.transitionId ] ) {
-        delete entity.properties[ propId ].stateTransition[ req.body.transitionId ]
-      }
-    }  
+      if ( inclProp ) {
+        entity.properties[ propId ].stateTransition[ req.body.transitionId ] = inclProp
+      } else {
+        if ( entity.properties[ propId ].stateTransition[ req.body.transitionId ] ) {
+          delete entity.properties[ propId ].stateTransition[ req.body.transitionId ]
+        }
+      }  
+    }
   }
   await dta.saveApp( appId, app )
 

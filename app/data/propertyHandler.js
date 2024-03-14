@@ -612,26 +612,34 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
   let tblRec = { recId: rec.id }
   log.debug( 'getDoc rec', rec, stateModel )
   if ( stateModel ) {
-    tblRec[ '_state' ]= rec[ '_state' ]
+    let stateId = rec[ '_state' ]
+    tblRec[ '_state' ]= stateId
     let actions = []
-    let state = stateModel.state[ rec[ '_state' ] ]
+    let state = stateModel.state[ stateId ]
     if ( state ) {
       if ( state.img ) {
-        tblRec[ '_state' ] = '<img src="img/'+state.img+'" title="'+( state.label ? state.label : rec[ '_state' ] )+'"/>'
+        tblRec[ '_state' ] = '<img src="img/'+state.img+'" title="'+( state.label ? state.label : stateId )+'"/>'
       }
+      let transitions = ( entity.stateTransition ? entity.stateTransition : {} )
 
       for ( let actionId in state.actions ) {
         let action =  state.actions[ actionId ]
+        log.info (  stateId +'_'+actionId+'_condition', transitions[ stateId +'_'+actionId+'_condition'] )
+        if ( transitions[ stateId +'_'+actionId+'_condition'] ) {
+          if ( ! filterMatch( transitions[ stateId +'_'+actionId+'_condition'], rec, rec ) ) {
+            continue // TODO make this work for selectRef ...
+          }
+        }
         if ( action.apiManaged ) { continue }
         let lnkTxt = ( action.label ? action.label : actionId ) +''
         lnkTxt = lnkTxt.replaceAll( ' ', '&nbsp;' )
         // TODO change to button
         if ( action.icon ) {
-          let navId = url +'/'+ rec[ '_state' ] +'_'+ actionId
+          let navId = url +'/'+ stateId +'_'+ actionId
           let lnk = '<span class="StatusActionLink"><a href="index.html?layout=AppEntityAction-nonav&id='+navId+'">'+ lnkTxt + '</a></span>'
           actions.push( lnk )
         } else {
-          let navId = url +'/'+ rec[ '_state' ] +'_'+ actionId
+          let navId = url +'/'+ stateId +'_'+ actionId
           let lnk = '<span class="StatusActionLink"><a href="index.html?layout=AppEntityAction-nonav&id='+navId+'">'+ lnkTxt + '</a></span>'
           actions.push( lnk )
         }

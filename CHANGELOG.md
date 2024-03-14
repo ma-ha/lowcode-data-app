@@ -1,3 +1,6 @@
+# 0.19.2
+- Action conditions
+
 # 0.19.1
 - Config: TITLE
 - State: Create form hide noEdit fields

@@ -402,9 +402,12 @@ async function init( ) {
       }
     }]
 
-    let cols = [ { id: "transition", label: "State Change", width: "15%", cellType: "text" } ]
+    let cols = [ 
+      { id: "transition", label: "State Change", width: "15%", cellType: "text" },
+      { id: "transitionCondition", label: "Condition", width: "15%", cellType: "text", editable: true } 
+    ]
 
-    let w = 85
+    let w = 70
     for ( let propId in entity.properties ) {
       let prop = entity.properties[ propId ]
       if ( propId == 'id' && prop.type == 'UUID' ) { continue }
