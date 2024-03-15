@@ -6,5 +6,4 @@
 - [ ] BLOB field type
 - [ ] fix session timeout handling 
 - [ ] Reset password fix
-- [ ] API data filter
 - [ ] Improve content config
