@@ -604,7 +604,8 @@
           "id": {
             "type": "UUID",
             "noDelete": true,
-            "noTable": true
+            "noTable": true,
+            "noEdit": true
           },
           "A1": {
             "type": "String",

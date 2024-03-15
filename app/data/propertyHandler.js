@@ -246,11 +246,13 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
   let cols = []
 
   if ( entity.properties[ 'id' ] && entity.properties[ 'id' ].type == 'UUID' ) {
-    cols.push({ formFields: [{ 
-      id: "id", 
-      label: ( entity.properties[ 'id' ].label ? entity.properties[ 'id' ].label : "Id (UUID)" ), 
-      type: "text", readonly: true, descr: 'ID is auto generated'
-    } ]})
+    if ( ! entity.properties[ 'id' ].noEdit ) {
+      cols.push({ formFields: [{ 
+        id: "id", 
+        label: ( entity.properties[ 'id' ].label ? entity.properties[ 'id' ].label : "Id (UUID)" ), 
+        type: "text", readonly: true, descr: 'ID is auto generated'
+      } ]})
+    }
   } else if ( entity.stateModel ) { 
     // prevent create via the edit form
     cols.push({ formFields: [{ id: "id", label: "Id", type: "text", readonly: true } ]})
@@ -419,7 +421,7 @@ function filterMatch( filter, dta, fieldDefault ) {
       let { ref1, ref2 } = splitQry( filter, ' $eq ' )
       let val1 = getVal( ref1, dta, fieldDefault )
       let val2 = getVal( ref2, fieldDefault, dta )
-      log.info( 'filterMatch >', filter, '"'+ref1+'"', '"'+ref2+'"', '"'+val1+'"', '"'+val2+'"' )
+      log.debug( 'filterMatch >', filter, '"'+ref1+'"', '"'+ref2+'"', '"'+val1+'"', '"'+val2+'"' )
       return ( val1 == val2 ) 
     } else {
       return true
@@ -624,7 +626,7 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
 
       for ( let actionId in state.actions ) {
         let action =  state.actions[ actionId ]
-        log.info (  stateId +'_'+actionId+'_condition', transitions[ stateId +'_'+actionId+'_condition'] )
+        log.debug (  stateId +'_'+actionId+'_condition', transitions[ stateId +'_'+actionId+'_condition'] )
         if ( transitions[ stateId +'_'+actionId+'_condition'] ) {
           if ( ! filterMatch( transitions[ stateId +'_'+actionId+'_condition'], rec, rec ) ) {
             continue // TODO make this work for selectRef ...

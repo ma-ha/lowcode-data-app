@@ -1,3 +1,6 @@
+# 0.19.3
+- State: Create form hide id if noEdit 
+
 # 0.19.2
 - Action conditions
 - State action matrix: Link to State Editor
