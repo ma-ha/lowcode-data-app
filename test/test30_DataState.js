@@ -51,6 +51,11 @@ describe( 'Data State', () => {
     assert.notEqual( result.data.length, 0 )
   })
 
+  it( 'Search by status + query', async () => {
+    let result = await axios.get( dtaUrl+'/state/Open?query={"Name":"test"}', { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data.length, 0 )
+  })
 
   it( 'Change state w/o id must fail', async () => {
     let rec = { 

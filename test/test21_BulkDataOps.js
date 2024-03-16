@@ -44,11 +44,11 @@ describe( 'Data Ops Arr', () => {
   let idArr = ['-']
   it( 'Add rec array with auto id', async () => {
     let recs = [
-      { name : 't1', testRef : '2' },
-      { name : 't2', testRef : '2' },
-      { name : 't3', testRef : '2' },
-      { name : 't4', testRef : '2' },
-      { name : 't5', testRef : '2' },
+      { name : 't1', tag:'red', testRef : '2' },
+      { name : 't2', tag:'red', testRef : '2' },
+      { name : 't3', tag:'red', testRef : '2' },
+      { name : 't4', tag:'blue', testRef : '2' },
+      { name : 't5', tag:'blue', testRef : '2' },
     ]
     let result = await axios.post( testUuidUrl, recs, { headers: HEADERS } )
     // console.log( result )
@@ -71,6 +71,7 @@ describe( 'Data Ops Arr', () => {
     // console.log( 'List result', result.data  )
     docMap = result.data
   })
+
   // --------------------------------------------------------------------------
 
   it( 'Update rec array ', async () => {

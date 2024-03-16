@@ -173,17 +173,15 @@ async function getAppList( req, res ) {
 
 async function getApp( req, res ) {
   log.info( 'getApp...')
-  let appId = req.params.scopeId +'/'+ req.params.appId +'/'+ req.params.appVersion
-  let app = await dta.getAppById( appId )
-  if ( ! app ) { log.warn( 'Not found', appId ); return res.status(400).send('Not found') }
+  let { app } = await checkApp( req, res )
+  if ( ! app ) { return }
   res.send( app )
 }
 
 // ----------------------------------------------------------------------------
 async function creStateModel( req, res ) {
   log.info( 'creStateModel...')
-  let stateModelId = req.params.scopeId +'/'+ req.params.stateId
-  let stateModel  = await dta.getDataById( 'state', stateModelId )
+  let { stateModelId, stateModel } = await getStateModelById( req )
   if ( stateModel ) {return sendErr( res, 'state model exists' ) }
   stateModel = req.body
   stateModel.scopeId = req.params.scopeId
@@ -195,8 +193,7 @@ async function creStateModel( req, res ) {
 
 async function getStateModel( req, res ) {
   log.info( 'getStateModel...')
-  let stateModelId = req.params.scopeId +'/'+ req.params.stateId
-  let stateModel  = await dta.getDataById( 'state', stateModelId )
+  let { stateModelId, stateModel } = await getStateModelById( req )
   if ( ! stateModel ) {return sendErr( res, 'state model not found' ) }
   res.send( stateModel )
 }
@@ -205,9 +202,11 @@ async function getStateModel( req, res ) {
 
 async function getDocArr( req, res ) {
   log.info( 'GET data array', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  if ( ! await checkApp( req, res ) ) { return }
-  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
-  let recs = await dta.getData( tbl, req.params.scopeId ) // TODO filter
+  let ( app, tbl ) = await checkApp( req, res )
+  if ( ! app ) { return }
+  let qry = extractQuery( req )
+  if ( qry == 'ERROR' ) { return sendErr( res, 'Query not valid' ) }
+  let recs = await dta.getData( tbl, req.params.scopeId, false, qry ) 
   log.debug( 'recs',recs)
   res.send( recs )
 }
@@ -215,8 +214,8 @@ async function getDocArr( req, res ) {
 
 async function getDoc( req, res ) {
   log.info( 'GET data by id', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
-  if ( ! await checkApp( req, res ) ) { return }
-  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+  let ( app, tbl ) = await checkApp( req, res )
+  if ( ! app ) { return }
   let rec = await dta.getDataById( tbl, req.params.recId )
   log.debug( 'rec',rec )
   res.send( rec )
@@ -225,11 +224,8 @@ async function getDoc( req, res ) {
 
 async function addDocs( req, res ) { // add doc w/o id or list
   log.info( 'Add data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let app = await checkApp( req, res )
+  let ( app, tbl, entity, properties ) = await checkApp( req, res )
   if ( ! app ) { return }
-  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
-  let entity =  app.entity[ req.params.entityId ] // exists, checked in checkApp(...)
-  let properties = entity.properties
   let rp = req.params
   let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'
 
@@ -260,15 +256,12 @@ async function addDocs( req, res ) { // add doc w/o id or list
 
 async function addDoc( req, res )  {
   log.info( 'Add data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let app = await checkApp( req, res )
+  let ( app, tbl, entity,properties ) = await checkApp( req, res )
   if ( ! app ) { return }
-  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
-  let entity =  app.entity[ req.params.entityId ] // exists, checked in checkApp(...)
   let rec = req.body
   if ( ! rec.id ) {
     rec.id = req.params.recId 
   }
-  let properties = entity.properties
   if ( ! chkPropValid( rec, properties, res )  ) { return }
   rec.scopeId = req.params.scopeId
   let rp = req.params
@@ -305,12 +298,10 @@ function chkPropValid( rec, properties, res ) {
 
 async function chgDoc( req, res )  {
   log.info( 'Upd data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let app = await checkApp( req, res )
+  let ( app, tbl, entity ) = await checkApp( req, res )
   if ( ! app ) { return }
-  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
   let doc = await dta.getDataById( tbl, req.params.recId )
   if ( ! doc ) { return sendErr( res, 'Not found' ) }
-  let entity = app.entity[ req.params.entityId ] // exists, checked in checkApp(...)
 
   let updates = req.body
   for ( let propId in updates ) {
@@ -330,10 +321,8 @@ async function chgDoc( req, res )  {
 
 async function chgDocs( req, res )  {
   log.info( 'Upd data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let app = await checkApp( req, res )
+  let ( app, tbl, entity ) = await checkApp( req, res )
   if ( ! app ) { return }
-  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
-  let entity = app.entity[ req.params.entityId ] // exists, checked in checkApp(...)
   let rp = req.params
   let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'
 
@@ -366,21 +355,12 @@ async function chgDocs( req, res )  {
 async function changeDocStatus( req, res )  {
   log.info( 'Change Status', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.state, req.params.action )
   log.debug( 'Change Status', req.body )
-  let app = await checkApp( req, res )
+  let ( app, tbl, entity, properties ) = await checkApp( req, res )
   if ( ! app ) { return }
-  let entity =  app.entity[ req.params.entityId ] // exists, checked in checkApp(...)
-  let properties   = entity.properties
-  let stateModelId = entity.stateModel
-  if ( ! stateModelId ) { return sendErr( res, 'Change Status: entity has no state' ) }
-  let stateModel = await dta.getDataById( 'state', req.params.scopeId +'/'+ stateModelId )
-  if ( ! stateModel ) { return sendErr( res, 'Change Status: state model error' ) } // should not happen, but...
-  let stateDef = stateModel.state[ req.params.state ]
-  if ( ! stateDef ) { return sendErr( res, 'Change Status: state not found' ) } 
-  let stateAction = stateDef.actions[ req.params.action ]
-  if ( ! stateAction ) { return sendErr( res, 'Change Status: state action not found' ) }
-  
-  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
 
+  let { stateModelId, stateModel, stateDef, stateAction } = await getStateModel( req, res, entity )
+  if ( ! stateModel ) { return }
+   
   let rec = {}
   if ( req.params.state != 'null' ) {
     rec = await dta.getDataById( tbl, req.body.id )
@@ -453,17 +433,17 @@ async function changeDocStatus( req, res )  {
 async function getDocByStatus( req, res )  {
   log.info( 'Change Status', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.state )
   log.debug( 'Change Status', req.body )
-  let app = await checkApp( req, res )
+  let ( app, tbl, entity ) = await checkApp( req, res )
   if ( ! app ) { return }
-  let stateModelId =  app.entity[ req.params.entityId ].stateModel
-  if ( ! stateModelId ) { return sendErr( res, 'Change Status: entity has no state' ) }
-  let stateModel = await dta.getDataById( 'state', req.params.scopeId +'/'+ stateModelId )
-  if ( ! stateModel ) { return sendErr( res, 'Change Status: state model error' ) } // should not happen, but...
-  let stateDef = stateModel.state[ req.params.state ]
-  if ( ! stateDef ) { return sendErr( res, 'Change Status: state not found' ) } 
-  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+
+  let { stateModelId, stateModel } = await getStateModel( req, res, entity )
+  if ( ! stateModel ) { return }
   
-  let qry = { '_state': req.params.state }
+  let qry = extractQuery( req )
+  if ( qry == 'ERROR' ) { return sendErr( res, 'Query not valid' ) }
+  if ( ! qry ) { qry = {} }
+  qry[ '_state' ] = req.params.state 
+
   let docMap = await dta.getData( tbl, req.params.scopeId, false, qry )
   
   let result = []
@@ -476,11 +456,9 @@ async function getDocByStatus( req, res )  {
 
 async function delDoc( req, res )  {
   log.info( 'Del data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
-  let user = await userDta.getUserInfoFromReq( gui, req )
-  let app =  await checkApp( req, res )
+  // let user = await userDta.getUserInfoFromReq( gui, req )
+  let ( app, tbl, entity ) = await checkApp( req, res )
   if ( ! app ) { return }
-  let tbl = getRootScope( req.params.scopeId ) + req.params.entityId
-  let entity = app.entity[ req.params.entityId ]
   let result = await dta.delDataObj( tbl, req.params.recId, entity )
   res.send({ status: result })
 }
@@ -526,15 +504,77 @@ function getRootScope( scopeId ) {
 async function checkApp( req, res ) {
   let appId = req.params.scopeId +'/'+ req.params.appId +'/'+ req.params.appVersion
   let app = await dta.getAppById( appId )
+  let tbl = null
+  let entity = null
+  let properties = null
+
   if ( ! app ) { 
     log.warn( 'api-adapter: app not found', appId )
     res.status( 400 ).send( )
     return null 
   }
-  if ( ! app.entity[ req.params.entityId ] ) { 
-    log.warn( 'api-adapter: entity not found', appId )
-    res.status( 400 ).send( )
-    return null 
+  if ( req.params.entityId  ) {
+    if ( ! app.entity[ req.params.entityId ] ) { 
+      log.warn( 'api-adapter: entity not found', appId )
+      res.status( 400 ).send( )
+      return null 
+    }
+    tbl = getRootScope( req.params.scopeId ) + req.params.entityId
+    entity = app.entity[ req.params.entityId ]
+    properties = entity.properties
   }
-  return app
+  return { app: app, tbl: tbl, entity: entity, properties: properties }
+}
+
+// ----------------------------------------------------------------------------
+async function getStateModelById( req ) {
+  let stateModelId = req.params.scopeId +'/'+ req.params.stateId
+  let stateModel  = await dta.getDataById( 'state', stateModelId )
+  return { stateModelId: stateModelId, stateModel: stateModel}
+}
+
+async function getStateModel( req, res, entity ) {
+  let stateModelId = entity.stateModel
+  if ( ! stateModelId ) { 
+    sendErr( res, 'Change Status: entity has no state' ) 
+    return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }
+  }
+  let stateModel = await dta.getDataById( 'state', req.params.scopeId +'/'+ stateModelId )
+  if ( ! stateModel ) { 
+    sendErr( res, 'Change Status: state model error' ) 
+    return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }
+  } // should not happen, but...
+  let stateDef = stateModel.state[ req.params.state ]
+  if ( ! stateDef ) { 
+    sendErr( res, 'Change Status: state not found' )
+    return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }
+  }
+  let stateAction = null
+  if ( req.params.action ) {
+    stateAction = stateDef.actions[ req.params.action ]
+    if ( ! stateAction ) {
+      sendErr( res, 'Change Status: state action not found' ) 
+      return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }
+    }
+  }
+  return { 
+    stateModelId : stateModelId,
+    stateModel   : stateModel,
+    stateDef     : stateDef,
+    stateAction  : stateAction
+  }
+}
+// ----------------------------------------------------------------------------
+function extractQuery( req ) {
+  let qry = null
+  try {
+    if ( req.query.query ) {
+      qry = JSON.parse( req.query.query )
+    }      
+  } catch ( exc ) {
+    log.warn( 'extractQuery', exc.message )
+    return "ERROR"
+  }
+  log.info( '>>>>>>>' , qry )
+  return qry
 }

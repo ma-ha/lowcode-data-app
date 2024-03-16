@@ -46,5 +46,36 @@
     },
     "password": "5a095719-cfbe-49d3-8927-a55da94221ed",
     "expires": null
+  },
+  "mochatest@t.de": {
+    "name": "mochatest@t.de",
+    "role": {
+      "dev": [
+        "2087"
+      ],
+      "admin": [
+        "2087"
+      ],
+      "appUser": [
+        "2087"
+      ],
+      "api": []
+    },
+    "password": "6eb63168fd54ac2372fca438a1d348432fca79eb2fdbbe0829ca3e652cf16f3b",
+    "expires": null
+  },
+  "mochatest": {
+    "name": "mochatest",
+    "sp": true,
+    "role": {
+      "dev": [],
+      "admin": [],
+      "appUser": [],
+      "api": [
+        "2087"
+      ]
+    },
+    "password": "mochatest-supasecret-id",
+    "expires": null
   }
 }
