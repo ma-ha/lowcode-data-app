@@ -102,7 +102,9 @@ async function initPages( ) {
   entityGUI.init()
   marketplaceGUI.init()
   appGUI.init()
-  docuGUI.init()
+  if ( cfg.HIDE_DOCU !== false ) {
+    docuGUI.init()
+  }
   userGUI.init()
 }
 

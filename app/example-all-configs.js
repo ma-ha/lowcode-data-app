@@ -26,6 +26,8 @@ lowCodeApp.init({
   // start app in debug mode with login as FAKE_LOGIN user id 
   FAKE_LOGIN : null,
 
+  HIDE_DOCU : false,
+
   // if an internal OpenId Connect server should be started:
   OIDC_SERVER : true,
 
