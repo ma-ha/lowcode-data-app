@@ -298,34 +298,5 @@
     },
     "_cre": 1710145679644,
     "_upd": 1710173542435
-  },
-  "2087/TestState": {
-    "state": {
-      "null": {
-        "actions": {
-          "Create": {
-            "to": "Open"
-          }
-        }
-      },
-      "Open": {
-        "actions": {
-          "Close": {
-            "to": "Closed"
-          }
-        }
-      },
-      "Closed": {
-        "actions": {
-          "Reopen": {
-            "to": "Open"
-          }
-        }
-      }
-    },
-    "scopeId": "2087",
-    "id": "2087/TestState",
-    "_cre": 1710600402325,
-    "_upd": 1710600402325
   }
 }

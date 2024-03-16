@@ -3,14 +3,6 @@
     "name": "Test Tenant",
     "tag": []
   },
-  "2087": {
-    "name": "mochatest",
-    "tag": [],
-    "meta": {},
-    "adminEmail": "mochatest@t.de",
-    "owner": "ma-ha",
-    "_cre": 1710600398185
-  },
   "1000/DE": {
     "name": "Region Germany",
     "tag": [
