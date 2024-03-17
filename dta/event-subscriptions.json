@@ -3,13 +3,8 @@
     "test-app": {
       "webHook": "http://localhost:3001/event",
       "app": "5a095719-cfbe-49d3-8927-a55da94221ed",
-      "filter": {
-        "op": "dta.add",
-        "data": {
-          "col": "blue"
-        }
-      },
-      "creDt": 1710669647041
+      "filter": {},
+      "creDt": 1710669727068
     }
   }
 }
