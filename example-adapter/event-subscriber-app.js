@@ -23,7 +23,11 @@ async function processEvent(req, res) {
 async function subscribeEvents() {
   const res = await axios.post( url, {
     name: 'test-app',
-    webHook : 'http://localhost:3001/event'
+    webHook : 'http://localhost:3001/event',
+    // filter: { 
+    //   op: "dta.add",
+    //   data: { col: 'blue' }
+    // }
   },
   {
     headers: {

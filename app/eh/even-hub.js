@@ -3,6 +3,7 @@
 const log        = require( '../helper/log' ).logger
 const helper     = require( '../helper/helper' )
 const apiSec     = require( '../api/api-sec' )
+const dta        = require( '../persistence/app-dta' )
 const userDta    = require( '../persistence/app-dta-user' )
 const bodyParser = require( 'body-parser' )
 const axios      = require( 'axios' )
@@ -98,7 +99,8 @@ async function publishDataChgEvt( dtaOp, dtaId, uri, dtaType, data ) {
         try {
           let sub = subscriptions[ scope ][ app ]
           if ( sub.filter ) {
-            // TODO
+            if ( ! isQueried( data,  sub.filter.data ) ) { continue }
+            if ( ! isQueried( dtaOp, sub.op ) ) { continue }
           }
           log.info( 'evt post', sub.webHook )
           let result = await axios.post( sub.webHook, evt )
@@ -109,6 +111,14 @@ async function publishDataChgEvt( dtaOp, dtaId, uri, dtaType, data ) {
   }
 }
 
+function isQueried( doc, qry ) {
+  log.info( 'QRY', doc, qry )
+  if ( ! qry ) { return true }
+  for ( let q in qry ) {
+    if ( ! doc[q]  ||  doc[q] != qry[q] ) { return false }
+  }
+  return true
+}
 
 // ============================================================================
 

@@ -17,6 +17,7 @@ exports: module.exports = {
   getData,
   getDataById,
   getDataObjX,
+  isQueried,
   idExists,
   addDataObj,
   addDataObjNoEvent,
@@ -210,6 +211,7 @@ async function getData( tbl, scopeId, admin, qry ) {
 }
 
 function isQueried( doc, qry ) {
+  log.info( 'QRY', qry )
   if ( ! qry ) { return true }
   for ( let q in qry ) {
     if ( ! doc[q]  ||  doc[q] != qry[q] ) { return false }

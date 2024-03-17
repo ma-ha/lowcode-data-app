@@ -21,6 +21,18 @@ If post request with existing name, the subscription is overwritten and renewed 
 
 The app subscription will receive data change events for the scope of the app.
 
+The filter is a JSON and can contain `data.key` or `op`. Example:
+
+    {
+      "name": "myRedStatusChangeAdapter",
+      "webHook": http://my-red-status-change-adapter/hook"
+      "filter": {
+        "op": "dta.change-status"
+        "data": {
+          "color": "red"
+        }
+      }
+    }
 
 ## POST /event/unsubscribe
 

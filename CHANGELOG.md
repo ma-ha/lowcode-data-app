@@ -2,6 +2,7 @@
 - State: Create form hide id if noEdit 
 - Adapter API: query parameter
 - Option to hide "Docu"
+- Event filter
 
 # 0.19.2
 - Action conditions
