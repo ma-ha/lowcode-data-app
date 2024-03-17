@@ -202,7 +202,7 @@ async function getStateModel( req, res ) {
 
 async function getDocArr( req, res ) {
   log.info( 'GET data array', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let ( app, tbl ) = await checkApp( req, res )
+  let { app, tbl } = await checkApp( req, res )
   if ( ! app ) { return }
   let qry = extractQuery( req )
   if ( qry == 'ERROR' ) { return sendErr( res, 'Query not valid' ) }
@@ -214,7 +214,7 @@ async function getDocArr( req, res ) {
 
 async function getDoc( req, res ) {
   log.info( 'GET data by id', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
-  let ( app, tbl ) = await checkApp( req, res )
+  let { app, tbl } = await checkApp( req, res )
   if ( ! app ) { return }
   let rec = await dta.getDataById( tbl, req.params.recId )
   log.debug( 'rec',rec )
@@ -224,7 +224,7 @@ async function getDoc( req, res ) {
 
 async function addDocs( req, res ) { // add doc w/o id or list
   log.info( 'Add data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let ( app, tbl, entity, properties ) = await checkApp( req, res )
+  let { app, tbl, entity, properties } = await checkApp( req, res )
   if ( ! app ) { return }
   let rp = req.params
   let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'
@@ -256,7 +256,7 @@ async function addDocs( req, res ) { // add doc w/o id or list
 
 async function addDoc( req, res )  {
   log.info( 'Add data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let ( app, tbl, entity,properties ) = await checkApp( req, res )
+  let { app, tbl, entity,properties } = await checkApp( req, res )
   if ( ! app ) { return }
   let rec = req.body
   if ( ! rec.id ) {
@@ -298,7 +298,7 @@ function chkPropValid( rec, properties, res ) {
 
 async function chgDoc( req, res )  {
   log.info( 'Upd data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let ( app, tbl, entity ) = await checkApp( req, res )
+  let { app, tbl, entity } = await checkApp( req, res )
   if ( ! app ) { return }
   let doc = await dta.getDataById( tbl, req.params.recId )
   if ( ! doc ) { return sendErr( res, 'Not found' ) }
@@ -321,7 +321,7 @@ async function chgDoc( req, res )  {
 
 async function chgDocs( req, res )  {
   log.info( 'Upd data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let ( app, tbl, entity ) = await checkApp( req, res )
+  let { app, tbl, entity } = await checkApp( req, res )
   if ( ! app ) { return }
   let rp = req.params
   let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'
@@ -355,10 +355,10 @@ async function chgDocs( req, res )  {
 async function changeDocStatus( req, res )  {
   log.info( 'Change Status', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.state, req.params.action )
   log.debug( 'Change Status', req.body )
-  let ( app, tbl, entity, properties ) = await checkApp( req, res )
+  let { app, tbl, entity, properties } = await checkApp( req, res )
   if ( ! app ) { return }
 
-  let { stateModelId, stateModel, stateDef, stateAction } = await getStateModel( req, res, entity )
+  let { stateModelId, stateModel, stateDef, stateAction } = await extractStateModel( req, res, entity )
   if ( ! stateModel ) { return }
    
   let rec = {}
@@ -431,16 +431,16 @@ async function changeDocStatus( req, res )  {
 
 
 async function getDocByStatus( req, res )  {
-  log.info( 'Change Status', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.state )
-  log.debug( 'Change Status', req.body )
-  let ( app, tbl, entity ) = await checkApp( req, res )
+  log.info( 'getDocByStatus', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.state )
+  log.debug( 'getDocByStatus', req.body )
+  let { app, tbl, entity } = await checkApp( req, res )
   if ( ! app ) { return }
 
-  let { stateModelId, stateModel } = await getStateModel( req, res, entity )
+  let { stateModelId, stateModel } = await extractStateModel( req, res, entity )
   if ( ! stateModel ) { return }
   
   let qry = extractQuery( req )
-  if ( qry == 'ERROR' ) { return sendErr( res, 'Query not valid' ) }
+  if ( qry == 'ERROR' ) { return sendErr( res, 'Get Doc By Status: Query not valid' ) }
   if ( ! qry ) { qry = {} }
   qry[ '_state' ] = req.params.state 
 
@@ -457,7 +457,7 @@ async function getDocByStatus( req, res )  {
 async function delDoc( req, res )  {
   log.info( 'Del data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
   // let user = await userDta.getUserInfoFromReq( gui, req )
-  let ( app, tbl, entity ) = await checkApp( req, res )
+  let { app, tbl, entity } = await checkApp( req, res )
   if ( ! app ) { return }
   let result = await dta.delDataObj( tbl, req.params.recId, entity )
   res.send({ status: result })
@@ -533,27 +533,28 @@ async function getStateModelById( req ) {
   return { stateModelId: stateModelId, stateModel: stateModel}
 }
 
-async function getStateModel( req, res, entity ) {
+async function extractStateModel( req, res, entity ) {
+  log.info( 'getStateModel', entity )
   let stateModelId = entity.stateModel
   if ( ! stateModelId ) { 
-    sendErr( res, 'Change Status: entity has no state' ) 
+    sendErr( res, 'Get StateModel: entity has no state' ) 
     return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }
   }
   let stateModel = await dta.getDataById( 'state', req.params.scopeId +'/'+ stateModelId )
   if ( ! stateModel ) { 
-    sendErr( res, 'Change Status: state model error' ) 
+    sendErr( res, 'Get StateMode: state model error' ) 
     return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }
   } // should not happen, but...
   let stateDef = stateModel.state[ req.params.state ]
   if ( ! stateDef ) { 
-    sendErr( res, 'Change Status: state not found' )
+    sendErr( res, 'Get StateMode: state not found' )
     return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }
   }
   let stateAction = null
   if ( req.params.action ) {
     stateAction = stateDef.actions[ req.params.action ]
     if ( ! stateAction ) {
-      sendErr( res, 'Change Status: state action not found' ) 
+      sendErr( res, 'Get StateMode: state action not found' ) 
       return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }
     }
   }
