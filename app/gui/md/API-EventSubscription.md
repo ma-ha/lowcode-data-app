@@ -21,7 +21,7 @@ If post request with existing name, the subscription is overwritten and renewed 
 
 The app subscription will receive data change events for the scope of the app.
 
-The filter is a JSON and can contain `data.key` or `op`. Example:
+The filter is an optional  JSON and can contain `data.key` or `op` or both. Example:
 
     {
       "name": "myRedStatusChangeAdapter",
