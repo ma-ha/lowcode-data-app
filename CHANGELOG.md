@@ -3,6 +3,7 @@
 - Adapter API: query parameter
 - Option to hide "Docu"
 - Event filter
+- State model docu
 
 # 0.19.2
 - Action conditions

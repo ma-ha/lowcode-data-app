@@ -13,6 +13,7 @@ exports: module.exports = {
 
 function init( ) {
   addDocuPg( gui, 'get-started',    'Getting Started' ) 
+  addDocuPg( gui, 'state-model',    'Entities with State' ) 
   // addDocuPg( gui, 'administration', 'Administration' ) 
   // addDocuPg( gui, 'customize',      'Customize' ) 
   addDocuPg( gui, 'API-Data',              'Data API' ) 

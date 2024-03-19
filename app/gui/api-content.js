@@ -94,7 +94,8 @@ const VALID_PG = [
   'customize',
   'API-Data',
   'API-EventSubscription',
-  'API-Provisioning'
+  'API-Provisioning',
+  'state-model'
 ]
 
 async function getPage( type, file, lang ) {
