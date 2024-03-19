@@ -299,9 +299,8 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
       } else {
         continue
       }
-    } 
-    
-    if ( prop.noEdit ) { continue }
+    } else if ( prop.noEdit ) { continue }
+
     if ( prop.apiManaged ) { 
       cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', readonly: true } ] })
       continue 
