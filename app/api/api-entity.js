@@ -74,6 +74,7 @@ async function getAppIcons( req, res ) {
   for ( let appId in appMap ) {
     let app = appMap[ appId ]
     if ( app.role == [] ) { continue }
+    if ( ! app.enabled ) { continue }
     icons.push({
       id     : appId,
       layout : 'AppEntity-nonav&id=' + appId,

@@ -138,12 +138,12 @@ async function getScopeOpts( req, res ) {
   let scopeTbl = []
   // log.info( 'getScopeOpts', user )
 
-  // if ( user.scopeId == user.rootScopeId ) {
-  //   scopeTbl.push(  {
-  //     id   : '-',
-  //     name : 'all'
-  //   } )  
-  // }
+  if ( user.scopeId == user.rootScopeId ) {
+    scopeTbl.push(  {
+      id   : '-',
+      name : 'all'
+    } )  
+  }
   for ( let scope of scopeArr ) { 
     scopeTbl.push({
       id   : scope.id,

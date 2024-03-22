@@ -80,6 +80,7 @@ async function getApp( req, res )  {
         scope : ( app.scopeId ? app.scopeId : 'all' ),
         tags  : getTagsCSV( app.scope ),
         role  : ( app.role ? app.role.join() : '' ),
+        enabled  : ( app.enabled ? true : false ),
         entitiesLnk :'<a href="index.html?layout=AppEntities-nonav&id='+appId+'">Manage&nbsp;Entities</a>',
         pagesLnk :'<a href="index.html?layout=AppPages-nonav&id='+appId+'">Manage&nbsp;Pages</a>',
         appLnk :'<a href="index.html?layout=AppEntity-nonav&id='+appId+','+app.startPage+'">Open&nbsp;App</a>',
@@ -101,7 +102,9 @@ async function getAppForCustomize( req, res )  {
     name  : app.title,
     scope : ( app.scopeId ? app.scopeId : '-' ),
     tags  : getTagsCSV( app.scope ),
-    role  : ( app.role.length > 0 ? app.role[0] : '-' )
+    role  : ( app.role.length > 0 ? app.role[0] : '-' ),
+    img   : ( app.img ? app.img : '' ),
+    enabled  : ( app.enabled ? true : false )
   }
 
   res.send( cApp )
@@ -137,11 +140,13 @@ async function addApp( req, res ) {
       require   : {},
       entity    : {},
       page      : {},
-      startPage : []
+      startPage : [],
+      enabled   : false
     }
   }
   app.scopeId = ( req.body.scope == '-' ? null : req.body.scope )
   app.title   = ( req.body.name ? req.body.name : req.body.id )
+  app.enabled = ( req.body.enabled ? true : false )
   if ( req.body.role == '-' ) {
     app.role = []
   } else {
@@ -158,6 +163,12 @@ async function addApp( req, res ) {
     }
   }
   app.scope = scope
+
+  if ( req.body.img == '' && app.img ) {
+    delete app.img
+  } else {
+    app.img =  req.body.img
+  }
 
   await dta.addApp( appId, app)
   res.send( 'OK' )

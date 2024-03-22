@@ -56,6 +56,15 @@ async function prepDB() {
 
   if ( ! fs.existsSync( fileName( APP_TBL ) ) ) {
     await writeFile( fileName( APP_TBL ), "{}" ) 
+  } else {
+    await syncTbl( APP_TBL )
+    for ( let appId in data[ APP_TBL ] ) {
+      let app = data[ APP_TBL ][ appId ]
+      if ( ! app.hasOwnProperty( 'enabled' ) ) {
+        app.enabled = true
+      }
+    }
+    await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
   }
   if ( ! fs.existsSync( fileName( 'user-auth' )) ) {
     const { createHash } = require( 'node:crypto' )

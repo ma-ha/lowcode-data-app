@@ -1,3 +1,7 @@
+# 0.19.4
+- App enable
+- App icon
+
 # 0.19.3
 - State: Create form hide id if noEdit 
 - Adapter API: query parameter

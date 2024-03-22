@@ -178,7 +178,8 @@
         ],
         "srcURL": ""
       }
-    }
+    },
+    "enabled": true
   },
   "1000/device-inventory-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
@@ -345,7 +346,8 @@
         ],
         "srcURL": ""
       }
-    }
+    },
+    "enabled": true
   },
   "1000/device-mgr-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
@@ -512,7 +514,8 @@
           "appUser"
         ]
       }
-    }
+    },
+    "enabled": true
   },
   "1000/city-mgr-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
@@ -557,7 +560,8 @@
         ],
         "srcURL": ""
       }
-    }
+    },
+    "enabled": true
   },
   "1000/region-mgr/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
@@ -750,11 +754,12 @@
         ],
         "srcURL": ""
       }
-    }
+    },
+    "enabled": true
   },
   "1000/city-light-mgr/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
-    "scopeId": null,
+    "scopeId": "",
     "title": "City Light Manager",
     "require": {
       "city-mgr/1.0.0": {
@@ -889,7 +894,8 @@
           "appUser"
         ]
       }
-    }
+    },
+    "enabled": true
   },
   "1000/ticket-mgr/1.0.0": {
     "require": {},
@@ -986,7 +992,7 @@
     "startPage": [
       "Ticket"
     ],
-    "scopeId": null,
+    "scopeId": "",
     "title": "Task List",
     "role": [
       "appUser"
@@ -1002,7 +1008,9 @@
           "appUser"
         ]
       }
-    }
+    },
+    "enabled": true,
+    "img": "img/k8s-fire.png"
   },
   "2011/mocha-test-app/1.0.0": {
     "scopeId": null,
@@ -1024,6 +1032,7 @@
     "role": [
       "appUser"
     ],
-    "scope": {}
+    "scope": {},
+    "enabled": true
   }
 }
