@@ -187,7 +187,7 @@ Entities can refer to external GUI Apps using links. Placeholders in the links a
 
 # Customizing
 
-The GUI framework is "easy-web-app" and the underlying api server is "express".
+The GUI framework is [easy-web-app](https://github.com/ma-ha/easy-web-app)/[rest-web-ui](https://github.com/ma-ha/rest-web-ui) and the underlying api server is "express".
 
 ## State Model
 
