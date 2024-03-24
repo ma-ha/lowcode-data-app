@@ -558,6 +558,7 @@
 .pongFormInputAddStateTransitionFormContentGrp0Col2 {
   width: 150px;
 }
+
 /* ==================================================== */
 
  .decor-tm-title,
@@ -651,6 +652,16 @@
    display: block; 
    width: 300px;
  }
+
+ .qr {
+    width: 262px !important; 
+    float: left
+  }
+
+  .qrBtn {
+    float: left
+  }
+
  .pongFormField input[type=checkbox]
  {
      width: unset;

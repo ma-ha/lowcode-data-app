@@ -322,11 +322,15 @@ async function getProperty( req, res ) {
   if ( req.query.propId && ! req.query.id ) { // property by id
     let dbProp = app.entity[ entityId ].properties[ req.query.propId ]
     if ( ! dbProp ) { return res.send( null ) }
+    let pType =  dbProp.type
+    if ( pType == 'String' && dbProp.qr ) {
+      pType = 'String QR/Barcode'
+    }
     let prop = {
       appId    : appId,
       entityId : entityId,
       propId   : req.query.propId,
-      type     :  dbProp.type,
+      type     : pType,
       label    : ( dbProp.label ? dbProp.label : '' ),
       filter   : ( dbProp.filter ? true : false ),
       noEdit     : ( dbProp.noEdit  === true ? true : false ),
@@ -582,7 +586,7 @@ async function addProperty ( req, res ) {
   }
 
   await propHandler.addNewPropertyDef( entity.properties[ id ], req.body.type, req.body.ref )
- 
+
   log.info( 'addProperty e', entity.properties[ id ] )
 
   await dta.saveApp( req.body.appId, app )

@@ -579,7 +579,8 @@
           "Name": {
             "type": "String",
             "refLbl": true,
-            "noDelete": true
+            "noDelete": true,
+            "qr": true
           },
           "Short": {
             "type": "String",
@@ -625,9 +626,11 @@
             "type": "String",
             "noDelete": true,
             "stateTransition": {
-              "null_Create2": true
+              "null_Create2": true,
+              "Created_SetDone": true
             },
-            "filter": true
+            "filter": true,
+            "qr": true
           },
           "A3": {
             "type": "String",
@@ -710,9 +713,7 @@
         "stateModel": "Test",
         "creFromHeight": "200px",
         "tableHeight": "600px",
-        "stateTransition": {
-          "Created_SetDone_condition": "A5 $eq 'two'"
-        }
+        "stateTransition": {}
       },
       "SomeTag": {
         "title": "",

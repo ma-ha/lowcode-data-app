@@ -90,7 +90,8 @@ Open your new app in the "App" tab (the app is only visible in the defined scope
 ![sceenshot](doc/locode.png)
 
 Data types (and their Web GUI mapping)
-- `Strings` (simple input fields)
+- `String` (simple input fields)
+- `String QR/Barcode` (input field with QR and barcode scanner)
 - `Text` (multi line input fields)
 - `Number` (simple input fields)
 - `Boolean`  (checkboxes)

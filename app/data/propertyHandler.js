@@ -24,7 +24,7 @@ exports: module.exports = {
 
 function getPropTypes() {
   return [
-    'String', 'Text',
+    'String', 'String QR/Barcode', 'Text',
     'Boolean', 'Number', 'Date', 
     'Select', 
     'DocMap', 'SelectRef', 'MultiSelectRef', /* 'RefArray',*/ 
@@ -70,6 +70,9 @@ function setPropRef( prop, dbProp ) {
 function getpropTypeDef( prop ) {
   let pType = ( prop.type ? prop.type : "?" )
   switch ( pType ) {
+    case 'String':
+      if ( prop.qr ) { pType = 'String QR/Barcode' }
+      break 
     case 'Text':
       pType = "Text ("+prop.lines+')'
       break 
@@ -106,7 +109,16 @@ function getpropTypeDef( prop ) {
 async function addNewPropertyDef( prop, type, ref  ) {
 
   // special types need additional info
-  if ( type == 'Text' ) {
+  if ( type == 'String' ) {
+
+      if ( prop.qr ) { delete prop.qr }
+
+  } else if ( type == 'String QR/Barcode' ) { // special String type
+    
+    prop.type = 'String'
+    prop.qr   = true
+
+  } else if ( type == 'Text' ) {
 
     prop.lines = 3
     if ( ref && ref !== '' ) { 
@@ -255,7 +267,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
     }
   } else if ( entity.stateModel ) { 
     // prevent create via the edit form
-    cols.push({ formFields: [{ id: "id", label: "Id", type: "text", readonly: true } ]})
+    // cols.push({ formFields: [{ id: "id", label: "Id", type: "text", readonly: true } ]})
   } else { // every data rec need an id
     cols.push({ formFields: [{ id: "id", label: "Id", type: "text" } ]})
   }
@@ -393,6 +405,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
       default:   // String, Number
         fld = { id: fldId, label: lbl, type: 'text' }
         if ( defaultVal ) { fld.defaultVal = defaultVal }
+        if ( prop.qr ) { fld.qr = true }
         break 
     }
 
@@ -538,6 +551,7 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
       default:   // String, Number
         fld = { id: propId, label: lbl, type: 'text', value: rec[ propId ] }
         if ( defaultVal ) { fld.value = defaultVal }
+        if ( prop.qr ) { fld.qr = true }
         break 
     }
 
@@ -574,7 +588,12 @@ function reformatDataReturn( entity, result  ) {
   for ( let propId in entity.properties )  {
     try {
       
-      if ( entity.properties[ propId ].type == 'JSON' ) {
+      if ( entity.properties[ propId ].type == 'String' ) {
+        if ( entity.properties[ propId ].qr ) {
+          
+        }
+
+      } else if ( entity.properties[ propId ].type == 'JSON' ) {
       
         try {
           log.debug( 'result[ propId ]',propId,result[ propId ] )
