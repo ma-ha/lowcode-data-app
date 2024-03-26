@@ -885,7 +885,7 @@ function getRefId( id ) {
 // ============================================================================
 
 async function getEntity( refId, propId ) {
-  log.info( 'getEntity', refId, propId )
+  log.debug( 'getEntity', refId, propId )
   try {
     let idParts = refId.split('/')
     let appId = idParts[0] + '/' + idParts[1] + '/' + idParts[2] 

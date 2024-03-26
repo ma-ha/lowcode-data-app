@@ -112,7 +112,7 @@ async function publishDataChgEvt( dtaOp, dtaId, uri, dtaType, data ) {
 }
 
 function isQueried( doc, qry ) {
-  log.info( 'QRY', doc, qry )
+  log.debug( 'QRY', doc, qry )
   if ( ! qry ) { return true }
   for ( let q in qry ) {
     if ( ! doc[q]  ||  doc[q] != qry[q] ) { return false }

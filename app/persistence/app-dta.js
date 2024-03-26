@@ -207,7 +207,7 @@ async function getData( tbl, scopeId, admin, qry ) {
   for ( let recId in data[ table ] ) {
     let rec = data[ table ][ recId ]
     if ( !  isQueried( rec, qry ) ) { continue }
-    log.info( 'getData dta:', inheritData, recId, scopeId, rec.scopeId  )
+    log.debug( 'getData dta:', inheritData, recId, scopeId, rec.scopeId  )
     if ( admin ) {
       result[ recId ] = rec
     } else  if ( inheritData ) {
@@ -225,7 +225,7 @@ async function getData( tbl, scopeId, admin, qry ) {
 }
 
 function isQueried( doc, qry ) {
-  log.info( 'QRY', qry )
+  log.debug( 'QRY', qry )
   if ( ! qry ) { return true }
   for ( let q in qry ) {
     if ( ! doc[q]  ||  doc[q] != qry[q] ) { return false }
