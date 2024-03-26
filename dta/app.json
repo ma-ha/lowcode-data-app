@@ -351,7 +351,7 @@
   },
   "1000/device-mgr-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
-    "scopeId": "",
+    "scopeId": null,
     "title": "Device Manager",
     "require": {},
     "entity": {
@@ -748,19 +748,13 @@
     "role": [
       "admin"
     ],
-    "scope": {
-      "1000": {
-        "role": [
-          "admin"
-        ],
-        "srcURL": ""
-      }
-    },
-    "enabled": true
+    "scope": {},
+    "enabled": true,
+    "img": ""
   },
   "1000/city-light-mgr/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
-    "scopeId": "",
+    "scopeId": null,
     "title": "City Light Manager",
     "require": {
       "city-mgr/1.0.0": {
@@ -993,7 +987,7 @@
     "startPage": [
       "Ticket"
     ],
-    "scopeId": "",
+    "scopeId": null,
     "title": "Task List",
     "role": [
       "appUser"
@@ -1012,28 +1006,5 @@
     },
     "enabled": true,
     "img": "img/k8s-fire.png"
-  },
-  "2011/mocha-test-app/1.0.0": {
-    "scopeId": null,
-    "title": "MochaTest",
-    "require": {},
-    "entity": {
-      "test": {
-        "title": "Test",
-        "scope": "inherit",
-        "maintainer": [],
-        "properties": {
-          "Name": {
-            "type": "String"
-          }
-        }
-      }
-    },
-    "startPage": "test",
-    "role": [
-      "appUser"
-    ],
-    "scope": {},
-    "enabled": true
   }
 }

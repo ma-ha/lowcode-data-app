@@ -1,4 +1,7 @@
 # 0.20.0
+- app lists on all scopes
+
+# 0.20.0
 - Input with QR or barcode scanner
 
 # 0.19.4

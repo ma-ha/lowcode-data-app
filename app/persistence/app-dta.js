@@ -63,6 +63,7 @@ async function prepDB() {
       if ( ! app.hasOwnProperty( 'enabled' ) ) {
         app.enabled = true
       }
+      if ( app.scopeId == '' ) { app.scopeId = null }
     }
     await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
   }
@@ -110,12 +111,16 @@ async function getAppList( scopeId, scopeTags, mode ) {
 
   let apps = {}
   for ( let appId in data[ APP_TBL ] ) {
+    if ( ! appId.startsWith( rootScope ) ) { continue }
     let app = data[ APP_TBL ][ appId ]
     let appInScope = false
     log.debug( 'getAppList >', app.scope,  app.scopeId )
     if ( mode == 'admin'  &&  appId.startsWith( rootScope ) ) {
       appInScope = true
     } else if ( app.scope[ scopeId ] || app.scopeId == scopeId ) {
+      appInScope = true
+    } else if ( ! app.scopeId && JSON.stringify( app.scope ) == '{}' ) { // all scopes
+      log.debug( '>>>', appId, ' >> all scopes')
       appInScope = true
     } else {
       for ( let tag of scopeTags ) {
