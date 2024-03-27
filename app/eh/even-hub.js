@@ -12,8 +12,7 @@ const { writeFile, readFile } = require( 'node:fs/promises' )
 
 exports: module.exports = { 
   init,
-  publishDataChgEvt,
-  subscribeEvt
+  publishDataChgEvt
 }
 
 let DB = '../dta/event-subscriptions.json'
@@ -25,16 +24,18 @@ let seqNo = 0
 
 // ============================================================================
 let gui = null
+let db = null
 
-async function init( app, dbDir ) {
-  if ( ! dbDir.endsWith( '/' ) ) { dbDir += '/' }
-  DB = dbDir + 'event-subscriptions.json'
-  if ( ! fs.existsSync( DB ) ) {
-    await writeFile( DB, '{}' )
-  }
+async function init( app, persistence ) {
+  db = persistence
+  // if ( ! dbDir.endsWith( '/' ) ) { dbDir += '/' }
+  // DB = dbDir + 'event-subscriptions.json'
+  // if ( ! fs.existsSync( DB ) ) {
+  //   await writeFile( DB, '{}' )
+  // }
   gui = app
   
-  subscriptions = JSON.parse( await readFile( DB ) )
+  // subscriptions = JSON.parse( await readFile( DB ) )
   let svc = app.getExpress()
   svc.use( bodyParser.urlencoded({  limit: "20mb", extended: false }) )
   svc.use( bodyParser.json({ limit: "20mb" }) )
@@ -53,6 +54,7 @@ async function getAppSubs( req, res ) {
   log.info( 'getAppSubs', req.query )
   // let user = await userDta.getUserInfoFromReq( gui, req )
   let appSubs = []
+  let subscriptions = await db.getSubscriptions()
   for ( let scope in subscriptions ) {
     // log.info( 'getAppSubs scope', scope )
     for ( let app in subscriptions[ scope ] ) {
@@ -91,6 +93,7 @@ async function publishDataChgEvt( dtaOp, dtaId, uri, dtaType, data ) {
     dt   : Date.now()
   }
   log.info( 'evt',evt )
+  let subscriptions = await db.getSubscriptions()
   for ( let scope in subscriptions ) {
     log.info( 'evt scope', scope )
     if ( dtaType.indexOf( scope) == 0 ) {
@@ -129,7 +132,7 @@ async function subscribeCall( req, res ) { try {
   let scopes = req.appScopes
   let result = {}
   for ( let scopeId of scopes ) {
-    result[ scopeId ] = await subscribeEvt( req.appId, req.body.name, scopeId, req.body.webHook, req.body.filter, req.body.since )
+    result[ scopeId ] = await db.subscribeEvt( req.appId, req.body.name, scopeId, req.body.webHook, req.body.filter, req.body.since )
   }
   res.send( result ) 
 } catch (exc) { log.error( 'subscribeCall', exc ) } }
@@ -138,14 +141,14 @@ async function subscribeCall( req, res ) { try {
 async function unsubscribeCall( req, res ) {  try {
   log.info( 'POST /event/unsubscribe', req.body )
   if ( ! req.body.name ) { return res.status(401).send( 'name required' ) }
-  let scopes = req.appScopes
-  let result = {}
-  for ( let scopeId of scopes ) {
-     delete  subscriptions[ scopeId ][ req.body.name ]
+  for ( let scopeId of req.appScopes ) {
+    await db.unsubscribeEvt( scopeId, req.body.name ) 
   }
-  await writeFile( DB, JSON.stringify( subscriptions, null, '  ' ) )
   res.send( 'done' ) 
-} catch (exc) { log.error( 'subscribeCall', exc ) } }
+} catch (exc) { 
+  log.error( 'subscribeCall', exc ) } 
+  res.send( 'failed' ) 
+}
 
 
 async function subscribeEvt( app, name, scopeId, webHook, filter, since ) {

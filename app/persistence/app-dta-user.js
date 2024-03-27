@@ -44,8 +44,11 @@ let OIDC_SESSION_DB = '../dta/oidc-session.json'
 
 let FAKE_LOGIN = false
 
-async function init( dbDir, fakeLogin ) {
-  if ( fakeLogin ) { FAKE_LOGIN = fakeLogin }
+async function init( cfg ) {
+  let dbDir = cfg.DATA_DIR 
+  if ( ! dbDir.endsWith('/') ) { dbDir += '/' }
+  if ( cfg.FAKE_LOGIN  ) { FAKE_LOGIN = cfg.FAKE_LOGIN  }
+  log.info( 'user-data init', dbDir, FAKE_LOGIN )
   SCOPE_DB        = dbDir + 'scope.json'
   SCOPE_ID        = dbDir + 'scopeSeq.json'
   USER_AUTH_DB    = dbDir + 'user-auth.json'

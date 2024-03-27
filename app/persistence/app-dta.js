@@ -24,7 +24,10 @@ exports: module.exports = {
   delDataObj,
   delDataObjNoEvent,
   delCollection,
-  delRootScope
+  delRootScope,
+  getSubscriptions,
+  subscribeEvt,
+  unsubscribeEvt
 }
 
 // ============================================================================
@@ -32,15 +35,15 @@ let DB_DIR = null
 const APP_TBL = 'app' 
 const STATE_TBL = 'state' 
 const ERM_TBL = 'erm'
-const EH_SUB_TBL = 'erm'
+const EH_SUB_TBL = 'event-subscriptions'
 
-async function init( dbDir, fakeLogin ) {
-  DB_DIR  = dbDir 
+async function init( cfg ) {
+  DB_DIR  = cfg.DATA_DIR 
   if ( ! DB_DIR.endsWith( '/' ) ) { DB_DIR += '/' }
 
   await prepDB()
 
-  userDB.init( DB_DIR, fakeLogin )
+  userDB.init( cfg )
 
   data[ APP_TBL ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )
 
@@ -451,6 +454,35 @@ async function delDataObjNoEvent( tbl, id ) {
 }
 
 // ============================================================================
+
+async function getSubscriptions() {
+  await syncTbl( EH_SUB_TBL )
+  return data[ EH_SUB_TBL ]
+}
+
+
+async function subscribeEvt( app, name, scopeId, webHook, filter, since ) {
+  let subscriptions =  await syncTbl( EH_SUB_TBL )
+  if ( ! subscriptions[ scopeId ] ) {
+    subscriptions[ scopeId ] = {}
+  }
+  subscriptions[ scopeId ][ name ] = {
+    webHook : webHook,
+    app     : app,
+    filter  : ( filter ? filter : {} ),
+    creDt   : Date.now()
+  }
+  writeTbl( EH_SUB_TBL ) 
+}
+
+async function unsubscribeEvt( scopeId, name ) {
+  let subscriptions = await syncTbl( EH_SUB_TBL )
+  for ( let scopeId of scopes ) {
+    delete  subscriptions[ scopeId ][ req.body.name ]
+ }  writeTbl( EH_SUB_TBL ) 
+}
+
+// ============================================================================
 async function delCollection( scopeId, entityId ) {
   let dbFile = fileName( scopeId + entityId )
   if ( fs.existsSync( dbFile ) ) {
@@ -488,6 +520,12 @@ async function syncTbl( tbl, always ) {
     log.debug('>> readFile', dbFile )
     data[ tbl ] =  JSON.parse( await readFile( dbFile ) )
   } 
+  return data[ tbl ]
+}
+
+async function writeTbl( tbl ) {
+  let dbFile = fileName( tbl )
+  await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
 }
 
 

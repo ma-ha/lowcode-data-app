@@ -28,8 +28,8 @@ async function init( lowCodeConfig ) {
 
   apiSec.init( cfg )
   let app = appGUI.init( cfg )
-  await appData.init( cfg.DATA_DIR, cfg.FAKE_LOGIN )
-  await eh.init( app, cfg.DATA_DIR )
+  await appData.init( cfg )
+  await eh.init( app, appData )
 
   await appGUI.initPages()
 

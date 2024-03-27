@@ -7,5 +7,14 @@
     "scopeId": "1000",
     "_cre": 1707503032823,
     "_upd": 1707503044172
+  },
+  "DE-West": {
+    "id": "DE-West",
+    "Name": "DE-West",
+    "Short": "DE-West",
+    "Size": "L",
+    "scopeId": "1000",
+    "_cre": 1711562787030,
+    "_upd": 1711562787030
   }
 }
