@@ -350,17 +350,24 @@
   right: unset;
  }
  #ScopeSelPullDownButton {
-  width: 200px;
+  width: 300px;
   background: unset;
   background-color: #3e3d3d;
   border: 1px solid #555555;
   color: white;
+}
+#ScopeSel {
+  width: 300px;
 }
 #ScopeSelPullDownMenu {
   background-color: #3e3d3d;
   max-height: 300px;
   overflow: auto;
   scrollbar-color: white rgb(66, 66, 66);
+  min-width: 200px;
+  width: auto;
+  padding-right: 10px;
+  padding-left: 10px;
 }
 
 
