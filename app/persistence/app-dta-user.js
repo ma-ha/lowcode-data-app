@@ -443,7 +443,7 @@ async function getUserArr( scopeId ) {
 
 
 async function getApiAppScopes( appId, appSecret ) {
-  let sp = awaitloadUserById( appId )
+  let sp = await loadUserById( appId )
   // let hash = createHash('sha256').update( appSecret ).digest('hex')
   let hash = appSecret // TODO
   log.debug( 'getApiAppScopes', hash, sp )
@@ -506,7 +506,8 @@ async function saveScope( id, scope ) {
 }
 
 async function delScope( id ) {
-  delete scopeTbl[ tId ] 
+  let scopeTbl = await loadScopes() 
+  delete scopeTbl[ id ] 
   await writeScope() 
 }
 

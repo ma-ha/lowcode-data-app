@@ -380,9 +380,10 @@ async function embedRefObjects( origDta, entity ) {
 
 async function delDataObj( tbl, id, entity ) {
   log.info( 'delDataObj', tbl, id )
+  let dta = await loadDataById( tbl, id )
   await delData( tbl, id )
   let uri = null
-  eh.publishDataChgEvt( 'dta.del', id, uri, tbl, cpyDta )
+  eh.publishDataChgEvt( 'dta.del', id, uri, tbl, dta )
   return "Deleted"
 }
 
