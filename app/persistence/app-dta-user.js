@@ -42,8 +42,14 @@ let OIDC_SESSION_DB = '../dta/oidc-session.json'
 
 let FAKE_LOGIN = false
 
+let DB = null
+
 async function init( cfg ) {
   if ( cfg.FAKE_LOGIN  ) { FAKE_LOGIN = cfg.FAKE_LOGIN  }
+
+  if ( cfg.PERSISTENCE && cfg.PERSISTENCE.USER ) {
+    DB = cfg.PERSISTENCE.USER
+  }
 
   let dbDir = cfg.DATA_DIR 
   if ( ! dbDir.endsWith('/') ) { dbDir += '/' }
@@ -475,6 +481,9 @@ let authTblCache = {}
 // DB methods
 
 async function getNextScopeId() {
+  log.debug( 'getNextScopeId' )
+  if ( DB ) { return await DB.getNextScopeId() }
+  // --- JSON file DB ---
   let scopeSeq = { ID: 1000 }
   if ( fs.existsSync( SCOPE_ID  ) ) {
     scopeSeq = JSON.parse( await readFile( SCOPE_ID ) )
@@ -491,6 +500,9 @@ async function writeScope() {
 
 
 async function loadScopes() {
+  log.debug( 'loadScopes' )
+  if ( DB ) { return await DB.loadScopes() }
+  // --- JSON file DB ---
   if ( fs.existsSync( SCOPE_DB  ) ) {
     scopeCache = JSON.parse( await readFile( SCOPE_DB ) )
   } else {
@@ -500,12 +512,18 @@ async function loadScopes() {
 }
 
 async function saveScope( id, scope ) {
+  log.debug( 'saveScope', id, scope )
+  if ( DB ) { return await DB.saveScope( id, scope ) }
+  // --- JSON file DB ---
   let scopeTbl = await loadScopes() 
   scopeTbl[ id ] = scope
   await writeScope()
 }
 
 async function delScope( id ) {
+  log.debug( 'delScope', id )
+  if ( DB ) { return await DB.delScope( id ) }
+  // --- JSON file DB ---
   let scopeTbl = await loadScopes() 
   delete scopeTbl[ id ] 
   await writeScope() 
@@ -514,23 +532,35 @@ async function delScope( id ) {
 //-----------------------------------------------------------------------------
 
 async function loadUserArr() {
+  log.debug( 'loadUserArr' )
+  if ( DB ) { return await DB.loadUserArr() }
+  // --- JSON file DB ---
   let authTbl = await getAuthTbl()
   return authTbl
 }
 
 async function loadUserById( uid ) {
+  log.debug( 'loadUserById' )
+  if ( DB ) { return await DB.loadUserById( uid ) }
+  // --- JSON file DB ---
   let authTbl = await getAuthTbl()
   let idnty = authTbl[ uid ]
   return idnty
 }
 
 async function saveUser( uid, user ) {
+  log.debug( 'saveUser' )
+  if ( DB ) { return await DB.saveUser( uid, user ) }
+  // --- JSON file DB ---
   let authTbl = await getAuthTbl()
   authTbl[ uid ] = user
   await writeAuthTbl()
 }
 
 async function delUser( uid ) {
+  log.debug( 'delUser' )
+  if ( DB ) { return await DB.delUser( uid ) }
+  // --- JSON file DB ---
   let authTbl = await getAuthTbl()
   if ( authTbl[ uid ]) {
     delete authTbl[ uid ]
@@ -559,6 +589,9 @@ async function writeAuthTbl() { // internal
 //-----------------------------------------------------------------------------
 
 async function loadUserScope( userId ) {
+  log.debug( 'loadUserScope' )
+  if ( DB ) { return await DB.loadUserScope( userId ) }
+  // --- JSON file DB ---
   if ( fs.existsSync( USER_SCOPE_DB  ) ) {
     userScopeCache = JSON.parse( await readFile( USER_SCOPE_DB ) )
   }  
@@ -566,6 +599,9 @@ async function loadUserScope( userId ) {
 }
 
 async function saveUserScope( uid, scopeId ) {
+  log.debug( 'saveUserScope' )
+  if ( DB ) { return await DB.saveUserScope( uid, scopeId ) }
+  // --- JSON file DB ---
   if ( fs.existsSync( USER_SCOPE_DB  ) ) {
     userScopeCache = JSON.parse( await readFile( USER_SCOPE_DB ) )
   }
@@ -580,6 +616,9 @@ async function writeUserScope() {
 //-----------------------------------------------------------------------------
 
 async function loadOidcSessions() { 
+  log.debug( 'loadOidcSessions' )
+  if ( DB ) { return await DB.loadOidcSessions() }
+  // --- JSON file DB ---
   let oidcSessions = {}
   if ( fs.existsSync( OIDC_SESSION_DB ) ) {
     oidcSessions = JSON.parse( await readFile( OIDC_SESSION_DB ) )
@@ -588,6 +627,9 @@ async function loadOidcSessions() {
 }
 
 async function saveOidcSessions( oidcSessions ) {
+  log.debug( 'saveOidcSessions' )
+  if ( DB ) { return await DB.saveOidcSessions( oidcSessions ) }
+  // --- JSON file DB ---
   await writeFile( OIDC_SESSION_DB, JSON.stringify( oidcSessions, null, '  ' ) )
 }
 

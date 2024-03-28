@@ -37,32 +37,51 @@ const STATE_TBL = 'state'
 const ERM_TBL = 'erm'
 const EH_SUB_TBL = 'event-subscriptions'
 
+let DB = null 
+
 async function init( cfg ) {
   if ( cfg.PERSISTENCE ) { // EXTERNAL IMPLEMENTATION
-    
-    const dbMethods = ['prepDB',
-      'getAppList','getApp','getAppById','addApp','saveApp',
-      'getStateModelById','getData','getDataById','getDataObjX','isQueried','idExists',
-      'addDataObj','addDataObjNoEvent','delDataObj','delDataObjNoEvent','delCollection',
-      'delRootScope','getSubscriptions','subscribeEvt','unsubscribeEvt']
-    
-      const dbUserMethods = ['getNextScopeId',
-        'writeScope','loadScopes','saveScope','delScope',
-        'loadUserArr','loadUserById','saveUser','delUser',
-        'loadUserScope','saveUserScope','writeUserScope',
-        'loadOidcSessions','saveOidcSessions']
+    let replaceOK = true
 
-  } else { // USE FILES
-    
-    DB_DIR  = cfg.DATA_DIR 
-    if ( ! DB_DIR.endsWith( '/' ) ) { DB_DIR += '/' }
-  
-    await prepDB()
-  
-    userDB.init( cfg )
-  
-    data[ APP_TBL ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )  
+    const dbMethods = ['info','prepDB',
+      'loadData','loadDataById','savedDataObj','delData'
+    ]
+    for ( let dbMethod of dbMethods ) {
+      if ( ! cfg.PERSISTENCE[ dbMethod ] ) {
+        log.error( "REQUIRED METHOD NOT FOUND:", dbMethod )
+        replaceOK = false
+      }
+    }
+    const userMethods = ['getNextScopeId','loadScopes','saveScope','delScope',
+      'loadUserArr','loadUserById','saveUser','delUser','loadUserScope','saveUserScope',
+      'writeUserScope','loadOidcSessions','saveOidcSessions'
+    ]
+    for ( let dbMethod of userMethods ) {
+      if ( ! cfg.PERSISTENCE.USER[ dbMethod ] ) {
+        log.error( "REQUIRED METHOD NOT FOUND:", dbMethod )
+        replaceOK = false
+      }
+    }
+    if ( replaceOK ) { 
+      DB = cfg.PERSISTENCE
+      log.info( 'USE:', DB.info() )
+      userDB.init( cfg )
+      return 
+    } else {
+      process.exit()
+    }
   }
+
+  log.info( 'USE JSON FILE DB' )
+
+  DB_DIR  = cfg.DATA_DIR 
+  if ( ! DB_DIR.endsWith( '/' ) ) { DB_DIR += '/' }
+
+  await prepDB()
+
+  userDB.init( cfg )
+
+  data[ APP_TBL ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )  
 }
 
 // ============================================================================
@@ -264,7 +283,7 @@ async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeI
   let result = null
   if ( id  ) { 
     // single rec by id
-    let rec = await getDataById( tbl, id )
+    let rec = await loadDataById ( tbl, id )
     log.debug( 'getDataObjX rec', rec )
     if ( rec && scopeOK( userScopeId, rec.scopeId  , inherit ) ) {
       result = rec
@@ -425,12 +444,16 @@ async function unsubscribeEvt( scopeId, name ) {
 
 async function loadData( tbl, qry ) {
   log.debug( 'loadData', tbl, qry  )
+  if ( DB ) { return await DB.loadData( tbl, qry ) }
+  // --- JSON file DB ---
   await syncTbl( tbl )
   return data[ tbl ]
 }
 
 async function loadDataById( tbl, id ) {
   log.debug( 'getDataById',tbl, id  )
+  if ( DB ) { return await DB.loadDataById( tbl, id ) }
+  // --- JSON file DB ---
   await syncTbl( tbl )
   if ( data[ tbl ] && data[ tbl ][ id ] ) {
     return data[ tbl ][ id ] 
@@ -440,6 +463,8 @@ async function loadDataById( tbl, id ) {
 
 async function saveData( tbl, id, obj ) {
   log.info( 'addDataObjNoEvent', tbl, id )
+  if ( DB ) { return await DB.saveData( tbl, id, obj ) }
+  // --- JSON file DB ---
   await syncTbl( tbl )
   let cre = null
   let dtaEvt = 'dta.add'
@@ -463,6 +488,8 @@ async function saveData( tbl, id, obj ) {
 
 async function delData( tbl, id ) {
   log.info( 'delDataObj', tbl, id )
+  if ( DB ) { return await DB.delData( tbl, id ) }
+  // --- JSON file DB ---
   await syncTbl( tbl )
   let idT = id.trim() 
   if ( ! data[ tbl ]  ||  ! data[ tbl ][ idT ] ) { return "Not found" }
@@ -476,6 +503,9 @@ async function delData( tbl, id ) {
 
 // ============================================================================
 async function delCollection( scopeId, entityId ) {
+  log.info( 'delCollection', scopeId, entityId )
+  if ( DB ) { return await DB.delCollection( scopeId, entityId ) }
+  // --- JSON file DB ---
   let dbFile = fileName( scopeId + entityId )
   if ( fs.existsSync( dbFile ) ) {
     await rm( dbFile )
@@ -483,14 +513,18 @@ async function delCollection( scopeId, entityId ) {
 }
 
 async function delRootScope( scopeId ) {
+  log.info( 'delRootScope', scopeId  )
   cleanUpScopeInTbl( APP_TBL, scopeId )
   cleanUpScopeInTbl( STATE_TBL, scopeId )
   cleanUpScopeInTbl( ERM_TBL, scopeId )
   cleanUpScopeInTbl( EH_SUB_TBL, scopeId )
-   return 'OK'
+  return 'OK'
 }
 
 async function cleanUpScopeInTbl( tbl, scopeId ) {
+  log.info( 'cleanUpScopeInTbl', tbl, scopeId  )
+  if ( DB ) { return await DB.cleanUpScopeInTbl( tbl, scopeId ) }
+  // --- JSON file DB ---
   await syncTbl( tbl )
   for ( let id in data[ tbl ] ) {
     if ( id.startsWith( scopeId ) ) {
