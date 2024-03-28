@@ -13,7 +13,7 @@
     "axios": "^1.6.7",
     "body-parser": "^1.19.0",
     "bunyan": "^1.8.15",
-    "easy-web-app": "^2.10.1",
+    "easy-web-app": "^2.10.2",
     "express-fileupload": "^1.4.3",
     "jsonwebtoken": "^9.0.2"
   },

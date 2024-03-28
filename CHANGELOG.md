@@ -1,6 +1,7 @@
 # 0.21.0
 - refactor persistence
 - Scope select CSS improved
+- fix properties with "-"
 
 # 0.20.0
 - app lists on all scopes

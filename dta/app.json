@@ -561,7 +561,10 @@
         "srcURL": ""
       }
     },
-    "enabled": true
+    "enabled": true,
+    "id": "1000/city-mgr-app/1.0.0",
+    "_cre": 1711644036674,
+    "_upd": 1711644036674
   },
   "1000/region-mgr/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
@@ -706,6 +709,11 @@
               "null_Create1_default": "TagType $eq col",
               "null_Create2_default": "TagType $eq 'blue'"
             }
+          },
+          "a-1": {
+            "type": "String",
+            "filter": true,
+            "noDelete": true
           }
         },
         "noDelete": true,
@@ -750,7 +758,10 @@
     ],
     "scope": {},
     "enabled": true,
-    "img": ""
+    "img": "",
+    "id": "1000/region-mgr/1.0.0",
+    "_cre": 1711642000428,
+    "_upd": 1711642000428
   },
   "1000/city-light-mgr/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
