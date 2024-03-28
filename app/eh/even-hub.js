@@ -15,11 +15,8 @@ exports: module.exports = {
   publishDataChgEvt
 }
 
-let DB = '../dta/event-subscriptions.json'
-
 // ============================================================================
-let subscriptions = {
-}
+
 let seqNo = 0
 
 // ============================================================================
@@ -150,20 +147,3 @@ async function unsubscribeCall( req, res ) {  try {
   res.send( 'failed' ) 
 }
 
-
-async function subscribeEvt( app, name, scopeId, webHook, filter, since ) {
-  // TODO check app authz
-  if ( ! subscriptions[ scopeId ] ) {
-    subscriptions[ scopeId ] = {}
-  }
-  subscriptions[ scopeId ][ name ] = {
-    webHook : webHook,
-    app     : app,
-    filter  : ( filter ? filter : {} ),
-    creDt   : Date.now()
-  }
-  await writeFile( DB, JSON.stringify( subscriptions, null, '  ' ) )
-
-  log.info( 'subs', subscriptions )
-  return 'OK'
-}

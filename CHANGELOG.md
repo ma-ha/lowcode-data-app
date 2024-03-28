@@ -1,3 +1,6 @@
+# 0.21.0
+- refactor persistence
+
 # 0.20.0
 - app lists on all scopes
 

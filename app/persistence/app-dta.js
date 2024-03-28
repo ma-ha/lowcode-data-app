@@ -15,7 +15,7 @@ exports: module.exports = {
   saveApp,
   getStateModelById,
   getData,
-  getDataById,
+  getDataById: loadDataById,
   getDataObjX,
   isQueried,
   idExists,
@@ -38,15 +38,31 @@ const ERM_TBL = 'erm'
 const EH_SUB_TBL = 'event-subscriptions'
 
 async function init( cfg ) {
-  DB_DIR  = cfg.DATA_DIR 
-  if ( ! DB_DIR.endsWith( '/' ) ) { DB_DIR += '/' }
+  if ( cfg.PERSISTENCE ) { // EXTERNAL IMPLEMENTATION
+    
+    const dbMethods = ['prepDB',
+      'getAppList','getApp','getAppById','addApp','saveApp',
+      'getStateModelById','getData','getDataById','getDataObjX','isQueried','idExists',
+      'addDataObj','addDataObjNoEvent','delDataObj','delDataObjNoEvent','delCollection',
+      'delRootScope','getSubscriptions','subscribeEvt','unsubscribeEvt']
+    
+      const dbUserMethods = ['getNextScopeId',
+        'writeScope','loadScopes','saveScope','delScope',
+        'loadUserArr','loadUserById','saveUser','delUser',
+        'loadUserScope','saveUserScope','writeUserScope',
+        'loadOidcSessions','saveOidcSessions']
 
-  await prepDB()
-
-  userDB.init( cfg )
-
-  data[ APP_TBL ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )
-
+  } else { // USE FILES
+    
+    DB_DIR  = cfg.DATA_DIR 
+    if ( ! DB_DIR.endsWith( '/' ) ) { DB_DIR += '/' }
+  
+    await prepDB()
+  
+    userDB.init( cfg )
+  
+    data[ APP_TBL ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )  
+  }
 }
 
 // ============================================================================
@@ -110,12 +126,11 @@ async function getAppList( scopeId, scopeTags, mode ) {
   }
   // log.info( 'getAppList rootScope', rootScope )
 
-  await syncTbl( APP_TBL )
-
   let apps = {}
-  for ( let appId in data[ APP_TBL ] ) {
+  let appMap = await loadData( APP_TBL )
+  for ( let appId in appMap ) {
     if ( ! appId.startsWith( rootScope ) ) { continue }
-    let app = data[ APP_TBL ][ appId ]
+    let app = appMap[ appId ]
     let appInScope = false
     log.debug( 'getAppList >', app.scope,  app.scopeId )
     if ( mode == 'admin'  &&  appId.startsWith( rootScope ) ) {
@@ -142,35 +157,24 @@ async function getAppList( scopeId, scopeTags, mode ) {
 
 async function getApp( scopeId, appId ) {
   log.debug( 'getApp', scopeId, appId )
-  await syncTbl( APP_TBL )
-  if ( data.app[ scopeId +'/'+ appId ] ) {
-    return data.app[  scopeId +'/'+ appId  ]
-  }
-  return null
+  return getAppById( scopeId +'/'+ appId ) 
 }
 
 async function getAppById( fullAppId ) {
-  log.debug( 'getApp',fullAppId )
-  await syncTbl( APP_TBL )
-  if ( data.app[fullAppId] ) {
-    return data.app[  fullAppId ]
-  }
-  return null
+  log.debug( 'getAppById',fullAppId )
+  return await loadDataById( APP_TBL, fullAppId )
 }
 
 async function addApp( fullAppId, app ) {
   log.debug( 'getApp',fullAppId )
-  await syncTbl( APP_TBL )
-  data.app[ fullAppId ] = app
-  await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
+  await addDataObjNoEvent( APP_TBL, fullAppId, app )
   let uri = '/adapter/app/' + fullAppId
   eh.publishDataChgEvt( 'app.add', fullAppId, uri, APP_TBL, app )
 }
 
 async function saveApp( fullAppId, app ) {
   log.info( 'saveApp',fullAppId )
-  data.app[ fullAppId ] = app
-  await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
+  await addDataObjNoEvent( APP_TBL, fullAppId, app )
   let uri = '/adapter/app/' + fullAppId
   eh.publishDataChgEvt( 'app.chg', fullAppId, uri, APP_TBL, app )
 }
@@ -179,12 +183,8 @@ async function saveApp( fullAppId, app ) {
 
 async function getStateModelById( rootScopeId, stateModelId ) {
   log.debug( 'getStateModelById', rootScopeId, stateModelId  )
-  await syncTbl( 'state', true )
-  // log.info( 'data.state', data.state )
-  if ( data.state[ rootScopeId +'/'+ stateModelId ] ) {
-    return data.state[ rootScopeId +'/'+ stateModelId ]
-  }
-  return null
+  let stateModel = await loadDataById( 'state', rootScopeId +'/'+ stateModelId )
+  return stateModel
 }
 // ============================================================================
 
@@ -205,10 +205,10 @@ async function getData( tbl, scopeId, admin, qry ) {
   } else {
     // nothing
   }
-  await syncTbl( table )
+  let dtaMap = await loadData( table, qry )
   let result = {}
-  for ( let recId in data[ table ] ) {
-    let rec = data[ table ][ recId ]
+  for ( let recId in dtaMap ) {
+    let rec = dtaMap[ recId ]
     if ( !  isQueried( rec, qry ) ) { continue }
     log.debug( 'getData dta:', inheritData, recId, scopeId, rec.scopeId  )
     if ( admin ) {
@@ -219,7 +219,7 @@ async function getData( tbl, scopeId, admin, qry ) {
         result[ recId ] = rec
       }
     } else {
-      if ( data[ table ][ recId ].scopeId == scopeId ){
+      if ( rec.scopeId == scopeId ){
         result[ recId ] = rec
       }
     }
@@ -236,20 +236,11 @@ function isQueried( doc, qry ) {
   return true
 }
 
-async function getDataById( tbl, id ) {
-  log.debug( 'getDataById',tbl, id  )
-  await syncTbl( tbl )
-  if ( data[ tbl ] && data[ tbl ][ id ] ) {
-    return data[ tbl ][ id ] 
-  }
-  return null
-}
-
 async function scopeInherited( rootScopeId, appId, appVersion, entityId ) {
   let inherit = false
   try {
     let appIdx = rootScopeId +'/'+ appId +'/'+ appVersion
-    let app = data.app[ appIdx ]
+    let app = await getAppById( appIdx )
     let entity = app.entity[ entityId ]
     if ( entity.scope == 'inherit' || entity.scope == 'inherit-readonly' ) { 
       inherit = true 
@@ -261,22 +252,19 @@ async function scopeInherited( rootScopeId, appId, appVersion, entityId ) {
 
 async function idExists( tbl, id  ) {
   log.info( 'idExists', tbl, id )
-  await syncTbl( tbl )
-  if ( data[ tbl ][ id ] ) {
-    return data[ tbl ][ id ] 
-  }
-  return null
+  let rec = await loadDataById( tbl, id )
+  return rec
 }
 
 async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams ) {
   log.debug( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams )
   let tbl = rootScopeId + entityId
-  await syncTbl( tbl )
+  // await syncTbl( tbl )
   let inherit = await scopeInherited( rootScopeId, appId, appVersion, entityId )
   let result = null
   if ( id  ) { 
     // single rec by id
-    let rec = data[ tbl ][ id ] 
+    let rec = await getDataById( tbl, id )
     log.debug( 'getDataObjX rec', rec )
     if ( rec && scopeOK( userScopeId, rec.scopeId  , inherit ) ) {
       result = rec
@@ -285,8 +273,9 @@ async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeI
   } else {
     // array of data fo scope
     result = []
-    for ( let recId in data[ tbl ] ) {
-      let rec = data[ tbl ][ recId ]
+    let dtaMap = await loadData( tbl )
+    for ( let recId in dtaMap ) {
+      let rec = dtaMap[ recId ]
       if ( scopeOK( userScopeId, rec.scopeId, inherit ) ) {
         if ( filterParams ) {  // only not null if there are params set
           let hit = false
@@ -331,53 +320,18 @@ function scopeOK( userScope, recScope, inherit ) {
 
 async function addDataObj( tbl, id, obj, uri, evt, entity ) {
   log.info( 'addDataObj',  tbl, id, obj, uri, evt, entity  )
-  await syncTbl( tbl )
-  let cre = null
-  let dtaEvt = 'dta.add'
-  if ( data[ tbl ][ id.trim() ] ) {
-    cre = data[ tbl ][ id.trim() ]._cre 
-    if ( ! evt ) {
-      dtaEvt = 'dta.update'
-    }
-  }
-  data[ tbl ][ id.trim() ] = obj
-  data[ tbl ][ id.trim() ].id  = id.trim()
-  if ( cre ) {
-    data[ tbl ][ id.trim() ]._cre = cre
-  } else {
-    data[ tbl ][ id.trim() ]._cre = Date.now()
-  }
-  data[ tbl ][ id.trim() ]._upd = Date.now()
-  let dbFile = fileName( tbl )
-  await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
-
+  let dtaEvt = await addDataObjNoEvent( tbl, id, obj )
   let objCopy = await embedRefObjects( obj, entity )
-
   eh.publishDataChgEvt( ( evt ? evt : dtaEvt ), id, uri, tbl, objCopy )
   return true
 }
 
 async function addDataObjNoEvent( tbl, id, obj ) {
   log.info( 'addDataObjNoEvent', tbl, id )
-  await syncTbl( tbl )
-  let cre = null
-  let dtaEvt = 'dta.add'
-  if ( data[ tbl ][ id.trim() ] ) {
-    cre = data[ tbl ][ id.trim() ]._cre 
-    dtaEvt = 'dta.update'
-  }
-  data[ tbl ][ id.trim() ] = obj
-  data[ tbl ][ id.trim() ].id  = id.trim()
-  if ( cre ) {
-    data[ tbl ][ id.trim() ]._cre = cre
-  } else {
-    data[ tbl ][ id.trim() ]._cre = Date.now()
-  }
-  data[ tbl ][ id.trim() ]._upd = Date.now()
-  let dbFile = fileName( tbl )
-  await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
+  await saveData( tbl, id, obj )
   return true
 }
+
 
 async function embedRefObjects( origDta, entity ) {
   log.debug('embedRefObjects e', origDta, entity )
@@ -391,7 +345,7 @@ async function embedRefObjects( origDta, entity ) {
         if ( prp.type == 'SelectRef' ) {
           let ref = prp.selectRef.split('/')
           let refTbl = ref[0] + ref[3]
-          let refDta = await getDataById( refTbl, dta[ propId ] )
+          let refDta = await loadDataById( refTbl, dta[ propId ] )
           if ( refDta ) {
             let uri =  '/adapter/entity/'+ref[0]+'/'+ref[1]+'/'+ref[2]+'/'+ref[3]+'/'+dta[ propId ]
             dta[ propId ] = JSON.parse( JSON.stringify( refDta ))
@@ -404,7 +358,7 @@ async function embedRefObjects( origDta, entity ) {
           let refTbl = ref[0] + ref[3]
           let refObArr = []
           for ( let refId of dta[ propId ] ) {
-            let refDta = await getDataById( refTbl, refId )
+            let refDta = await loadDataById( refTbl, refId )
             if ( refDta ) {
               let refCpy = JSON.parse( JSON.stringify( refDta ))
               refCpy._uri =  '/adapter/entity/'+ref[0]+'/'+ref[1]+'/'+ref[2]+'/'+ref[3]+'/'+refId
@@ -426,21 +380,87 @@ async function embedRefObjects( origDta, entity ) {
 
 async function delDataObj( tbl, id, entity ) {
   log.info( 'delDataObj', tbl, id )
-  await syncTbl( tbl )
-  let idT = id.trim() 
-  if ( ! data[ tbl ]  ||  ! data[ tbl ][ idT ] ) { return "Not found" }
-  log.info( 'delDataObj', tbl, data[ tbl ][ idT ] )
-  let cpyDta = await embedRefObjects( data[ tbl ][ idT ], entity )
-  //let cpyDta = JSON.parse( JSON.stringify( data[ tbl ][ idT ] ) )
-  delete  data[ tbl ][ idT ]
-  let dbFile = fileName( tbl )
-  await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
+  await delData( tbl, id )
   let uri = null
   eh.publishDataChgEvt( 'dta.del', id, uri, tbl, cpyDta )
   return "Deleted"
 }
 
 async function delDataObjNoEvent( tbl, id ) {
+  log.info( 'delDataObj', tbl, id )
+  await delData( tbl, id )
+  return "Deleted"
+}
+
+// ============================================================================
+
+async function getSubscriptions() {
+  return await loadData(  EH_SUB_TBL )
+}
+
+
+async function subscribeEvt( app, name, scopeId, webHook, filter, since ) {
+  let subscriptions = loadDataById(  EH_SUB_TBL, scopeId )
+  if ( ! subscriptions ) {
+    subscriptions = {}
+  }
+  subscriptions[ name ] = {
+    webHook : webHook,
+    app     : app,
+    filter  : ( filter ? filter : {} ),
+    creDt   : Date.now()
+  }
+  saveData( EH_SUB_TBL, scopeId, subscriptions )
+}
+
+async function unsubscribeEvt( scopeId, name ) {
+  let subscriptions = loadDataById( EH_SUB_TBL, scopeId )
+  delete  subscriptions[ name ]
+  saveData( EH_SUB_TBL, scopeId, subscriptions )
+}
+
+// ============================================================================
+
+
+async function loadData( tbl, qry ) {
+  log.debug( 'loadData', tbl, qry  )
+  await syncTbl( tbl )
+  return data[ tbl ]
+}
+
+async function loadDataById( tbl, id ) {
+  log.debug( 'getDataById',tbl, id  )
+  await syncTbl( tbl )
+  if ( data[ tbl ] && data[ tbl ][ id ] ) {
+    return data[ tbl ][ id ] 
+  }
+  return null
+}
+
+async function saveData( tbl, id, obj ) {
+  log.info( 'addDataObjNoEvent', tbl, id )
+  await syncTbl( tbl )
+  let cre = null
+  let dtaEvt = 'dta.add'
+  if ( data[ tbl ][ id.trim() ] ) {
+    cre = data[ tbl ][ id.trim() ]._cre 
+    dtaEvt = 'dta.update'
+  }
+  data[ tbl ][ id.trim() ] = obj
+  data[ tbl ][ id.trim() ].id  = id.trim()
+  if ( cre ) {
+    data[ tbl ][ id.trim() ]._cre = cre
+  } else {
+    data[ tbl ][ id.trim() ]._cre = Date.now()
+  }
+  data[ tbl ][ id.trim() ]._upd = Date.now()
+  let dbFile = fileName( tbl )
+  await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
+  return dtaEvt
+}
+
+
+async function delData( tbl, id ) {
   log.info( 'delDataObj', tbl, id )
   await syncTbl( tbl )
   let idT = id.trim() 
@@ -451,35 +471,6 @@ async function delDataObjNoEvent( tbl, id ) {
   let dbFile = fileName( tbl )
   await writeFile( dbFile, JSON.stringify( data[ tbl ], null, '  ' ) )
   return "Deleted"
-}
-
-// ============================================================================
-
-async function getSubscriptions() {
-  await syncTbl( EH_SUB_TBL )
-  return data[ EH_SUB_TBL ]
-}
-
-
-async function subscribeEvt( app, name, scopeId, webHook, filter, since ) {
-  let subscriptions =  await syncTbl( EH_SUB_TBL )
-  if ( ! subscriptions[ scopeId ] ) {
-    subscriptions[ scopeId ] = {}
-  }
-  subscriptions[ scopeId ][ name ] = {
-    webHook : webHook,
-    app     : app,
-    filter  : ( filter ? filter : {} ),
-    creDt   : Date.now()
-  }
-  writeTbl( EH_SUB_TBL ) 
-}
-
-async function unsubscribeEvt( scopeId, name ) {
-  let subscriptions = await syncTbl( EH_SUB_TBL )
-  for ( let scopeId of scopes ) {
-    delete  subscriptions[ scopeId ][ req.body.name ]
- }  writeTbl( EH_SUB_TBL ) 
 }
 
 // ============================================================================

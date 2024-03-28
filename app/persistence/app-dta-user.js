@@ -34,8 +34,6 @@ exports: module.exports = {
 
 // ============================================================================
 
-let userScopeCache = null
-
 let SCOPE_DB      = '../dta/scope.json'
 let SCOPE_ID      = '../dta/scopeSeq.json'
 let USER_AUTH_DB  = '../dta/user-auth.json'
@@ -45,9 +43,10 @@ let OIDC_SESSION_DB = '../dta/oidc-session.json'
 let FAKE_LOGIN = false
 
 async function init( cfg ) {
+  if ( cfg.FAKE_LOGIN  ) { FAKE_LOGIN = cfg.FAKE_LOGIN  }
+
   let dbDir = cfg.DATA_DIR 
   if ( ! dbDir.endsWith('/') ) { dbDir += '/' }
-  if ( cfg.FAKE_LOGIN  ) { FAKE_LOGIN = cfg.FAKE_LOGIN  }
   log.info( 'user-data init', dbDir, FAKE_LOGIN )
   SCOPE_DB        = dbDir + 'scope.json'
   SCOPE_ID        = dbDir + 'scopeSeq.json'
@@ -59,9 +58,8 @@ async function init( cfg ) {
 // ============================================================================
 
 async function creRootScope( name, adminEmail, owner, tagArr, noCustomizing ) {
-  let scopeTbl = await getScope() 
   let newId = await getNextScopeId()
-  scopeTbl[ newId ] = {
+  scope = {
     name       : name,
     tag        : ( tagArr ? tagArr : [] ),
     meta       : {},
@@ -72,21 +70,13 @@ async function creRootScope( name, adminEmail, owner, tagArr, noCustomizing ) {
   if ( noCustomizing ) {
     scopeTbl[ newId ].noCustomizing = true
   }
-  await writeScope() 
-  return newId
-}
-
-async function getNextScopeId() {
-  let scopeSeq = JSON.parse( await readFile( SCOPE_ID ) )
-  scopeSeq.ID ++
-  let newId = scopeSeq.ID + ''
-  await writeFile( SCOPE_ID, JSON.stringify( scopeSeq, null, '  ' ) )
+  await saveScope( newId, scope ) 
   return newId
 }
 
 
 async function getRootScopes() {
-  let scopeTbl = await getScope() 
+  let scopeTbl = await loadScopes()
   let scopeMap = {}
   for ( let tId in scopeTbl ) {
     if ( tId.indexOf('/') == -1 ) {
@@ -98,25 +88,25 @@ async function getRootScopes() {
 
 async function delRootScope( scopeId ) {
   log.info( 'AppDta delRootScope ...' )
-  let scopeTbl = await getScope() 
-  let authTbl = await getAuthTbl()
+  let scopeTbl = await loadScopes()
+  let userMap = await loadUserArr() 
 
   // remove scope from user roles
-  for ( let uid in authTbl ) {
-    let user = authTbl[ uid ]
+  for ( let uid in userMap ) {
+    let user = userMap[ uid ]
     removeScopeId( scopeId, user.role.admin )
     removeScopeId( scopeId, user.role.dev )
     removeScopeId( scopeId, user.role.appUser )
     removeScopeId( scopeId, user.role.api )
+    await saveUser( uid, user ) 
   }
 
   // remove scope
   for ( let tId in scopeTbl ) {
     if ( tId.startsWith( scopeId ) ) {
-      delete scopeTbl[ tId ] 
+     await delScope( tId )
     }
   }
-  await writeScope() 
 
   return 'OK'
 }
@@ -131,97 +121,49 @@ function removeScopeId( scopeId, scopeArr ) {
 
 // ============================================================================
 
-async function getUserScope() {
-  // if ( ! userScopeCache ) {
-    if ( fs.existsSync( USER_SCOPE_DB  ) ) {
-      userScopeCache = JSON.parse( await readFile( USER_SCOPE_DB ) )
-    } else {
-      userScopeCache = {}
-    }
-  // } 
-  return userScopeCache
-}
-async function writeUserScope() {
-  await writeFile( USER_SCOPE_DB, JSON.stringify( userScopeCache, null, '  ' ) )
-}
-
-
-async function getScope() {
-  // if ( ! scopeCache ) {
-    if ( fs.existsSync( SCOPE_DB  ) ) {
-      scopeCache = JSON.parse( await readFile( SCOPE_DB ) )
-    } else {
-      scopeCache = {}
-    }
-  // } 
-  return scopeCache
-}
-async function writeScope() {
-  await writeFile( SCOPE_DB, JSON.stringify( scopeCache, null, '  ' ) )
-}
-
-
-async function getAuthTbl() {
-  // if ( ! authTblCache ) {
-    if ( fs.existsSync( USER_AUTH_DB  ) ) {
-      authTblCache = JSON.parse( await readFile( USER_AUTH_DB ) )
-    } else {
-      // authTblCache = {}
-    }
-  // } 
-  return authTblCache
-}
-async function writeAuthTbl() {
-  await writeFile( USER_AUTH_DB, JSON.stringify( authTblCache, null, '  ' ) )
-}
-
-// ============================================================================
-
-async function authenticate( uid, pwd ) {
-  let authTbl = await getAuthTbl()
-  if ( authTbl[ uid ] && authTbl[ uid ].password == createHash('sha256').update( pwd ).digest('hex') ) {
-    authTbl[ uid ].lastLogin = Date.now()
-    await writeAuthTbl()
-    log.info( 'authenticate ok', uid  )
+async function authenticate( userId, pwd ) {
+  let idnty = await loadUserById( userId )
+  if ( idnty && idnty.password == createHash('sha256').update( pwd ).digest('hex') ) {
+    idnty.lastLogin = Date.now()
+    await saveUser( userId, idnty )
+    log.info( 'authenticate ok', userId  )
     return true
   }
-  log.warn( 'authenticate failed', uid  )
+  log.warn( 'authenticate failed', userId  )
   return false
 }
 
-async function setSelScope( userId, scope ) {
-  let authTbl = await getAuthTbl()
-  if ( ! authTbl[ userId ] ) { return null }
-  let userScope = await getUserScope()
-  userScope[ userId ] = scope
-  await  writeUserScope()
+async function setSelScope( userId, scopeId ) {
+  let idnty = await loadUserById( userId )
+  if ( ! idnty ) { return null }
+  await saveUserScope( userId, scopeId ) 
 }
 
 async function getSelScope( userId ) {
-  let authTbl = await getAuthTbl()
-  if ( ! authTbl[ userId ] ) { return null }
-  let userScope = await getUserScope()
-  if (  userScope[ userId ] ) {
-    return userScope[ userId ]
+  let idnty = await loadUserById( userId )
+  if ( ! idnty ) { return null }
+  let userScope = await loadUserScope( userId )
+  if (  userScope ) {
+    return userScope
   } 
-  return authTbl[ userId ].role.appUser[0]
+  return idnty.role.appUser[0]
 }
 
 async function getSelScopeName( userId ) {
-  let authTbl = await getAuthTbl()
-  if ( ! authTbl[ userId ] ) { return '' }
-  let userScope = await getUserScope()
-  if (  userScope[ userId ] ) {
-    return await getScopeName( userScope[ userId ] )
+  let idnty = await loadUserById( userId )
+  if ( ! idnty ) { return '' }
+  let userScope =await loadUserScope( userId )
+  if (  userScope ) {
+    return await getScopeName( userScope )
   } 
-  return await getScopeName( authTbl[ userId ].role.appUser[0] )
+  return await getScopeName( idnty.role.appUser[0] )
 }
 
 
 // ============================================================================
 
 async function getScopeName( scopeId ) {
-  let scopeTbl = await getScope() 
+  let scopeTbl = await loadScopes() 
   if ( scopeTbl[ scopeId ] ) {
     return scopeTbl[ scopeId ].name
   }
@@ -229,9 +171,9 @@ async function getScopeName( scopeId ) {
 }
 
 async function getScopeList( userId, role='appUser' ) {
-  let authTbl = await getAuthTbl()
-  if ( ! authTbl[ userId ] ) { return null }
-  let scopeTbl = await getScope() 
+  let idnty = await loadUserById( userId )
+  if ( ! idnty ) { return null }
+  let scopeTbl = await loadScopes() 
 
   let scopeIds = []
   for ( let aScope in scopeTbl ) {
@@ -241,7 +183,7 @@ async function getScopeList( userId, role='appUser' ) {
   let availableScopes = {}
   for ( let aScope of scopeIds ) {
     let scopeAuthorized = false
-    for ( let userRootScope of authTbl[ userId ].role[ role ] ) {
+    for ( let userRootScope of idnty.role[ role ] ) {
       if ( aScope.startsWith( userRootScope ) ) {
         scopeAuthorized = true
         break
@@ -257,7 +199,7 @@ async function getScopeList( userId, role='appUser' ) {
 // ============================================================================
 
 async function geScopeArr( rootScopeId ) {
-  let scopeTbl = await getScope() 
+  let scopeTbl = await loadScopes() 
   let scopeArr = []
   for ( let scopeId in scopeTbl ) {
     if ( scopeId.startsWith( rootScopeId ) ) {
@@ -273,13 +215,13 @@ async function geScopeArr( rootScopeId ) {
 }
 
 async function addScope( id, name, tagArr, meta) {
-  let scopeTbl = await getScope() 
-  scopeTbl[ id ] = {
+  log.info( 'addScope', id, name, tagArr, meta )
+  scope = {
     name : name,
     tag  : tagArr,
     meta : meta
   }
-  await writeScope() 
+  saveScope( id, scope ) 
 }
 
 // ============================================================================
@@ -296,8 +238,8 @@ async function getUserInfoFromReq( gui, req ) {
 async function getUserInfo( userId ) {
   // log.info( 'getUserInfo', userId )
   let scopeId = await getSelScope( userId )
-  let scopeTbl = await getScope() 
-  let authTbl = await getAuthTbl()
+  let scopeTbl = await loadScopes() 
+  let idnty = await loadUserById( userId )
 
 
   if ( ! scopeId ) { return null }
@@ -307,11 +249,11 @@ async function getUserInfo( userId ) {
   }
   let userInfo = {
     userId      : userId,
-    name        : authTbl[ userId ].name,
+    name        : idnty.name,
     scopeId     : scopeId,
     rootScopeId : rootScope,
     scopeTags   : scopeTbl[ scopeId ].tag,
-    role        : authTbl[ userId ].role
+    role        : idnty.role
   }
   if ( scopeTbl[ rootScope ].noCustomizing ) {
     userInfo.role.dev = []  // dev not allowed
@@ -321,14 +263,13 @@ async function getUserInfo( userId ) {
 
 
 async function addUser( id, newUser ) {
-  let authTbl = await getAuthTbl()
-  if ( id && authTbl[ id ] ) { return 'ERROR: ID exists' }
+  let idnty = await loadUserById( id )
+  if ( id && idnty ) { return 'ERROR: ID exists' }
   if ( id && newUser.sp ) {
     if ( ! newUser.password ) {
        newUser.password = helper.uuidv4()
     }
-    authTbl[ id ] = newUser
-    await writeAuthTbl()
+    await saveUser( id, newUser )
     return 'API account added'
   } else  if ( id ) { // add user
     let result = 'User added'
@@ -339,31 +280,27 @@ async function addUser( id, newUser ) {
       newUser.password = createHash('sha256').update( pwd ).digest('hex')
       result = 'User added, password is "'+pwd+'"'
     }
-    authTbl[ id ] = newUser
-    await writeAuthTbl()
+    await saveUser( id, newUser )
     return result
   } else { // add API account
     let spId = helper.uuidv4()
     newUser.password = helper.uuidv4()
-    authTbl[ spId ] = newUser
-    await writeAuthTbl()
+    await saveUser( id, newUser )
     return 'API account "'+spId+'" added'
   } 
 } 
 
 async function addUserAdmin( uid, scopeId ) {
-  let authTbl = await getAuthTbl()
-  let user = authTbl[ uid ]
+  let user = await loadUserById( uid )
   if ( ! user ) { return 'not found' }
   user.role.appUser.push( scopeId )
   user.role.admin.push( scopeId )
   user.role.dev.push( scopeId )
-  await writeAuthTbl()
+  await saveUser( uid, user )
 }
 
 async function getUser( uid, scopeId ) {
   log.info( 'getUser..' )
-  let authTbl = await getAuthTbl()
 
   if ( uid == 'empty' ) {
     return {
@@ -381,7 +318,7 @@ async function getUser( uid, scopeId ) {
     }
   }
 
-  let idnty = authTbl[ uid ]
+  let idnty = await loadUserById( uid )
 
   let ret = {
     mode   : 'update'
@@ -405,21 +342,20 @@ async function getUser( uid, scopeId ) {
 
 async function updateUser( uid, newEmail, user, scopeId, action ) {
   log.info( 'updateUser..', uid, user )
-  let authTbl = await getAuthTbl()
-  let idnty = authTbl[ uid ]
+  let idnty = await loadUserById( uid )
   if ( ! idnty ) { return 'not found' }
 
   if ( action == 'lock' ) {
 
     idnty.password = null
-    await writeAuthTbl()
+    await saveUser( uid, idnty )
     return 'User login disabled!'
 
   } else if ( action == 'reset' ) {
 
     let pwd = randomBytes(5).toString('hex')
     idnty.password = createHash('sha256').update( pwd ).digest('hex')
-    await writeAuthTbl()
+    await saveUser( uid, idnty )
     return 'User login reset! New password: '+ pwd
   }
   
@@ -446,18 +382,18 @@ async function updateUser( uid, newEmail, user, scopeId, action ) {
     // TODO ?
   }
 
-  await writeAuthTbl()
+  await saveUser( uid, idnty )
   return 'OK'
 }
 
 
 async function getUserArr( scopeId ) {
   log.debug( 'getUserArr...' )
-  let authTbl = await getAuthTbl()
+  let userArr = await  loadUserArr()
 
   let result = []
-  for ( let uid in authTbl ) {
-    let idnty = authTbl[ uid ]
+  for ( let uid in userArr ) {
+    let idnty = userArr[ uid ]
     let isInScope  = false
     let userScope  = inScope( scopeId, idnty.role.appUser )
     let devScope   = inScope( scopeId, idnty.role.dev )
@@ -505,23 +441,14 @@ async function getUserArr( scopeId ) {
   return result
 }
 
-async function delUser( uid ) {
-  let authTbl = await getAuthTbl()
-  if ( authTbl[ uid ]) {
-    delete authTbl[ uid ]
-    await writeAuthTbl()
-    return 'OK'
-  }
-  return 'Not found'
-}
 
 async function getApiAppScopes( appId, appSecret ) {
-  let authTbl = await getAuthTbl()
+  let sp = awaitloadUserById( appId )
   // let hash = createHash('sha256').update( appSecret ).digest('hex')
   let hash = appSecret // TODO
-  log.debug( 'getApiAppScopes', hash,  authTbl[ appId ] )
-  if ( authTbl[ appId ] && authTbl[ appId ].password == hash ) {
-    return authTbl[ appId ].role.api
+  log.debug( 'getApiAppScopes', hash, sp )
+  if ( sp && sp.password == hash ) {
+    return sp.role.api
   } else {
     return null
   }
@@ -539,6 +466,117 @@ function inScope( scopeId, scopeArr ) {
 
 
 // ============================================================================
+// ============================================================================
+let scopeCache = {}
+let userScopeCache = {}
+let authTblCache = {}
+
+// ============================================================================
+// DB methods
+
+async function getNextScopeId() {
+  let scopeSeq = { ID: 1000 }
+  if ( fs.existsSync( SCOPE_ID  ) ) {
+    scopeSeq = JSON.parse( await readFile( SCOPE_ID ) )
+  }
+  scopeSeq.ID ++
+  let newId = scopeSeq.ID + ''
+  await writeFile( SCOPE_ID, JSON.stringify( scopeSeq, null, '  ' ) )
+  return newId
+}
+
+async function writeScope() {
+  await writeFile( SCOPE_DB, JSON.stringify( scopeCache, null, '  ' ) )
+}
+
+
+async function loadScopes() {
+  if ( fs.existsSync( SCOPE_DB  ) ) {
+    scopeCache = JSON.parse( await readFile( SCOPE_DB ) )
+  } else {
+    scopeCache = {}
+  }
+  return scopeCache
+}
+
+async function saveScope( id, scope ) {
+  let scopeTbl = await loadScopes() 
+  scopeTbl[ id ] = scope
+  await writeScope()
+}
+
+async function delScope( id ) {
+  delete scopeTbl[ tId ] 
+  await writeScope() 
+}
+
+//-----------------------------------------------------------------------------
+
+async function loadUserArr() {
+  let authTbl = await getAuthTbl()
+  return authTbl
+}
+
+async function loadUserById( uid ) {
+  let authTbl = await getAuthTbl()
+  let idnty = authTbl[ uid ]
+  return idnty
+}
+
+async function saveUser( uid, user ) {
+  let authTbl = await getAuthTbl()
+  authTbl[ uid ] = user
+  await writeAuthTbl()
+}
+
+async function delUser( uid ) {
+  let authTbl = await getAuthTbl()
+  if ( authTbl[ uid ]) {
+    delete authTbl[ uid ]
+    await writeAuthTbl()
+    return 'OK'
+  }
+  return 'Not found'
+}
+
+
+async function getAuthTbl() { // internal
+  // if ( ! authTblCache ) {
+    if ( fs.existsSync( USER_AUTH_DB  ) ) {
+      authTblCache = JSON.parse( await readFile( USER_AUTH_DB ) )
+    } else {
+      // authTblCache = {}
+    }
+  // } 
+  return authTblCache
+}
+
+async function writeAuthTbl() { // internal
+  await writeFile( USER_AUTH_DB, JSON.stringify( authTblCache, null, '  ' ) )
+}
+
+//-----------------------------------------------------------------------------
+
+async function loadUserScope( userId ) {
+  if ( fs.existsSync( USER_SCOPE_DB  ) ) {
+    userScopeCache = JSON.parse( await readFile( USER_SCOPE_DB ) )
+  }  
+  return userScopeCache[ userId ]
+}
+
+async function saveUserScope( uid, scopeId ) {
+  if ( fs.existsSync( USER_SCOPE_DB  ) ) {
+    userScopeCache = JSON.parse( await readFile( USER_SCOPE_DB ) )
+  }
+  userScopeCache[ uid ] = scopeId
+  await  writeUserScope()
+}
+
+async function writeUserScope() {
+  await writeFile( USER_SCOPE_DB, JSON.stringify( userScopeCache, null, '  ' ) )
+}
+
+//-----------------------------------------------------------------------------
 
 async function loadOidcSessions() { 
   let oidcSessions = {}
@@ -551,10 +589,4 @@ async function loadOidcSessions() {
 async function saveOidcSessions( oidcSessions ) {
   await writeFile( OIDC_SESSION_DB, JSON.stringify( oidcSessions, null, '  ' ) )
 }
-
-// ============================================================================
-// ============================================================================
-let scopeCache = {}
-
-let authTblCache = {}
 
