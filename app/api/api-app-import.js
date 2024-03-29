@@ -23,7 +23,7 @@ async function setupAPI( app ) {
 
   const guiAuthz = apiSec.userTenantAuthz( gui )
 
-  svc.get(  '/app/json/:scope/:id', guiAuthz, getAppJSON )
+  svc.get(  '/app/json/:scope/:id', guiAuthz, getAppJSON ) // export
   svc.post( '/app/json', fileupload(),guiAuthz, uploadAppJSON )
   svc.get(  '/app/json/html', guiAuthz, getUploadAppResult )
   svc.get(  '/app/import/:uid', guiAuthz, importApp )
@@ -31,7 +31,7 @@ async function setupAPI( app ) {
 
 // ============================================================================
 
-async function getAppJSON( req, res )  {
+async function getAppJSON( req, res )  { // export
   log.info( 'GET app/json', req.params.id )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }

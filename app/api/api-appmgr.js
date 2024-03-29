@@ -193,8 +193,9 @@ async function getEntity( req, res )  {
         maintainer : entity.maintainer,
         start      : ( app.startPage.indexOf( req.query.entityId ) < 0 ? false : 'start' ),
         stateModel : ( entity.stateModel ? entity.stateModel : '' ),
-        noEdit     : ( entity.noEdit === true ?  'no' : 'yes' ),
-        userDelete : ( entity.noDelete === true ? false : true )
+        noEdit     : ( entity.noEdit    === true ? true : false ),
+        userDelete : ( entity.noDelete  === true ? false : true ),
+        csvUpload  : ( entity.csvUpload === true ? true : false )
       }) 
 
     } else { return res.send( null )  } // id not in scopes
@@ -215,9 +216,10 @@ async function getEntity( req, res )  {
         appId      : appId,
         title      : entity.title,
         scope      : entity.scope,
-        startPage  : ( app.startPage.indexOf( entityId ) < 0 ? '': 'yes' ),
-        editForm   : ( entity.noEdit === true ? 'hide' : 'yes' ),
-        userDelete : ( entity.noDelete === true ? 'no' : 'yes' ),
+        startPage  : ( app.startPage.indexOf( entityId ) < 0 ? false : true ),
+        editForm   : ( entity.noEdit   === true ? false : true ),
+        userDelete : ( entity.noDelete  === true ? false : true ),
+        csvUpload  : ( entity.csvUpload === true ? true : false ),
         stateModel : stateModel,
         maintainer : entity.maintainer,
         propLnk :'<a href="index.html?layout=AppEntityProperties-nonav&id='+appId+','+entityId+'">Manage Properties</a>'
@@ -231,6 +233,9 @@ async function addEntity( req, res ) {
   log.info( 'POST entity', req.body )
   let { allOK, user, app, appId } = await checkUserApp( req, res )
   if ( ! allOK ) { return }
+  if ( ! req.body.entityId ||  req.body.entityId == '' ) {
+    return res.status(400).send('ID required') 
+  }
 
   if ( ! app.startPage ) { app.startPage = [] }
 
@@ -250,20 +255,28 @@ async function addEntity( req, res ) {
       app.startPage.splice( app.startPage.indexOf( req.body.entityId ), 1 )
     }
   }
-
+  
   if ( ! req.body.userDelete ) {
     newEntity.noDelete = true
-  } 
+  } else if ( newEntity.userDelete ) { 
+    delete newEntity.userDelete 
+  }
 
-  if ( req.body.noEdit == 'noEdit' ) {
+  if ( req.body.noEdit ) {
     newEntity.noEdit = true
-  } else {
-    delete newEntity.noEdit
+  } else if ( newEntity.noEdit ) { 
+    delete newEntity.noEdit 
+  }
+
+  if ( req.body.csvUpload ) {
+    newEntity.csvUpload = true
+  } else  if ( newEntity.csvUpload ) { 
+    delete newEntity.csvUpload 
   }
 
   if ( req.body.stateModel &&  req.body.stateModel != '' ) {
     newEntity.stateModel = req.body.stateModel 
-  } else {
+  } else if ( newEntity.stateModel ) { 
     delete newEntity.stateModel
   }
 

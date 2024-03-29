@@ -538,13 +538,16 @@
 #AppEntitiesAddContentstart,
 #AppEntitiesAddContentnoEdit,
 #AddStateTransitionFormContentapiManaged,
-#AppEntitiesAddContentuserDelete
+#AppEntitiesAddContentuserDelete,
+#AppEntitiesAddContentcsvUploadDiv
 {
   width: unset;
 }
 #AppEntitiesAddContentstartDiv label,
 #AppEntitiesAddContentnoEditDiv label,
-#AddStateTransitionFormContentapiManaged label
+#AddStateTransitionFormContentapiManaged label,
+#AppEntitiesAddContentuserDeleteDiv label,
+#AppEntitiesAddContentcsvUploadDiv label
 {
   width: unset;
 }

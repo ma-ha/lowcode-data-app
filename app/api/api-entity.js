@@ -8,6 +8,7 @@ const bodyParser = require( 'body-parser' )
 const helper     = require( '../helper/helper' )
 const propHandler = require( '../data/propertyHandler' )
 const { appRoot } = require( 'easy-web-app' )
+const fileupload = require( 'express-fileupload' )
 
 exports: module.exports = { 
   setupAPI  
@@ -44,6 +45,11 @@ async function setupAPI( app, oauthCfg ) {
   svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/:recId/:actionId', guiAuthz, docStateChange )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/:recId/:event', guiAuthz, docEvent )
   svc.delete( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, delDoc )
+
+  svc.post( '/guiapp/csv/:tenantId/:appId/:appVersion/:entityId', fileupload(),guiAuthz, uploadCsvData )
+  svc.post( '/guiapp/csv/:tenantId/:appId/:appVersion/:entityId/:actionId', fileupload(),guiAuthz, uploadCsvData )
+  svc.get(  '/guiapp/csv/html', guiAuthz, getUploadCsvResult )
+  svc.get(  '/guiapp/csv/import/:uid', guiAuthz, importCsvData )
 }
 
 // --------------------------------------------------------------------------
@@ -306,7 +312,6 @@ async function docEvent( req, res )  {
 }
 
 
-
 function extractFilter( filterQuery ){
   let filter = null
   if ( filterQuery ) {
@@ -319,4 +324,95 @@ function extractFilter( filterQuery ){
     } catch ( exc ) { log.warn( 'extractFilter', exc ) }}
   }
   return filter
+}
+
+// ============================================================================
+let uploadCsvResult = {}
+
+async function uploadCsvData( req, res ) {
+  log.info( 'uploadCsvData',  req.params )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.files || Object.keys( req.files ).length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  }
+  let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
+  let app = await dta.getAppById( appId )
+  if ( ! app ) { return res.send( 'ERROR: App not found') }
+  let entityId = req.params.entityId
+  let entity = app.entity[ entityId ]
+  if ( ! entity ) { return res.send( 'ERROR: Entity not found') }
+  let actionId = ( req.params.actionId ? req.params.actionId : null ) 
+  let separator = ';'
+  try {
+    let recs = {}
+    // let newApps = JSON.parse( '' + req.files.file.data )
+    // let dbApps = await  dta.getAppList( user.scopeId, [], 'admin' )
+
+    // let dbEntityMap = {}
+    // for ( let appId in dbApps ) {
+    //   for ( let entityId in dbApps[ appId ].entity ) {
+    //     dbEntityMap[ entityId ] = { appId: appId }
+    //   }
+    // }
+
+    let html = 'App Id: '+ appId
+    html += '<br>Entity Id: '+ entityId
+    if ( actionId ) { html += '<br>Action Id: '+ actionId }
+
+    html += '<p>Parseer: TODO'
+    // html += '<p>Parsed successfully'
+    uploadOK     = true
+
+    if ( uploadOK ) {
+      let importId = helper.uuidv4()
+      let importDta = {
+        rec    : recs,
+        appId  : '',
+        entityId : '',
+        actionId : '',
+        _expire : Date.now() + 1000*60*60*24
+      }
+      await dta.addDataObjNoEvent( 'csv-temp', importId, importDta )
+      html += '<p> Click to <a href="guiapp/csv/import/'+importId+'">IMPORT DATA</a>'
+    } else {
+      html += '<p> <b> UPLOAD FAILED! </b>'
+    }
+    uploadCsvResult[ user.userId ] = html
+   
+  } catch ( exc ) {  
+    log.warn( 'uploadCsvData', exc )
+    return res.status(400).send( 'Error' )
+  }
+  res.send( 'OK' )
+}
+
+
+async function getUploadCsvResult( req, res ) {
+  log.info( 'GET /csv/html' ) // , req.files.file.data
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  log.info( 'getUploadCsvResult user', user.userId )
+  log.info( 'getUploadCsvResult html', uploadCsvResult )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  res.send( uploadCsvResult[ user.userId ]  )
+  delete uploadCsvResult[ user.userId ] 
+}
+
+
+async function importCsvData( req, res ) {
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  log.info( 'GET /app/import', req.params.uid  ) 
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.params.uid ) { return res.status(400).send( 'id required' ) }
+
+  let impDta = await dta.getDataById( 'csv-temp', req.params.uid ) 
+  if ( ! impDta ) { return res.status(400).send( 'not found' ) }
+
+  // for ( let appId in impDta.apps ) {
+  //   log.info( 'GET /app/import IMPORT >>', appId  ) 
+  //   await dta.addApp( user.rootScopeId +'/'+ appId, impDta.apps[ appId] )
+  // }
+  // await dta.delDataObjNoEvent( 'app-temp', req.params.uid )
+
+  res.redirect( '../../../index.html?layout=AppEntity-nonav&id=1000/ticket-mgr/1.0.0' ) 
 }

@@ -30,7 +30,15 @@ function init(  ) {
   appEntityActionPage.title = "App"
   appEntityActionPage.setPageWidth( "90%")
   appEntityActionPage.dynamicRow( renderDynEntityActionRows )
-  
+
+  // --------------------------------------------------------------------------
+
+  let appEntityUploacCsvPage = gui.addPage( 'UploadCSV-nonav' ) 
+  appEntityUploacCsvPage.title = "App"
+  appEntityUploacCsvPage.setPageWidth( "90%")
+  appEntityUploacCsvPage.dynamicRow( renderDynEntityCsvUploadRows )
+  // appEntityUploacCsvPage.addView( uploadCsvForm() )
+  // appEntityUploacCsvPage.addView( uploadCsvOut( 'csv' ) )
 }
 
 // ==========================================================================++
@@ -190,6 +198,13 @@ async function stateCreateForm( appId, entity, entityId, initState, actionId, us
           update: [{ resId : 'EntityList' + entityId }], target: "modal" }
       ]
     }
+  }
+  if ( entity.csvUpload ) {
+    let id = appId +'/'+ entityId  +'/'+ actionId
+    form.moduleConfig.actions.push({ id: "BtnUpload"+entityId,
+      link: 'Upload CSV', target: '_parent',
+      linkURL: 'index.html?layout=UploadCSV-nonav&id='+id
+    })
   }
   return form
 }
@@ -497,6 +512,38 @@ function renderEntityPrpRows( app, appId, entityId ) {
 
   return rows
 }
+
+// ==========================================================================++
+async function renderDynEntityCsvUploadRows( staticRows, req, pageName )  {
+  if ( ! req.query.id  ) { log.warn('require param: id'); return [] }
+  log.info( 'renderDynEntityCsvUploadRows', req.query.id )
+  let eId =  req.query.id.split('/')
+  let rowArr = [] 
+  let entityStr = eId[3]
+  if ( eId.length == 5 ) {
+    entityStr += '-> ' + eId[4]
+  }
+
+  rowArr.push({
+    rowId: "CsvUpload", title: "Upload CSV Data: " + entityStr, 
+    type : "pong-upload", resourceURL: 'guiapp/csv/' + req.query.id,
+    height: '80px', decor: "decor",
+    moduleConfig: {
+      update : [ "CsvUploadLog" ],
+      input: []
+      // input: [ { id: 'separator', label:'Separator' },]
+    }
+  })
+
+  rowArr.push({
+    rowId: "CsvUploadLog", title: "CSV Data",
+    resourceURL: "guiapp/csv",
+    height: '700px', decor: "decor",
+  })
+
+  return rowArr
+}
+
 
 // ==========================================================================++
 // helper 

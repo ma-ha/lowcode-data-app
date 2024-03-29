@@ -168,9 +168,10 @@ async function init( ) {
           { id: "entityId",   label: "Id",         width: "10%", cellType: "text" },
           { id: "title",      label: "Title",      width: "10%", cellType: "text" },
           { id: "scope",      label: "Scope",      width: "10%", cellType: "text" },
-          { id: "startPage",  label: "Start Page", width: "10%", cellType: "text" },
-          { id: "editForm",   label: "Edit Form",  width: "10%", cellType: "text" },
-          { id: "userDelete", label: "Deletable",  width: "10%", cellType: "text" },
+          { id: "startPage",  label: "Start Page", width: "10%", cellType: "checkbox" },
+          { id: "editForm",   label: "Edit Form",  width: "10%", cellType: "checkbox" },
+          { id: "userDelete", label: "Deletable",  width: "10%", cellType: "checkbox" },
+          { id: "csvUpload",  label: "CSV Upload", width: "10%", cellType: "checkbox" },
           { id: "stateModel", label: "State Model",width: "10%", cellType: "text" },
           { id: "propLnk",    label: "Properties", width: "10%", cellType: "text" },
           { id: "maintainer", label: "Maintainer", width: "10%", cellType: "text" },
@@ -205,12 +206,15 @@ async function init( ) {
               options: addOptions([ "appUser", 'admin', 'dev' ]) }
           ]},
           { formFields: [
-            { id: "start", label: "Start Page", type: "checkbox" },
-            { id: "noEdit", label: "Hide Add/Edit Form", type: "checkbox" }
+            { id: "start",     label: "Start Page", type: "checkbox" },
+            { id: "csvUpload", label: "CSV Upload", type: "checkbox" }
+          ]},
+          { formFields: [
+            { id: "userDelete", label: "User can delete",    type: "checkbox" },
+            { id: "noEdit",     label: "Hide Add/Edit Form", type: "checkbox" }
           ]},
           { formFields: [
             { id: "stateModel", label: "State Model", type: "select", options: stateModels },
-            { id: "userDelete", label: "User can delete", type: "checkbox" }
           ]}
         ] }],
         actions : [ 

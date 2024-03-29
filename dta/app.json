@@ -989,9 +989,9 @@
           }
         },
         "noDelete": true,
-        "stateModel": "Ticket",
-        "creFromHeight": "180px",
-        "tableHeight": "600px"
+        "noEdit": true,
+        "csvUpload": true,
+        "stateModel": "Ticket"
       }
     },
     "page": {},
@@ -1016,6 +1016,9 @@
       }
     },
     "enabled": true,
-    "img": "img/k8s-fire.png"
+    "img": "img/k8s-fire.png",
+    "id": "1000/ticket-mgr/1.0.0",
+    "_cre": 1711692745036,
+    "_upd": 1711695058839
   }
 }
