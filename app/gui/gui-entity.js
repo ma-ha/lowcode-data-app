@@ -382,6 +382,13 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
         actionURL: 'guiapp/'+appId+'/entity/'+entityId+'?recId=_empty',
         setData:  [ { resId : 'Add' + entityId } ] }
     ]
+    if ( entity.csvUpload ) {
+      actions.push({ 
+        id: "BtnUpload"+entityId,
+        link: 'Upload CSV', target: '_parent',
+        linkURL: 'index.html?layout=UploadCSV-nonav&id='+ appId +'/'+ entityId  
+      })
+    }
   }
 
   let addFormView = { 

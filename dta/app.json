@@ -544,7 +544,8 @@
             "type": "SelectRef",
             "selectRef": "1000/region-mgr/1.0.0/region"
           }
-        }
+        },
+        "csvUpload": true
       }
     },
     "startPage": [
@@ -564,7 +565,7 @@
     "enabled": true,
     "id": "1000/city-mgr-app/1.0.0",
     "_cre": 1711644036674,
-    "_upd": 1711644036674
+    "_upd": 1711706084490
   },
   "1000/region-mgr/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
