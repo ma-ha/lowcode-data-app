@@ -1,3 +1,6 @@
+# 0.22.0 WIP
+- Create new entity with id (UUID) by default
+
 # 0.21.0/1
 - refactor persistence
 - Scope select CSS improved

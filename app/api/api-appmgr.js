@@ -243,7 +243,10 @@ async function addEntity( req, res ) {
     title : req.body.title,
     scope : req.body.scope,
     maintainer : [req.body.maintainer],
-    properties : ( app.entity[ req.body.entityId ] ? app.entity[ req.body.entityId ].properties : {} )
+    properties : ( 
+      app.entity[ req.body.entityId ] ? app.entity[ req.body.entityId ].properties : 
+      { "id": { type: "UUID", noDelete: true, noTable: true, noEdit: true } } 
+    )
   }
 
   if ( req.body.start ) {
