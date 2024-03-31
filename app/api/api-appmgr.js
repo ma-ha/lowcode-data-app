@@ -144,7 +144,7 @@ async function addApp( req, res ) {
       enabled   : false
     }
   }
-  app.scopeId = ( req.body.scope == '-' ? null : req.body.scope )
+  app.scopeId = ( req.body.scope == '' ? null : req.body.scope )
   app.title   = ( req.body.name ? req.body.name : req.body.id )
   app.enabled = ( req.body.enabled ? true : false )
   if ( req.body.role == '-' ) {
