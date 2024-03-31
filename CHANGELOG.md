@@ -1,6 +1,7 @@
 # 0.22.0 WIP
 - CSV Upload
 - Create new entity with id (UUID) by default
+- App: fix icon size
 
 # 0.21.0/1
 - refactor persistence

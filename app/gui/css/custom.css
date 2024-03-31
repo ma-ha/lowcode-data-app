@@ -632,6 +632,14 @@
   border-style: solid;
   padding: 0px 5px 0px 5px;
 }
+.pongIconAppsContent {
+  width: 180px;
+  height: 138px;
+}
+#AppsContent .pongIconImg {
+  height: 115px;
+}
+}
 
  /* All Forms --------------------------------------------- */
  .pongFormField label {
