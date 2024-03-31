@@ -626,6 +626,13 @@
   width: 190px;
  }
 
+.csvTable th,
+.csvTable td {
+  border-width: 1px;
+  border-style: solid;
+  padding: 0px 5px 0px 5px;
+}
+
  /* All Forms --------------------------------------------- */
  .pongFormField label {
    font-size: 0.9em;

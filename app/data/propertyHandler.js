@@ -777,6 +777,8 @@ function reformatDataUpdateInput( entity, rec ) {
   if ( ! rec.id ) {
     if ( entity.properties[ 'id' ]  &&  entity.properties[ 'id' ].type == 'UUID' ) {
       rec.id = helper.uuidv4()
+    } else if ( ! entity.properties[ 'id' ] ) {
+      rec.id = helper.uuidv4()
     } else {
       return { err: 'ERROR: id required' }
     }

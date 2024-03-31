@@ -331,58 +331,148 @@ let uploadCsvResult = {}
 
 async function uploadCsvData( req, res ) {
   log.info( 'uploadCsvData',  req.params )
-  let user = await userDta.getUserInfoFromReq( gui, req )
-  if ( ! user ) { return res.status(401).send( 'login required' ) }
-  if ( ! req.files || Object.keys( req.files ).length === 0) {
-    return res.status(400).send('No files were uploaded.');
-  }
-  let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
-  let app = await dta.getAppById( appId )
-  if ( ! app ) { return res.send( 'ERROR: App not found') }
-  let entityId = req.params.entityId
-  let entity = app.entity[ entityId ]
-  if ( ! entity ) { return res.send( 'ERROR: Entity not found') }
-  let actionId = ( req.params.actionId ? req.params.actionId : null ) 
-  let separator = ';'
   try {
-    let recs = {}
-    // let newApps = JSON.parse( '' + req.files.file.data )
-    // let dbApps = await  dta.getAppList( user.scopeId, [], 'admin' )
+    let user = await userDta.getUserInfoFromReq( gui, req )
+    if ( ! user ) { return res.status(401).send( 'login required' ) }
+    if ( ! req.files || Object.keys( req.files ).length === 0) {
+      return res.status(400).send('No files were uploaded.');
+    }
+    let appId = req.params.tenantId +'/'+ req.params.appId +'/'+ req.params.appVersion
+    let app = await dta.getAppById( appId )
+    if ( ! app ) { return res.send( 'ERROR: App not found') }
+    let entityId = req.params.entityId
+    let entity = app.entity[ entityId ]
+    if ( ! entity ) { return res.send( 'ERROR: Entity not found') }
+    let actionId = ( req.params.actionId ? req.params.actionId : null ) 
+    let toState = null
+    if ( entity.stateModel ) {
+      let stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
+      if ( ! stateModel ) { return res.send( 'ERROR: StateModel not found') }
+      if ( ! actionId ){ return res.send( 'ERROR: Action required') }
+      toState = stateModel.state['null'].actions[ actionId ]
+      if ( ! toState ){ return res.send( 'ERROR: Action not valid') }
+    }
 
-    // let dbEntityMap = {}
-    // for ( let appId in dbApps ) {
-    //   for ( let entityId in dbApps[ appId ].entity ) {
-    //     dbEntityMap[ entityId ] = { appId: appId }
-    //   }
-    // }
+    let separator = ';'
 
     let html = 'App Id: '+ appId
     html += '<br>Entity Id: '+ entityId
     if ( actionId ) { html += '<br>Action Id: '+ actionId }
+    let recs = []
+    let csvRow = ( '' + req.files.file.data ).split('\n')
+    if ( csvRow.length < 2 ) { return res.send( 'ERROR: CSV contains no data') }
+    let hr = csvRow[ 0 ].split( separator ) // should be headline with field names
+    csvRow.shift()
 
-    html += '<p>Parseer: TODO'
-    // html += '<p>Parsed successfully'
-    uploadOK     = true
+    // check upload data
+    let uploadOK = true
+    if ( actionId ) { // State "Create"
+      for ( let propId in entity.properties ) {
+        let prop = entity.properties[ propId ]
+        if ( prop.stateTransition && prop.stateTransition[ 'null_'+ actionId ] ) { // required field
+          if ( ! hr.includes( propId ) ) {
+            uploadOK = false
+            html += '<p>ERROR: Column "'+propId+'" required for "'+actionId+'"!' 
+          }
+        } else if ( hr.includes( propId ) ) { // not allowed field
+          uploadOK = false
+          html += '<p>ERROR: Column "'+propId+'" not allowed for "'+actionId+'"!' 
+        }
+      }
+    } else { // normal data w/o state
+      for ( let propId in entity.properties ) {
+        if ( ! hr.includes( propId ) ) {
+          uploadOK = false
+          html += '<p>ERROR: Column "'+propId+'" required!' 
+        }
+      }  
+    }
+    for ( let r of csvRow ) {
+      let v = r.split( separator )
+      if ( v.length != hr.length ) {
+        uploadOK = false
+        html += '<p>ERROR: Row does not mach to values:' 
+        html += '<br>' + r
+      }
+    }
 
     if ( uploadOK ) {
-      let importId = helper.uuidv4()
-      let importDta = {
-        rec    : recs,
-        appId  : '',
-        entityId : '',
-        actionId : '',
-        _expire : Date.now() + 1000*60*60*24
+      // parse data
+      html += '<table class="csvTable"><tr>' 
+      if ( toState ) {
+        html += '<th>State</th>'
       }
-      await dta.addDataObjNoEvent( 'csv-temp', importId, importDta )
-      html += '<p> Click to <a href="guiapp/csv/import/'+importId+'">IMPORT DATA</a>'
-    } else {
+      for (let c of hr ) {
+        html += '<th>'+ c + '</th>'
+      }
+      html += '<th></th></tr>'
+
+      for ( let r of csvRow ) {
+        let parse = {}
+        html += '<tr>'
+        let v = r.split( separator )
+        let i = 0
+        let creDate = Date.now()
+        let rec = {}
+        if ( ! hr.includes(' id' ) ) {
+          rec.id = helper.uuidv4()
+        }
+        if ( toState ) {
+          rec[ '_state' ] = toState.to
+          html += '<td>'+toState.to + '</td>'
+        }
+        if ( ! hr.includes( 'scopeId' ) ) {
+          rec[ 'scopeId' ] = user.scopeId
+        } 
+        rec[ '_cre' ] = creDate
+        rec[ '_upd' ] = creDate
+     
+        for ( let c of hr ) {
+          rec[ c ] = v[i]
+          html += '<td>'+ v[i] + '</td>'
+          if ( c == 'scopeId' ) {
+            if ( ! v[i].startsWith( user.rootScopeId ) ) {
+              parse.err = 'Error: Scope ID invalid!'
+              uploadOK = false
+            }
+          }
+          i++
+        }
+        // TODO support JSON, sub/fields, ...
+        if ( ! parse.err ) { parse = propHandler.reformatDataUpdateInput( entity, rec ) }
+        html += '<td>'+ ( parse.err ? parse.err : 'OK' )+ '</td>'
+        recs.push( rec )
+        html += '</tr>'
+      }
+      html += '</table>'
+      
+      if ( uploadOK ) {
+        let importId = helper.uuidv4()
+        let importDta = {
+          tbl    : user.rootScopeId + entityId,
+          rec    : recs,
+          appId  : '',
+          entityId : '',
+          actionId : '',
+          _expire : Date.now() + 1000*60*60*24
+        }
+        await dta.addDataObjNoEvent( 'csv-temp', importId, importDta )
+        html += '<p> Click to <a href="guiapp/csv/import/'+importId+'">IMPORT DATA</a>'  
+      }
+    } 
+    if ( ! uploadOK ) {
       html += '<p> <b> UPLOAD FAILED! </b>'
+      let csvStr =  ''+ req.files.file.data
+      html += '<hr>'
+      html += csvStr.replaceAll( '\n', '<br>')
+      html += '<hr>'
+  
     }
     uploadCsvResult[ user.userId ] = html
    
   } catch ( exc ) {  
     log.warn( 'uploadCsvData', exc )
-    return res.status(400).send( 'Error' )
+    return res.status(200).send( 'ERROR' )
   }
   res.send( 'OK' )
 }
@@ -391,8 +481,8 @@ async function uploadCsvData( req, res ) {
 async function getUploadCsvResult( req, res ) {
   log.info( 'GET /csv/html' ) // , req.files.file.data
   let user = await userDta.getUserInfoFromReq( gui, req )
-  log.info( 'getUploadCsvResult user', user.userId )
-  log.info( 'getUploadCsvResult html', uploadCsvResult )
+  // log.info( 'getUploadCsvResult user', user.userId )
+  // log.info( 'getUploadCsvResult html', uploadCsvResult )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   res.send( uploadCsvResult[ user.userId ]  )
   delete uploadCsvResult[ user.userId ] 
@@ -408,11 +498,11 @@ async function importCsvData( req, res ) {
   let impDta = await dta.getDataById( 'csv-temp', req.params.uid ) 
   if ( ! impDta ) { return res.status(400).send( 'not found' ) }
 
-  // for ( let appId in impDta.apps ) {
-  //   log.info( 'GET /app/import IMPORT >>', appId  ) 
-  //   await dta.addApp( user.rootScopeId +'/'+ appId, impDta.apps[ appId] )
-  // }
-  // await dta.delDataObjNoEvent( 'app-temp', req.params.uid )
+  for ( let rec of impDta.rec ) {
+    await dta.addDataObj( impDta.tbl, rec.id, rec ) //TODO add entity
+  }
+
+  await dta.delDataObjNoEvent( 'csv-temp', req.params.uid )
 
   res.redirect( '../../../index.html?layout=AppEntity-nonav&id=1000/ticket-mgr/1.0.0' ) 
 }

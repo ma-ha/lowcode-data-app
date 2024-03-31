@@ -558,8 +558,7 @@
       "#region": {
         "role": [
           "admin"
-        ],
-        "srcURL": ""
+        ]
       }
     },
     "enabled": true,
@@ -914,6 +913,11 @@
           "appUser"
         ],
         "properties": {
+          "id": {
+            "type": "UUID",
+            "noDelete": true,
+            "noTable": true
+          },
           "Task": {
             "type": "String",
             "filter": true,
@@ -928,22 +932,6 @@
               "Review_Reopen": true,
               "Closed_Reopen": true
             }
-          },
-          "Description": {
-            "type": "Text",
-            "stateTransition": {
-              "null_Create": true,
-              "Open_StartProgress": true,
-              "Open_Reject": true,
-              "Open_Blocked": true,
-              "InProgress_Done": true,
-              "InProgress_StopProgress": true,
-              "InProgress_SetBlocked": true,
-              "Blocked_Unblock": true,
-              "Blocked_StartProgress": true,
-              "Closed_Reopen": true
-            },
-            "lines": 3
           },
           "Assignee": {
             "type": "String",
@@ -963,6 +951,32 @@
               "Closed_Reopen": true
             }
           },
+          "Description": {
+            "type": "Text",
+            "stateTransition": {
+              "null_Create": true,
+              "Open_StartProgress": true,
+              "Open_Reject": true,
+              "Open_Blocked": true,
+              "InProgress_Done": true,
+              "InProgress_StopProgress": true,
+              "InProgress_SetBlocked": true,
+              "Blocked_Unblock": true,
+              "Blocked_StartProgress": true,
+              "Closed_Reopen": true
+            },
+            "lines": 3
+          },
+          "Approval": {
+            "type": "String",
+            "noTable": true,
+            "stateTransition": {
+              "null_Create": false,
+              "Review_Close": true,
+              "Closed_Reopen": true
+            },
+            "noEdit": true
+          },
           "Resolution": {
             "type": "String",
             "noEdit": true,
@@ -977,16 +991,6 @@
               "Blocked_StartProgress": true,
               "Closed_Reopen": true
             }
-          },
-          "Approval": {
-            "type": "String",
-            "noTable": true,
-            "stateTransition": {
-              "null_Create": false,
-              "Review_Close": true,
-              "Closed_Reopen": true
-            },
-            "noEdit": true
           }
         },
         "noDelete": true,
@@ -1020,6 +1024,6 @@
     "img": "img/k8s-fire.png",
     "id": "1000/ticket-mgr/1.0.0",
     "_cre": 1711692745036,
-    "_upd": 1711695058839
+    "_upd": 1711865943982
   }
 }

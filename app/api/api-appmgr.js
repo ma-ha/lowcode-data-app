@@ -408,6 +408,7 @@ async function addPropertyMoveDn( req, res ) {
       doNext = true
     }
   }
+  await dta.saveApp( appId, app )
   res.send( entity.properties )
 }
 
