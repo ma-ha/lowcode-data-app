@@ -639,6 +639,19 @@
 #AppsContent .pongIconImg {
   height: 115px;
 }
+
+#CsvUploadContentseparator {
+  float: left;
+}
+#CsvUploadContentseparator input {
+  width: 50px
+}
+#CsvUploadContentseparator label {
+  width: 100px
+}
+
+#CsvUploadContentFile {
+  padding-top: 16px;
 }
 
  /* All Forms --------------------------------------------- */

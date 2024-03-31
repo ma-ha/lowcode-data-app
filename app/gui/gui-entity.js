@@ -538,8 +538,8 @@ async function renderDynEntityCsvUploadRows( staticRows, req, pageName )  {
     moduleConfig: {
       update : [ "CsvUploadLog" ],
       input: [],
-      accept: '.csv'
-      // input: [ { id: 'separator', label:'Separator' },]
+      accept: '.csv',
+      input: [ { id: 'separator', label:'Separator', value: ';' }]
     }
   })
 

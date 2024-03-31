@@ -353,7 +353,8 @@ async function uploadCsvData( req, res ) {
       if ( ! toState ){ return res.send( 'ERROR: Action not valid') }
     }
 
-    let separator = ';'
+    let separator = ( req.body.separator ? req.body.separator : ';' )
+    log.info( 'uploadCsvData separator', separator )
 
     let html = 'App Id: '+ appId
     html += '<br>Entity Id: '+ entityId
