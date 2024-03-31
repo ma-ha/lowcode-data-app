@@ -1024,6 +1024,7 @@
     "img": "img/k8s-fire.png",
     "id": "1000/ticket-mgr/1.0.0",
     "_cre": 1711692745036,
-    "_upd": 1711865943982
+    "_upd": 1711867868549,
+    "description": "Task management"
   }
 }

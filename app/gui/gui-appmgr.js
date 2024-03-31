@@ -35,8 +35,8 @@ async function init( ) {
       fieldGroups:[{ columns: [
         { formFields: [{ id: "scopeId", label: "Id", type: "text" } ]},
         { formFields: [{ id: "name", label: "Name", type: "text" } ]},
-        { formFields: [{ id: "tags", label: "Tags, comma separated", type: "text" } ]},
-        { formFields: [{ id: "metaJSON", label: "Meta Data (JSON)", type: "text", rows: 6 } ]}
+        { formFields: [{ id: "tags", label: "Tags", descr: 'Comma separated', type: "text" } ]},
+        { formFields: [{ id: "metaJSON", label: "Meta Data", descr: "JSON", type: "text", rows: 6 } ]}
       ] }],
       actions : [ 
         { id: "AdScopeBtn", actionName: "Add / Update", update: [{ resId:'Scopes' }], 
@@ -108,7 +108,7 @@ async function init( ) {
           { formFields: [
             { id: "scope", label: "Scope", type: "select", 
               optionsResource: { resourceURL: 'scope/options', optionValue: 'id',optionField:'name' } },
-            { id: "tags", label: "Tags (comma separated)", type: "text" }
+            { id: "tags", label: "Tags", descr: 'Comma separated', type: "text" }
           ]},
           { formFields: [
             { id: "img",  label: "Icon", type: "text" },
@@ -116,6 +116,7 @@ async function init( ) {
               options: addOptions([ "appUser", "admin", 'dev', '-' ]) }
           ]},
           { formFields: [{ id: "enabled",  label: "Enabled", type: "checkbox" } ]},
+          { formFields: [{ id: "description", label: "Description", type: "text", rows: 4 } ]}
         ] }],
         actions : [ 
           { id: "AddFormBtn", actionName: "Add / Change",

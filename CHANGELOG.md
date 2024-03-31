@@ -2,6 +2,7 @@
 - CSV Upload
 - Create new entity with id (UUID) by default
 - App: fix icon size
+- App: Description text
 
 # 0.21.0/1
 - refactor persistence

@@ -104,7 +104,8 @@ async function getAppForCustomize( req, res )  {
     tags  : getTagsCSV( app.scope ),
     role  : ( app.role.length > 0 ? app.role[0] : '-' ),
     img   : ( app.img ? app.img : '' ),
-    enabled  : ( app.enabled ? true : false )
+    enabled  : ( app.enabled ? true : false ),
+    description : ( app.description ?  app.description : '' )
   }
 
   res.send( cApp )
@@ -163,6 +164,7 @@ async function addApp( req, res ) {
     }
   }
   app.scope = scope
+  app.description = req.body.description 
 
   if ( req.body.img == '' && app.img ) {
     delete app.img
