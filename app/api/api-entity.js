@@ -248,9 +248,18 @@ async function docStateChange( req, res ) {
   }
   // TODO: check condition OK: entity.stateTransition
 
+  let dtaColl = user.rootScopeId + req.params.entityId
+  let dbRec = await  dta.getDataById( dtaColl, rec.id ) 
+  if ( ! dbRec ) { return res.send( 'ERROR: Data not found') }
+  for ( let propId in dbRec ) { // don't "forget" hidden properties
+    if ( ! rec[ propId ] ) {
+      rec[ propId ] = dbRec[ propId ]
+    }
+  }
+
   let rp = req.params
   let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec.id
-    await dta.addDataObj( req.params.tenantId + req.params.entityId, rec.id, rec, uri, 'dta.stateUpdate', entity )
+  await dta.addDataObj( dtaColl, rec.id, rec, uri, 'dta.stateUpdate', entity )
 
   let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
 

@@ -264,6 +264,10 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         label: ( entity.properties[ 'id' ].label ? entity.properties[ 'id' ].label : "Id (UUID)" ), 
         type: "text", readonly: true, descr: 'ID is auto generated'
       } ]})
+    } else {
+      cols.push({ formFields: [{ 
+        id: "id", type: "text", hidden: true
+      } ]})
     }
   } else if ( entity.stateModel ) { 
     // prevent create via the edit form

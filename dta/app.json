@@ -916,7 +916,8 @@
           "id": {
             "type": "UUID",
             "noDelete": true,
-            "noTable": true
+            "noTable": true,
+            "noEdit": true
           },
           "Task": {
             "type": "String",
@@ -994,7 +995,6 @@
           }
         },
         "noDelete": true,
-        "noEdit": true,
         "csvUpload": true,
         "stateModel": "Ticket"
       }
@@ -1024,7 +1024,7 @@
     "img": "img/k8s-fire.png",
     "id": "1000/ticket-mgr/1.0.0",
     "_cre": 1711692745036,
-    "_upd": 1711867868549,
+    "_upd": 1711953934769,
     "description": "Task management"
   }
 }
