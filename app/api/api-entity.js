@@ -453,6 +453,13 @@ async function uploadCsvData( req, res ) {
               uploadOK = false
             }
           }
+          if ( c == 'id' ) {
+            let dbRec = await  dta.getDataById( user.rootScopeId + entityId, v[i] ) 
+            if ( dbRec ) {
+              parse.err = 'Error: ID exists!'
+              uploadOK = false
+            }
+          }
           i++
         }
         // TODO support JSON, sub/fields, ...
@@ -466,12 +473,12 @@ async function uploadCsvData( req, res ) {
       if ( uploadOK ) {
         let importId = helper.uuidv4()
         let importDta = {
-          tbl    : user.rootScopeId + entityId,
-          rec    : recs,
-          appId  : '',
-          entityId : '',
-          actionId : '',
-          _expire : Date.now() + 1000*60*60*24
+          tbl      : user.rootScopeId + entityId,
+          rec      : recs,
+          appId    : appId,
+          entityId : entityId,
+          actionId : actionId,
+          _expire  : Date.now() + 1000*60*60*24
         }
         await dta.addDataObjNoEvent( 'csv-temp', importId, importDta )
         html += '<p> Click to <a href="guiapp/csv/import/'+importId+'">IMPORT DATA</a>'  
@@ -521,5 +528,5 @@ async function importCsvData( req, res ) {
 
   await dta.delDataObjNoEvent( 'csv-temp', req.params.uid )
 
-  res.redirect( '../../../index.html?layout=AppEntity-nonav&id=1000/ticket-mgr/1.0.0' ) 
+  res.redirect( '../../../index.html?layout=AppEntity-nonav&id='+ impDta.appId ) 
 }

@@ -908,7 +908,8 @@ async function getEntity( refId, propId ) {
 }
 
 function getRefLabel( entity, recId, rec ) {
-  log.debug( 'getRefLabel', entity, recId, rec )
+  log.info( 'getRefLabel', entity, recId, rec )
+  if ( ! rec ) { return }
   let lbl = []
   if ( entity ) {
     for ( let propId in entity.properties ) {
