@@ -83,7 +83,9 @@ e.g. `app.getExpress()` to add API routes or ` gui.pages['main'].addFooterLink(.
 
 ### Test the App
 
-Open your new app in the "App" tab (the app is only visible in the defined scope)
+Open your new app in the "App" tab (the app is only visible in the defined scope).
+
+The web GUI supports CSV data upload, if this is enabled for the entity (checkbox).
 
 # Entity / Document Model
 
@@ -168,6 +170,8 @@ Currently only `$eq` is allowed. The compared values can be a String (in single 
 The left value is prioritized taken from the select values and the right from the entity default values. 
 For "select" the condition can be `val $eq ...`.
 
+For the "create" action a CSV upload is available.
+
 # Integration 
 
 ## APIs
@@ -203,7 +207,7 @@ The persistence uses simple files and a memory cache.
 This is not recommended for production use.
 
 It should be simple to replace the persistence with a document DB. 
-Simply rewrite:
+Simply rewrite some methods in:
 - [app-dta.js](app/persistence/app-dta.js)
 - [app-dta-user.js](app/persistence/app-dta-user.js)
 
