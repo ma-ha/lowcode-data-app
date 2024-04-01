@@ -98,7 +98,7 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
 }
 
 async function renderEntityRows( app, appId, entityId, filterParam, user ) {
-  // log.info( 'renderEntityRows', app, appId, entityId )
+  log.debug( 'renderEntityRows', app, appId, entityId )
   let rows = []
   //let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
   let entity = app.entity[ entityId ]
@@ -180,6 +180,7 @@ async function stateCreateFormRow( rows, app, appId, entityId, user ) {
 }
 
 async function stateCreateForm( appId, entity, entityId, initState, actionId, user ) {
+  log.debug( 'stateCreateForm', appId, entity, entityId, initState )
   let actionFields = await propHandler.genGuiFormFieldsDef( entity, null, user, 'null_'+actionId, 'small' )
   actionFields.push({ formFields: [{ id: '_state', type: "text", value: initState.actions[ actionId ].to, hidden: true }] } )
 
@@ -282,7 +283,7 @@ function genDivs( divArr, properties ) { // recursive
 // ============================================================================
 
 function genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel ) {
-  log.debug( 'genDataTable', appId, entityId, entity, user )
+  log.debug( 'genDataTable', appId, entityId, entity, user, tblHeight, stateModel )
   
   let tblDef = { 
     rowId       : 'EntityList' + entityId,
@@ -366,8 +367,10 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
 
   let cols = await propHandler.genGuiFormFieldsDef( entity, filter, user )
 
+  let title = 'Add/edit '+ entity.title
   let actions = []
   if ( entity.stateModel ) {
+    title = 'Edit '+ entity.title
     actions = [ 
       { id: "AddEntityBtn", actionName: "Update",
         actionURL: 'guiapp/'+appId+'/entity/'+entityId,
@@ -393,7 +396,7 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
 
   let addFormView = { 
     id: 'Add' + entityId, rowId: 'Add' + entityId, type : 'pong-form',
-    title: 'Add/edit'+ entity.title,  
+    title: title, 
     height: 'auto',  decor  : "decor",
     resourceURL: 'guiapp/'+appId+'/entity/'+entityId, 
 
@@ -473,7 +476,7 @@ async function renderDynEntityPrpRows( staticRows, req, pageName ) {
 }
 
 function renderEntityPrpRows( app, appId, entityId ) {
-  // log.info( 'renderEntityRows', app, appId, entityId )
+  log.info( 'renderEntityRows', app, appId, entityId )
   let rows = []
   let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
   let entity = app.entity[ entityId ]

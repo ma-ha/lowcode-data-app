@@ -258,16 +258,18 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
   let cols = []
 
   if ( entity.properties[ 'id' ] && entity.properties[ 'id' ].type == 'UUID' ) {
-    if ( ! entity.properties[ 'id' ].noEdit ) {
-      cols.push({ formFields: [{ 
-        id: "id", 
-        label: ( entity.properties[ 'id' ].label ? entity.properties[ 'id' ].label : "Id (UUID)" ), 
-        type: "text", readonly: true, descr: 'ID is auto generated'
-      } ]})
-    } else {
-      cols.push({ formFields: [{ 
-        id: "id", type: "text", hidden: true
-      } ]})
+    if ( !( stateTransition && stateTransition.startsWith( 'null_' ) ) ) {
+      if ( ! entity.properties[ 'id' ].noEdit ) {
+        cols.push({ formFields: [{ 
+          id: "id", 
+          label: ( entity.properties[ 'id' ].label ? entity.properties[ 'id' ].label : "Id (UUID)" ), 
+          type: "text", readonly: true, descr: 'ID is auto generated'
+        } ]})
+      } else {
+        cols.push({ formFields: [{ 
+          id: "id", type: "text", hidden: true
+        } ]})
+      }  
     }
   } else if ( entity.stateModel ) { 
     // prevent create via the edit form
@@ -781,6 +783,7 @@ function reformatDataUpdateInput( entity, rec ) {
   if ( ! rec.id ) {
     if ( entity.properties[ 'id' ]  &&  entity.properties[ 'id' ].type == 'UUID' ) {
       rec.id = helper.uuidv4()
+      log.info( 'reformatDataUpdateInput rec.id',  rec.id )
     } else if ( ! entity.properties[ 'id' ] ) {
       rec.id = helper.uuidv4()
     } else {

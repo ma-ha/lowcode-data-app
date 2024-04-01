@@ -338,7 +338,7 @@ function scopeOK( userScope, recScope, inherit ) {
 
 
 async function addDataObj( tbl, id, obj, uri, evt, entity ) {
-  log.info( 'addDataObj',  tbl, id, obj, uri, evt, entity  )
+  log.debug( 'addDataObj',  tbl, id, obj, uri, evt, entity  )
   let dtaEvt = await addDataObjNoEvent( tbl, id, obj )
   let objCopy = await embedRefObjects( obj, entity )
   eh.publishDataChgEvt( ( evt ? evt : dtaEvt ), id, uri, tbl, objCopy )
@@ -346,7 +346,7 @@ async function addDataObj( tbl, id, obj, uri, evt, entity ) {
 }
 
 async function addDataObjNoEvent( tbl, id, obj ) {
-  log.info( 'addDataObjNoEvent', tbl, id )
+  log.debug( 'addDataObjNoEvent', tbl, id )
   await saveData( tbl, id, obj )
   return true
 }
@@ -462,7 +462,7 @@ async function loadDataById( tbl, id ) {
 }
 
 async function saveData( tbl, id, obj ) {
-  log.info( 'addDataObjNoEvent', tbl, id )
+  log.debug( 'addDataObjNoEvent', tbl, id )
   if ( DB ) { return await DB.saveData( tbl, id, obj ) }
   // --- JSON file DB ---
   await syncTbl( tbl )

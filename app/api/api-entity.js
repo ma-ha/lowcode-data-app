@@ -191,6 +191,7 @@ async function addDoc( req, res )  {
   let app = await dta.getAppById( appId )
   if ( ! app ) { return res.send( 'ERROR: App not found') }
   let entity = app.entity[ req.params.entityId ]
+  if ( ! entity ) { return res.send( 'ERROR: Entity not found') }
 
   let dtaColl = user.rootScopeId + req.params.entityId
   
@@ -208,9 +209,15 @@ async function addDoc( req, res )  {
   
   // complete data set with property data from DB
   let dbRec = await  dta.getDataById( dtaColl, rec.id ) 
-  for ( let propId in dbRec ) {
-    if ( ! rec[ propId ] || ( entity.properties[ propId ] && entity.properties[ propId ].apiManaged ) ) {
-      rec[ propId ] = dbRec[ propId ]
+  if ( dbRec ) {
+    for ( let propId in dbRec ) {
+      if ( ! rec[ propId ] || ( entity.properties[ propId ] && entity.properties[ propId ].apiManaged ) ) {
+        rec[ propId ] = dbRec[ propId ]
+      }
+    }
+  } else {
+    if ( entity.stateModel && ! rec[ '_state' ]  ) {
+      return res.send( 'ERROR: Create not allowed' ) 
     }
   }
 
