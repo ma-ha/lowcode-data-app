@@ -1,4 +1,4 @@
-# 0.22.0 WIP
+# 0.22.0
 - CSV Upload
 - Create new entity with id (UUID) by default
 - App: fix icon size
