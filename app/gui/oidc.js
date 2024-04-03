@@ -22,7 +22,7 @@ async function init ( app, OIDCCfg ) {
 
   let oidcLoginPg = gui.addPage( 'openid-login-nonav', 'Login' )
   oidcLoginPg.title = 'Login' 
-  oidcLoginPg.setPageWidth( '1200px' )
+  oidcLoginPg.setPageWidth( '90%' )
   oidcLoginPg.addView({ 
     id: 'Login', title: 'Login', 
     height: '450px', 
@@ -32,7 +32,7 @@ async function init ( app, OIDCCfg ) {
   
   let oidcChPwdPg = gui.addPage( 'change-password-nonav', 'ChangePassword' )
   oidcChPwdPg.title = 'Change Password' 
-  oidcChPwdPg.setPageWidth( '1200px' )
+  oidcChPwdPg.setPageWidth( '90%' )
   oidcChPwdPg.addView({ 
     id: 'ChangePassword', title: 'Change Password', 
     height: '450px', 
