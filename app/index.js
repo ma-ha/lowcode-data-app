@@ -93,7 +93,7 @@ function checkOidcParams( cfg ) {
       AUTH_SCOPE: 'read:all',
       LOGIN_URL:  'oidc/authorize',
       LOGOUT_URL: 'oidc/logout',
-      CHANGE_PWD_URL: 'http://localhost:8888/index.html?layout=main',
+      CHANGE_PWD_URL: 'index.html?layout=change-password-nonav',
       REGISTER_URL: 'http://localhost:8888/index.html?layout=product-nonav&id=5d380c06abc348168ba62ec6',
       PWD_RESET_URL: 'http://localhost:8888/index.html?layout=main',
   

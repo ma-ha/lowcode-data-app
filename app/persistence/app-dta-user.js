@@ -23,6 +23,7 @@ exports: module.exports = {
   getScopeList,
   addScope,
   addUser,
+  updateUserPassword,
   updateUser,
   addUserAdmin,
   getUserArr,
@@ -345,6 +346,14 @@ async function getUser( uid, scopeId ) {
   return ret
 }
 
+async function updateUserPassword( uid, newPassword ) {
+  log.info( 'updateUserPassword..', uid )
+  let user = await loadUserById( uid )
+  if ( ! user ) { return 'not found' }
+  user.password = createHash('sha256').update( newPassword ).digest('hex')
+  await saveUser( uid, user )
+  return 'OK, changed'
+}
 
 async function updateUser( uid, newEmail, user, scopeId, action ) {
   log.info( 'updateUser..', uid, user )

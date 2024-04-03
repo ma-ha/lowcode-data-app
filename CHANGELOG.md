@@ -1,3 +1,6 @@
+# 0.23.0
+- change password
+
 # 0.22.0
 - CSV Upload
 - Create new entity with id (UUID) by default

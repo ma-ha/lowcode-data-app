@@ -20,17 +20,25 @@ async function init ( app, OIDCCfg ) {
   cfg = OIDCCfg
   gui = app
 
-  let oidctPg = gui.addPage( 'openid-login-nonav', 'Login' )
-  oidctPg.setPageWidth( '1200px' )
-
-  oidctPg.addView({ 
+  let oidcLoginPg = gui.addPage( 'openid-login-nonav', 'Login' )
+  oidcLoginPg.title = 'Login' 
+  oidcLoginPg.setPageWidth( '1200px' )
+  oidcLoginPg.addView({ 
     id: 'Login', title: 'Login', 
     height: '450px', 
     type: 'pong-form',
     resourceURL: 'oidc/login' 
   })
-
-  oidctPg.title = 'Login' 
+  
+  let oidcChPwdPg = gui.addPage( 'change-password-nonav', 'ChangePassword' )
+  oidcChPwdPg.title = 'Change Password' 
+  oidcChPwdPg.setPageWidth( '1200px' )
+  oidcChPwdPg.addView({ 
+    id: 'ChangePassword', title: 'Change Password', 
+    height: '450px', 
+    type: 'pong-form',
+    resourceURL: 'oidc/password' 
+  })
 
   svc = gui.getExpress() 
   svc.get(  '/oidc/authorize', authorize ) 
@@ -38,8 +46,11 @@ async function init ( app, OIDCCfg ) {
   svc.post( '/oidc/token', bodyParser.urlencoded({ extended: false }), genToken ) 
   svc.get(  '/oidc/login/auto', autoLogin )
   svc.post( '/oidc/login', bodyParser.urlencoded({ extended: false }), login )
-  svc.get(  '/oidc/logout', logout )
 
+  svc.get(  '/oidc/password/pong-form', passwordForm )
+  svc.post( '/oidc/password', bodyParser.urlencoded({ extended: false }), changePassword )
+
+  svc.get(  '/oidc/logout', logout )
 
   gui.createToken          = createToken
   gui.getUserIdForToken    = getUserIdForToken
@@ -155,6 +166,37 @@ async function loginForm ( req, res ) {
 }
 
 
+async function passwordForm ( req, res ) {
+  log.info( 'GET /oidc/password/pong-form' )
+  let ctx = await getContextOrInfo( req )
+  if ( ctx && ctx.userId ) {
+    // let user = await userDta.getUserInfo( ctx.userId )
+    let frm = { 
+      id: 'oidcChangePasswordForm',
+      fieldGroups: [ { columns: [
+        { formFields: [
+          { id: 'email', type: 'text', label: 'Email', readonly: true, defaultVal: ctx.userId },
+          { id: 'password', type: 'password',label: 'Password' },
+          { id: 'newPassword', type: 'newPassword',label: 'New Password' }
+        ] }
+      ] } ],
+      actions: [
+        {
+          id: 'oIdcChangePasswordBtn',
+          actionName: 'Change Password',
+          actionURL: 'oidc/password',
+          target: 'modal',
+          navto: 'index.html'
+        }
+      ]
+    }
+    res.send( frm )
+  } else {
+    res.send({})
+  }
+}
+
+
 async function genToken( req, res ) {
   log.info( 'POST /oidc/token' )
   try {
@@ -212,9 +254,9 @@ async function autoLogin( req, res ) {
 async function login( req, res ) {
   try {
     log.info( 'GET /oidct/login', req.body )
-    if ( req.body.client_id && req.body.email && req.body.password ) { 
+    if ( req.body.client_id && req.body.email && req.body.password ) {
       
-      if ( userDta.authenticate( req.body.email ) ) {
+      if ( await userDta.authenticate( req.body.email, req.body.password ) ) {
         log.info( 'OIDC login', err, loginOK )
         let accessToken = await gui.createToken( req.body.email )
         res.cookie( 'pong-security', accessToken, { httpOnly: true, path: gui.appRoot } )
@@ -227,7 +269,7 @@ async function login( req, res ) {
         //   res.status( 400 ).send( 'Not Authorized' )
         // }
       } else {
-        return res.status( 401 ).send( 'Failed' )
+        return res.status( 400 ).send( 'Failed' )
       }
 
     } else {
@@ -238,6 +280,37 @@ async function login( req, res ) {
     res.status( 500 ).send( 'Error' )
   }
 }
+
+
+async function changePassword( req, res ) {
+  try {
+    log.info( 'GET /oidct/password', req.body )
+    if (req.body.email && req.body.password ) { 
+      
+      if ( await userDta.authenticate( req.body.email, req.body.password ) ) {
+        log.info( 'changePassword authenticate ok' )
+      
+        if ( req.body.newPassword.length < 8 ) {
+          log.info( 'changePassword too short' )
+          return res.status( 400 ).send( 'Password length must be at least 8' )
+        }
+        
+        log.info( 'changePassword update...' )
+        let result = await userDta.updateUserPassword( req.body.email, req.body.newPassword )
+        log.info( 'changePassword done' )
+        return res.send( result )
+      } else {
+        res.status( 400 ).send( 'Wrong Password' )
+      }
+    } else {
+      res.status( 400 ).send( 'Parameter Error' )
+    }
+  } catch ( e ) {
+    log.error( '/oidct/login', e )
+    res.status( 500 ).send( 'Error' )
+  }
+}
+
 
 function logout(req, res) {
   log.info( 'GET /oidc/logout' )

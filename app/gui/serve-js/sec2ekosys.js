@@ -113,6 +113,7 @@ function mSec_Logout( params ) {
 
 
 function mSec_ChangePassword( params, userEmail ) {
+  window.location.href = 'index.html?layout=change-password-nonav'
 //   new Auth0ChangePassword({
 //     container:         "SecurityChangePasswordDiv",                   // required
 // //    email:             "{{email | escape}}",                          // DO NOT CHANGE THIS
