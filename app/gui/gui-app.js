@@ -18,6 +18,6 @@ async function init() {
   appPage.navLabel = 'Apps'
   appPage.setPageWidth( '90%' )
   appPage.addView(
-    { id:'Apps', type:'pong-icons', resourceURL:'gui/tenant/app/icons', height:'700px' }
+    { id:'Apps', type:'pong-icons', resourceURL:'gui/tenant/app/icons', height:'760px' }
   )
 }

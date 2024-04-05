@@ -1,3 +1,7 @@
+# 0.23.1
+- Header text
+- CSS height adjust
+
 # 0.23.0
 - change password
 

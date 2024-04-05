@@ -20,7 +20,7 @@ async function init( ) {
   userPg.setPageWidth( '90%' )
 
   userPg.addView({  id: 'User',
-    rowId: 'User', title: 'User',  height: '500px', 
+    rowId: 'User', title: 'User',  height: '520px', 
     type : 'pong-table', resourceURL: 'user',
     moduleConfig : {
       dataURL: "",

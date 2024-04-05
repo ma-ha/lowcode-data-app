@@ -22,7 +22,7 @@ async function init( ) {
   scopePg.navLabel = 'Scopes'
   scopePg.setPageWidth( '90%' )
   scopePg.addView({ id: 'Scopes', 
-    rowId: 'Scopes', title: 'Scopes',  height: '650px', 
+    rowId: 'Scopes', title: 'Scopes',  height: '560px', 
     type : 'pong-table', resourceURL: 'scope' 
   })
   scopePg.addView({  id: 'AddScope', 
@@ -71,7 +71,7 @@ async function init( ) {
 
   function cstmizePageAppTable() {
     return {
-      id: 'CustomizeAppsTbl', rowId: 'CustomizeAppsTbl', title: 'Apps',  height: '650px', 
+      id: 'CustomizeAppsTbl', rowId: 'CustomizeAppsTbl', title: 'Apps',  height: '565px', 
       type : 'pong-table', resourceURL: 'app',
       moduleConfig : {
         dataURL: "",
@@ -158,7 +158,7 @@ async function init( ) {
     }]
 
     rows.push({
-      id: 'AppEntitiesTbl', title: 'App Entities',  height: '600px', 
+      id: 'AppEntitiesTbl', title: 'App Entities',  height: '535px', 
       type : 'pong-table', resourceURL: 'app/entity',  decor: 'decor', rowId: 'AppEntitiesTbl',
       moduleConfig : {
         dataURL: "",
@@ -501,7 +501,7 @@ async function init( ) {
   admStatusPage.setPageWidth( '90%' )
 
   admStatusPage.addView({ id: 'StateLst', 
-    rowId: 'StateLst', title: 'State Models',  height: '650px', 
+    rowId: 'StateLst', title: 'State Models',  height: '610px', 
     type : 'pong-table', resourceURL: 'state-model',
     moduleConfig : {
       dataURL: "",

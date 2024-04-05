@@ -47,6 +47,8 @@
  }
  
  .header-logo h1,
+ .header-logo,
+ .header-logo-text,
  #WikiContent h1,
  .pong-markdown h1,
  .pong-markdown h2,
@@ -189,6 +191,10 @@
 
  /* ------END COLOR SCHEME ---------*/
  
+ #header { 
+  height: 120px;
+ }
+
  #headerdiv {
    box-shadow:#000 0 0 8px 0;  
    margin-bottom: 5px;
@@ -220,14 +226,20 @@
   padding: 0 0 0 8px;
   text-align: right;
   box-sizing:border-box;
+  top: 90px;
  }
  
  .header-logo {
+   line-height: 36px;
    height:40px;
    width:100%;
    padding:0;
  }
- 
+
+ .header-logo-text {
+   padding-top: 10px;
+ }
+
  .header-logo h1 {
    min-width:420px;
    margin:0;
@@ -236,6 +248,10 @@
    font-size:2.8em;
    font-weight:normal;
    text-transform: uppercase;
+ }
+
+ .header-logo-tenant {
+   font-size: 0.8em;
  }
  
 .header-logo  a,
@@ -357,6 +373,7 @@
   color: white;
 }
 #ScopeSel {
+  top: 90px;
   width: 300px;
 }
 #ScopeSelPullDownMenu {
@@ -1051,6 +1068,7 @@
   display: none;
 }
 #welcome {
+  height: 760px;
   overflow: auto;
 }
 

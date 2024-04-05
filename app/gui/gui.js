@@ -174,7 +174,7 @@ async function genPageHeader ( pgHeader, req, page ) {
     // log.info( 'genPageHeader', pgHeader )
     if ( page == 'openid-login-nonav' ) {
       return {
-        logoText: "Login",
+        logo: { text: "Login" },
         frameWarning: "true",
         modules: []
       }
@@ -183,10 +183,10 @@ async function genPageHeader ( pgHeader, req, page ) {
     let user = await userDta.getUserInfoFromReq( gui, req )
     // log.info( 'genPageHeader', user )
     if ( user ) { 
-      pgHeader.logoText = '<a href="index.html">'+await userDta.getScopeName( user.rootScopeId ) +'</a>'
+      pgHeader.logo = { text: '<a href="index.html">'+await userDta.getScopeName( user.rootScopeId ) +'</a>' }
 
       if ( user.rootScopeId != user.scopeId ) {
-        pgHeader.logoText += ' / '+ await userDta.getScopeName( user.scopeId )
+        pgHeader.logo.text += '<br/><span class="header-logo-tenant">'+ await userDta.getScopeName( user.scopeId ) + '</span>'
       }
     
       let scopeTbl = await userDta.getScopeList( user.userId )

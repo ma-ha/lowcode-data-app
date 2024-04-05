@@ -17,7 +17,7 @@ async function init( ) {
   marketPage.setPageWidth( '90%' )
 
   marketPage.addView({ 
-    id: 'AppMarketplace', title: 'App Marketplace',  height: '600px', 
+    id: 'AppMarketplace', title: 'App Marketplace',  height: '760px', 
     resourceURL: 'svc/product/stat' 
   })
 
