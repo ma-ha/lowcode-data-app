@@ -66,10 +66,23 @@ async function setScope ( req, res ) {
   } else {
     log.info( 'ERR: SET SCOPE', user.userId, req.query.id )
   }
-  log.debug( 'set scope', req.query )
+  log.info( 'set scope', req.query )
   let layout = req.query.layout 
-  if ( ! layout || layout == 'AppEntity-nonav' ) { layout = 'Apps' }
-  res.redirect( 'index.html?layout='+layout ) 
+  let app = ''
+  if ( ! layout ) { 
+    layout = 'Apps'
+  } else if ( layout == 'AppEntity-nonav' ) {
+    let user = await userDta.getUserInfoFromReq( gui, req )
+    let appMap = await dta.getAppList( user.scopeId, user.scopeTags )
+    log.info( '>>>>>>>>>>>>>', req.query.app, appMap )
+    if ( appMap[ req.query.app ] ) {
+      app = ( req.query.app ? '&id='+req.query.app : '' ) 
+    } else {
+      layout = 'Apps'
+    }
+
+  }
+  res.redirect( 'index.html?layout='+layout + app ) 
 }
 
 

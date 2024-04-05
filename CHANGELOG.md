@@ -1,6 +1,7 @@
 # 0.23.1
 - Header text
 - CSS height adjust
+- Scope switch: reload app (if possible)
 
 # 0.23.0
 - change password

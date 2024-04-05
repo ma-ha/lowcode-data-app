@@ -194,7 +194,12 @@ async function genPageHeader ( pgHeader, req, page ) {
       for ( let scope in scopeTbl ) {
         let ident = ''
         let deepth = (scope.match(/\//g) || []).length
-        for ( let i = 0; i < deepth; i++ ) { ident += '&nbsp;&nbsp;'}
+        for ( let i = 0; i < deepth; i++ ) { ident += '&nbsp;&nbsp;'} 
+        if ( page == 'AppEntity-nonav' ) {
+          if ( req.query.id ) {
+            page += '&app='+ req.query.id
+          }
+        }
         menuItems.push({ html: ident + '<a href="setscope?id='+scope+'&layout='+page+'">'+scopeTbl[ scope ].name+'</a>', id: scope })
       }
 
