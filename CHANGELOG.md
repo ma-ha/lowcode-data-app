@@ -1,7 +1,8 @@
-# 0.23.1
+# 0.24.0
 - Header text
 - CSS height adjust
 - Scope switch: reload app (if possible)
+- Property column width 
 
 # 0.23.0
 - change password
