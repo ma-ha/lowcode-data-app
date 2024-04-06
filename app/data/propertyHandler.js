@@ -220,10 +220,37 @@ function genGuiTableFilterDef( entityMap ) {
 }
 
 
-function genGuiTableColsDef( entityMap ) {
+function genGuiTableColsDef( entityMap, maxWidth=80 ) {
   let cnt = 0
-  for ( let propId in entityMap ) { cnt++ }
-  let width = Math.round( 80/cnt ) + '%'
+  for ( let propId in entityMap ) { 
+    let prop =  entityMap[ propId ]
+    if ( prop.noTable ) { continue }
+    if ( prop.colWidth ) {
+      switch ( prop.colWidth ) {
+        case 'XS': cnt += 1; break
+        case 'S' : cnt += 2; break
+        case 'M' : cnt += 3; break
+        case 'L' : cnt += 4; break
+        case 'XL': cnt += 5; break
+        default  : cnt += 3; break
+      }
+    } else { cnt += 3  } // default is M
+  }
+  let widthUnits = Math.round( maxWidth / cnt )
+
+  function calcWith( prop ) {
+    let wi = widthUnits * 3
+    if ( prop.colWidth ) {
+      switch ( prop.colWidth ) {
+        case 'XS': wi = widthUnits * 1; break
+        case 'S' : wi = widthUnits * 2; break
+        case 'M' : wi = widthUnits * 3; break
+        case 'L' : wi = widthUnits * 4; break
+        case 'XL': wi = widthUnits * 5; break
+      }
+    }
+    return wi + '%'
+  }
 
   let cols = []
   for ( let propId in entityMap ) {
@@ -236,20 +263,21 @@ function genGuiTableColsDef( entityMap ) {
 
     switch ( prop.type ) {
       case 'Boolean':
-        cols.push({ id: pId, label : label, cellType: 'checkbox', width:width })
+        cols.push({ id: pId, label : label, cellType: 'checkbox', width: calcWith( prop )  })
         break 
       // case 'Date':
       //   cols.push({ id: propId, label : label, cellType: 'date', width:width }) 
       //   break 
       case 'JSON':
-        cols.push({ id: propId+'JSON', label : label, cellType: 'text', width:width }) 
+        cols.push({ id: propId+'JSON', label : label, cellType: 'text', width: calcWith( prop )  }) 
         cols.push({ id: propId, label : propId+'JSON', cellType: 'tooltip' }) 
         break 
       default:  // String, Number, Select, Event, Link, RefArray, Ref, DocMap, SelectRef
-        cols.push({ id: pId, label : label, cellType: 'text', width:width }) 
+        cols.push({ id: pId, label : label, cellType: 'text', width: calcWith( prop )  }) 
         break 
     }
   }
+  log.debug( cols )
   return cols
 }
 
@@ -908,7 +936,7 @@ async function getEntity( refId, propId ) {
 }
 
 function getRefLabel( entity, recId, rec ) {
-  log.info( 'getRefLabel', entity, recId, rec )
+  log.debug( 'getRefLabel', entity, recId, rec )
   if ( ! rec ) { return }
   let lbl = []
   if ( entity ) {

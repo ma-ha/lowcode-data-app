@@ -350,6 +350,7 @@ async function getProperty( req, res ) {
       propId   : req.query.propId,
       type     : pType,
       label    : ( dbProp.label ? dbProp.label : '' ),
+      colWidth : ( dbProp.colWidth ? dbProp.colWidth : 'M' ),
       filter   : ( dbProp.filter ? true : false ),
       noEdit     : ( dbProp.noEdit  === true ? true : false ),
       refLbl     : ( dbProp.refLbl  === true ? true : false ),
@@ -378,6 +379,7 @@ async function getProperty( req, res ) {
       propId   : propId,
       label    : prop.label,
       type     : pType,
+      colWidth : ( prop.colWidth ? prop.colWidth : 'M' ),
       filter   : ( prop.filter   ? true : false ),
       api      : ( prop.apiManaged ? true : false ),
       noEdit   : ( prop.noEdit  ? true : false ),
@@ -555,6 +557,12 @@ async function addProperty ( req, res ) {
   if ( jsonId ) {
     entity.properties[ id ].jsonId = jsonId
     entity.properties[ id ].subId  = subId
+  }
+
+  if ( req.body.colWidth == 'M'  ) { 
+    delete entity.properties[ id ].colWidth 
+  } else {
+     entity.properties[ id ].colWidth = req.body.colWidth 
   }
 
   if ( req.body.filter  ) { 

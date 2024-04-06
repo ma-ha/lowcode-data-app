@@ -264,24 +264,25 @@ async function init( ) {
     
     // Property table:
     rows.push({
-      id: 'AppEntityProp', rowId: 'AppEntityProp', title: 'App Entity Properties',  height: '500px', 
+      id: 'AppEntityProp', rowId: 'AppEntityProp', title: 'App Entity Properties',  height: '600px', 
       type : 'pong-table', resourceURL: 'app/entity/property', decor: 'decor', 
       moduleConfig : {
         dataURL: "",
         rowId: [ 'appId', 'entityId', 'propId' ],
         cols: [
-          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'7%', icon: 'ui-icon-pencil', 
+          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'4%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AppEntityPropAdd' } ] },
-          { id: "propId",  label: "Id",       width: "9%", cellType: "text" },
+          { id: "propId",  label: "Id",       width: "15%", cellType: "text" },
           { id: "label",   label: "Label",    width: "10%", cellType: "text" },
           { id: "type",    label: "Type",     width: "35%", cellType: "text" },
+          { id: "colWidth",label: "Width",     width: "5%", cellType: "text" },
           { id: "filter",  label: "Filter",     width: "4%",  cellType: "checkbox" },
           { id: "api",     label: "API Managed",width: "4%", cellType: "checkbox" },
           { id: "noTable", label: "No Table",   width: "4%", cellType: "checkbox" },
           { id: "noEdit",  label: "No Edit",    width: "4%", cellType: "checkbox" },
           { id: "refLbl",  label: "Ref Label",  width: "4%", cellType: "checkbox" },
           { id: "notNull", label: "Not Null",   width: "4%", cellType: "checkbox" },
-          { id: 'Del', label: "&nbsp;", cellType: "button", width :'7%', icon: 'ui-icon-trash', 
+          { id: 'Del', label: "&nbsp;", cellType: "button", width :'4%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" },
           { id: 'moveDn', label: "&nbsp;", cellType: "button", width :'7%', icon: '	ui-icon-arrowthick-1-s', 
             method: "POST", URL: 'app/entity/property/move-down', update: [ { resId : 'AppEntityProp' } ] }
@@ -323,6 +324,10 @@ async function init( ) {
           ]},
           { formFields: [ 
             { id: "description", label: "Description / Help", type: "text", rows: 3 }
+          ]},
+          { formFields: [ 
+            { id: "colWidth", label: "Width", type: "select",
+              options: [{option:'XS'},{option:'S'},{option:'M'},{option:'L'},{option:'XL'}] }
           ]}
 
         ] }],

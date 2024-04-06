@@ -732,7 +732,8 @@
         "properties": {
           "id": {
             "type": "UUID",
-            "noDelete": true
+            "noDelete": true,
+            "colWidth": "L"
           },
           "TagType": {
             "type": "String",
@@ -761,7 +762,7 @@
     "img": "",
     "id": "1000/region-mgr/1.0.0",
     "_cre": 1711642000428,
-    "_upd": 1711642000428
+    "_upd": 1712382139250
   },
   "1000/city-light-mgr/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
@@ -966,7 +967,9 @@
               "Blocked_StartProgress": true,
               "Closed_Reopen": true
             },
-            "lines": 3
+            "lines": 3,
+            "colWidth": "XL",
+            "noDelete": true
           },
           "Approval": {
             "type": "String",
@@ -991,7 +994,9 @@
               "Blocked_Unblock": true,
               "Blocked_StartProgress": true,
               "Closed_Reopen": true
-            }
+            },
+            "colWidth": "XS",
+            "noDelete": true
           }
         },
         "noDelete": true,
@@ -1024,7 +1029,7 @@
     "img": "img/k8s-fire.png",
     "id": "1000/ticket-mgr/1.0.0",
     "_cre": 1711692745036,
-    "_upd": 1711953934769,
+    "_upd": 1712381559047,
     "description": "Task management"
   }
 }

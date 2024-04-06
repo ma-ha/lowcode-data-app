@@ -564,9 +564,17 @@
 #AppEntitiesAddContentnoEditDiv label,
 #AddStateTransitionFormContentapiManaged label,
 #AppEntitiesAddContentuserDeleteDiv label,
-#AppEntitiesAddContentcsvUploadDiv label
+#AppEntitiesAddContentcsvUploadDiv label,
+#AppEntityPropAddContentcolWidthDiv label
 {
   width: unset;
+}
+
+#AppEntityPropAddContentcolWidth {
+  width: 50px;
+}
+#AppEntityPropAddContentdescription {
+  width: 200px;
 }
 
 #CustomizeAddAppContentLnkImportLink,

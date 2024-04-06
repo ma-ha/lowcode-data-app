@@ -300,26 +300,32 @@ function genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel
 
 function genTblColsConfig( entityId, entity, user, stateModel ) {
   let appEntityPropMap = entity.properties
-
+  let availWidth = 100
   let cols = [ ]
   if ( ! entity.noEdit ) {
     cols.push({ id: 'Edit', label: "&nbsp;", cellType: "button", method: "GET", width :'5%', 
     icon: 'ui-icon-pencil', setData: [ { resId : 'Add' + entityId } ] })
+    availWidth -= 5
   }
   
   if ( entity.stateModel ) {
-    cols.push({ id: '_state', label: "State",  cellType: "text", width:'10%' })
+    cols.push({ id: '_state', label: "State",  cellType: "text", width:'5%' })
+    availWidth -= 5
   }
 
   if ( ! ( entity.properties.id && entity.properties.id.noTable ) ) {
-    cols.push({ id: 'recId', label: "Id",  cellType: "text", width:'10%' })
+    if ( entity.properties.id && entity.properties.id.type == 'UUID' ) {
+      cols.push({ id: 'recId', label: "Id",  cellType: "text", width:'15%' })
+      availWidth -= 15
+    } else {
+      cols.push({ id: 'recId', label: "Id",  cellType: "text", width:'10%' })
+      availWidth -= 10
+    }
   }
 
-  cols = cols.concat( propHandler.genGuiTableColsDef( appEntityPropMap ) )
-
+  let showUserAction = false
   if (  stateModel ) {
     // TODO hide if there are only api managed actions
-    let showUserAction = false
     for ( let state in stateModel.state ) {
       if ( state == 'null' ) { continue }
       for ( action in stateModel.state[ state ].actions ) {
@@ -328,11 +334,20 @@ function genTblColsConfig( entityId, entity, user, stateModel ) {
           break
         }
       }
-      if ( showUserAction ) { break }
+      if ( showUserAction ) { 
+        availWidth -= 10
+        break 
+      }
     }
-    if ( showUserAction ) {
-      cols.push({ id: '_stateBtn', label: "Action",  cellType: "text", width:'10%' })
-    }
+  }
+  if ( ! entity.noEdit &&  ! entity.noDelete && ! entity.stateModel ) {
+    availWidth -= 5
+  }
+ 
+  cols = cols.concat( propHandler.genGuiTableColsDef( appEntityPropMap, availWidth ) )
+
+  if ( showUserAction ) {
+    cols.push({ id: '_stateBtn', label: "Action",  cellType: "text", width:'10%' })
   }
 
   if ( ! entity.noEdit &&  ! entity.noDelete && ! entity.stateModel ) {
