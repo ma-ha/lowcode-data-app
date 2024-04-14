@@ -511,13 +511,13 @@ async function checkApp( req, res ) {
   if ( ! app ) { 
     log.warn( 'api-adapter: app not found', appId )
     res.status( 400 ).send( )
-    return null 
+    return { app: null }
   }
   if ( req.params.entityId  ) {
     if ( ! app.entity[ req.params.entityId ] ) { 
       log.warn( 'api-adapter: entity not found', appId )
       res.status( 400 ).send( )
-      return null 
+      return { app: null } 
     }
     tbl = getRootScope( req.params.scopeId ) + req.params.entityId
     entity = app.entity[ req.params.entityId ]

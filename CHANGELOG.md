@@ -1,3 +1,6 @@
+# 0.24.2
+- fix adapter get app exception
+
 # 0.24.1
 - fix "API Account" id creation
 
