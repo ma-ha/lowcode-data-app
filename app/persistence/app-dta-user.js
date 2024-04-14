@@ -292,7 +292,7 @@ async function addUser( id, newUser ) {
   } else { // add API account
     let spId = helper.uuidv4()
     newUser.password = helper.uuidv4()
-    await saveUser( id, newUser )
+    await saveUser( spId, newUser )
     return 'API account "'+spId+'" added'
   } 
 } 

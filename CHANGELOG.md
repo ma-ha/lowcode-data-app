@@ -1,3 +1,6 @@
+# 0.24.1
+- fix "API Account" id creation
+
 # 0.24.0
 - Header text
 - CSS height adjust
