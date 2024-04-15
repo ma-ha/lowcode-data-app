@@ -211,6 +211,7 @@ async function getStateModelById( rootScopeId, stateModelId ) {
 async function getData( tbl, scopeId, admin, qry ) {  
   log.info( 'getData',  tbl, scopeId )
   let table = tbl
+  await syncTbl( tbl )
   let inheritData = false
   if ( tbl.indexOf('/') > 0 ) {
     let tlbComp = tbl.split('/')
@@ -278,7 +279,7 @@ async function idExists( tbl, id  ) {
 async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams ) {
   log.debug( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams )
   let tbl = rootScopeId + entityId
-  // await syncTbl( tbl )
+  await syncTbl( tbl )
   let inherit = await scopeInherited( rootScopeId, appId, appVersion, entityId )
   let result = null
   if ( id  ) { 
@@ -542,7 +543,7 @@ async function syncTbl( tbl, always ) {
   if ( ! fs.existsSync( dbFile ) ) {
     await writeFile( dbFile, '{}' )
   }
-  if ( ! data[ tbl ]  || always ) {
+  if ( ! data[ tbl ]  || always || process.env.LC_DB_SYNC_ALWAYS == 'y' ) {
     log.debug('>> readFile', dbFile )
     data[ tbl ] =  JSON.parse( await readFile( dbFile ) )
   } 
