@@ -1,6 +1,6 @@
 {
   "name": "lowcode-data-app",
-  "version": "0.24.3",
+  "version": "0.24.4",
   "description": "LowCode App Environment",
   "main": "app.js",
   "scripts": {

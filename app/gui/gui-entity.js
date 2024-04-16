@@ -107,7 +107,7 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
   let stateModel = null
   if ( entity.stateModel ) {
     stateModel = await stateCreateFormRow( rows, app, appId, entityId, user ) 
-    if ( ! stateModel ) { return [] }
+    // if ( ! stateModel ) { return [] }
   }
 
   let filter = null
@@ -142,13 +142,20 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
 
 
 async function stateCreateFormRow( rows, app, appId, entityId, user ) {
+  log.info( 'stateCreateFormRow...', entityId )
   let entity = app.entity[ entityId ]
   let stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
   if ( ! stateModel ) { log.warn('renderEntityRows: stateModel not found'); return null }
   let initState = stateModel.state[ 'null' ]
   if ( ! initState || ! initState.actions ) { log.warn('renderEntityRows: stateModel not found'); return null }
   let intiActionCnt = 0 
-  for ( let actionId in initState.actions ) { intiActionCnt++ }
+  for ( let actionId in initState.actions ) { 
+    if ( ! initState.actions[ actionId ].apiManaged ) {
+      intiActionCnt++ 
+    }
+  }
+  log.info( 'stateCreateFormRow intiActionCnt', intiActionCnt )
+  if ( intiActionCnt === 0 ) { return stateModel }
 
   if ( intiActionCnt > 1 ) {
     let tabRow = {
@@ -157,6 +164,7 @@ async function stateCreateFormRow( rows, app, appId, entityId, user ) {
       tabs   : [] 
     }
     for ( let actionId in initState.actions ) {
+      if ( initState.actions[ actionId ].apiManaged ) { continue }
       let creForm = await stateCreateForm( appId, entity, entityId, initState, actionId, user )
       let action = initState.actions[ actionId ]
       let tabSpec = {
@@ -170,6 +178,7 @@ async function stateCreateFormRow( rows, app, appId, entityId, user ) {
 
   } else {
     for ( let actionId in initState.actions ) {
+      if ( initState.actions[ actionId ].apiManaged ) { continue }
       let creForm = await stateCreateForm( appId, entity, entityId, initState, actionId, user )
       rows.push( creForm )
       break // its only one 1st state

@@ -1,3 +1,6 @@
+# 0.24.4
+- state: hide create dialog if apiManaged
+
 # 0.24.2
 - fix adapter get app exception
 
