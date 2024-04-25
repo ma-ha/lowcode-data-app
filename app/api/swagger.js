@@ -18,31 +18,6 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
     produces : "application/json;charset-utf-8",
     tags: [],
     paths : {
-      // ':entityId' : {
-      //   'get' : {
-      //     operationId : '',
-      //     summary : '',
-      //     description : '',
-      //     tags : [],
-      //     parameters : [],
-      //     response : {
-      //       '200' : {
-      //         describtion: 'success',
-      //         // headers : {
-      //         //   'xz' : {
-      //         //     describtion : 'bla',
-      //         //     type : 'string'
-      //         //   }
-      //         // },
-      //         schema : {
-      //           '$ref' : '#/definitions/XZY'
-      //         }
-      //       }
-      //     }
-
-
-      //   }
-      // }
     },
     definitions : {
       _addDataStatusOK: {
@@ -272,17 +247,19 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
     if ( entity.stateModel ) {
       swagger.paths[ '/'+ entityId +'/state' ] = {
         'get': {
-          '200' : {
-            describtion: 'success',
-            schema : {
-              type : 'array',
-              items : {
-                '$ref' : '#/definitions/'+entityId  
+          responses : {
+            '200' : {
+              describtion: 'success',
+              schema : {
+                type : 'array',
+                items : {
+                  '$ref' : '#/definitions/'+entityId  
+                }
               }
-            }
-          },
-          '400' : { describtion: 'Parameter Error' },
-          '401' : { describtion: 'Not authorized' }
+            },
+            '400' : { describtion: 'Parameter Error' },
+            '401' : { describtion: 'Not authorized' }
+          }
         }
       }
       swagger.paths[ '/'+ entityId +'/state/{action}' ] = {
@@ -291,15 +268,17 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
           parameters : [
             { name: 'action', type: 'String', required: true, in: 'path', describtion: 'action id, ref state model' }
           ],
-          '200' : {
-            describtion: 'success',
-            schema : {
-              'type': 'object',
-              '$ref' : '#/definitions/_changeDataStatusOK'
-            }
-          },
-          '400' : { describtion: 'Parameter Error' },
-          '401' : { describtion: 'Not authorized' }
+          responses : {
+            '200' : {
+              describtion: 'success',
+              schema : {
+                'type': 'object',
+                '$ref' : '#/definitions/_changeDataStatusOK'
+              }
+            },
+            '400' : { describtion: 'Parameter Error' },
+            '401' : { describtion: 'Not authorized' }
+          }
         }
       }
     }
