@@ -28,7 +28,8 @@ function getPropTypes() {
     'Boolean', 'Number', 'Date', 
     'Select', 
     'DocMap', 'SelectRef', 'MultiSelectRef', /* 'RefArray',*/ 
-    'UUID', 'Metric', 'Link', 'JSON', 'Event' 
+    'UUID', 'Metric', 'Link', 'JSON', 'Event',
+    'API static string' 
   ]
 }
 
@@ -62,6 +63,8 @@ function setPropRef( prop, dbProp ) {
     case 'Event':
       prop.ref  = dbProp.event
       break 
+    case 'API static string':
+      prop.ref = prop.apiString 
     default: break 
   }
 }
@@ -100,6 +103,8 @@ function getpropTypeDef( prop ) {
     case 'Event':
       pType = 'Event: '+prop.event
       break 
+    case 'API static string':
+      pType = 'API static string: '+ prop.apiString 
     default: break 
   }
   return pType
@@ -191,8 +196,13 @@ async function addNewPropertyDef( prop, type, ref  ) {
       case 'Ref':
         prop.ref = ref
         break
+       
       default: break
     }
+  } else if ( type == 'API static string' ) {
+    prop.apiString = ref
+    prop.noTable   = true
+    prop.filter    = false
   }
 }
 
@@ -255,11 +265,12 @@ function genGuiTableColsDef( entityMap, maxWidth=80 ) {
   let cols = []
   for ( let propId in entityMap ) {
     let prop =  entityMap[ propId ]
+    if ( propId == 'id' ) { continue }
+    if ( prop.noTable   ) { continue }
+
     let pId = propId.replaceAll('.','_')
-    if ( prop.noTable ) { continue }
     let label = ( prop.label ? prop.label : propId )
 
-    if ( propId == 'id' ) { continue }
 
     switch ( prop.type ) {
       case 'Boolean':
@@ -321,6 +332,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
     let prop = entity.properties[ propId ]
+    if ( prop.type == 'API static string' ) { continue }
     let lbl  = ( prop.label ? prop.label : propId )
     let fldId = propId.replaceAll('.','_')
     // console.log( 'LBL', lbl)
@@ -507,6 +519,8 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
 
   for ( let propId in entity.properties ) {
     if ( propId == 'id' ) { continue }
+    if ( prop.type == 'API static string' ) { continue }
+
     let prop = entity.properties[ propId ]
     let lbl  = ( prop.label ? prop.label : propId )
     let defaultVal = null 
@@ -797,6 +811,9 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
 
         tblRec[ pId ] = eventLnk //recDta.event
         break 
+
+      case 'API static string': break
+
       default:   // String, Number, Select
         tblRec[ pId ] = ( recDta ? recDta : '' )
         break 
