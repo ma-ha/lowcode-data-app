@@ -261,6 +261,10 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
           sProp.type = 'object'
           sProp['@ref'] = prop.selectRef
           break
+        case 'API static string': 
+          sProp.type = 'string'
+          sProp.describtion = prop.apiString
+          break;
         default:
           sProp.type = 'string'
           break;
