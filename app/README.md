@@ -79,14 +79,17 @@ e.g. `app.getExpress()` to add API routes or ` gui.pages['main'].addFooterLink(.
 
 ### Test the App
 
-Open your new app in the "App" tab (the app is only visible in the defined scope)
+Open your new app in the "App" tab (the app is only visible in the defined scope).
+
+The web GUI supports CSV data upload, if this is enabled for the entity (checkbox).
 
 # Entity / Document Model
 
 ![sceenshot](doc/locode.png)
 
 Data types (and their Web GUI mapping)
-- `Strings` (simple input fields)
+- `String` (simple input fields)
+- `String QR/Barcode` (input field with QR and barcode scanner)
 - `Text` (multi line input fields)
 - `Number` (simple input fields)
 - `Boolean`  (checkboxes)
@@ -163,12 +166,16 @@ Currently only `$eq` is allowed. The compared values can be a String (in single 
 The left value is prioritized taken from the select values and the right from the entity default values. 
 For "select" the condition can be `val $eq ...`.
 
+A CSV upload for the "create" action is available.
+
 # Integration 
 
 ## APIs
 
 Adapters and connectors can use ReST APIs,
 see [API and Format Reference Docu](doc/README.md).
+
+In the app manager you can export the Swagger/OpenAPI API spec file.
 
 ## Event Hub
 
@@ -182,7 +189,7 @@ Entities can refer to external GUI Apps using links. Placeholders in the links a
 
 # Customizing
 
-The GUI framework is "easy-web-app" and the underlying api server is "express".
+The GUI framework is [easy-web-app](https://github.com/ma-ha/easy-web-app)/[rest-web-ui](https://github.com/ma-ha/rest-web-ui) and the underlying api server is "express".
 
 ## State Model
 
@@ -190,7 +197,7 @@ State models can be added or customized to your needs.
 
 ![sceenshot](doc/locode-statemodel-admin.png)
 
-The start stateId is `null`. 
+The start stateId is `null`.
 
 ## Persistence
 
@@ -198,7 +205,7 @@ The persistence uses simple files and a memory cache.
 This is not recommended for production use.
 
 It should be simple to replace the persistence with a document DB. 
-Simply rewrite:
+Simply rewrite some methods in:
 - [app-dta.js](app/persistence/app-dta.js)
 - [app-dta-user.js](app/persistence/app-dta-user.js)
 
