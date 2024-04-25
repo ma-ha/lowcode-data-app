@@ -33,6 +33,7 @@ async function setupAPI( app ) {
   
   svc.get(    '/app/entity', guiAuthz, getEntity )
   svc.post(   '/app/entity', guiAuthz, addEntity )
+  svc.post(   '/app/entity/inherit', guiAuthz, inheritEntity )
   svc.post(   '/app/entity/config', guiAuthz, chgEntity )
   svc.delete( '/app/entity', guiAuthz, delEntity )
 
@@ -184,7 +185,7 @@ async function getEntity( req, res )  {
   let { allOK, user, app, appId } = await checkUserApp( req, res )
   if ( ! allOK ) { return }
  
-  if (  req.query.appId &&  req.query.entityId && ! req.query.scope  ) { // get by id 
+  if (  req.query.appId &&  req.query.entityId && ! req.query.scope && ! req.query.parentId  ) { // get by id 
   
     if ( app.entity[ req.query.entityId ] ) {
       let entity = app.entity[ req.query.entityId ]
@@ -292,6 +293,26 @@ async function addEntity( req, res ) {
   app.entity[ req.body.entityId ] = newEntity
   await dta.saveApp( req.body.appId, app )
   res.send( resultTxt )
+}
+
+
+async function inheritEntity( req, res ) {
+  log.info( 'POST entity/config', req.body )
+  let { allOK, user, app, appId } = await checkUserApp( req, res )
+  if ( ! allOK ) { return }
+  let entityId = req.body.entityId
+  if ( ! entityId ||  entityId == '' ) { return res.status(400).send('ID required') }
+  if ( app.entity[ entityId ] ) { return res.status(400).send('ID exists') }
+  if ( !req.body.parentId ) { return res.status(400).send('Parent ID required') }
+  let pid = req.body.parentId.split('/')
+  if ( pid.length != 4 ) { return res.status(400).send('Parent ID wrong') }
+  let parentApp = await dta.getAppById( pid[0]+'/'+ pid[1]+'/'+ pid[2] )
+  if ( ! parentApp ) { return res.status(400).send('Parent app not found') }
+  let parentEntity = parentApp.entity[ pid[3] ]
+  if ( ! parentEntity ) { return res.status(400).send('Parent entity not found') }
+  app.entity[ entityId ] = JSON.parse( JSON.stringify( parentEntity ) )
+  await dta.saveApp( appId, app )
+  res.send( 'OK' )
 }
 
 

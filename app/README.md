@@ -122,6 +122,8 @@ But: Please choose your entity ids wisely, if you don't want this behavior.
 
 For JSON properties sub-elements can be defined with a dot-notation (e.g. "MyJsonProp.MySubField"). Allowed types: 'String', 'Text','Boolean','Date','Select'.
 
+You can "inherit" a new child entity in your app from an existing entity in any app of your root scope. This is initially a 1:1 copy and it can be modified to your needs.
+
 # Add New Root Scope (aka "Tenant")
 
 This should be done via API ... but it's simple:

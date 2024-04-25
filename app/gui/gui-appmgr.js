@@ -226,6 +226,36 @@ async function init( ) {
       }
     })
 
+
+    let appOptions = []
+    let appMap = await dta.getAppList( user.rootScopeId, [],  'admin' )
+    for ( let appId in appMap ) {
+      for ( let entityId in appMap[ appId ].entity ) {
+         appOptions.push({ option: appId +'/'+ entityId  })
+      }
+    }
+
+    rows.push({ 
+      id: 'AppEntitiesInherit', rowId: 'AppEntitiesInherit', title: 'Inherit Entity',  height: 'auto', 
+      type : 'pong-form', resourceURL: 'app/entity',   decor: 'decor',
+      moduleConfig : {
+        description: "Add",
+        id: 'AppEntitiesInheritForm',
+        fieldGroups:[{ columns: [
+          { formFields: [{ id: "appId", label: "App", type: "text", defaultVal: appId, readonly: true } ]},
+          { formFields: [
+            { id: "entityId",   label: "Id", type: "text",descr: 'Define wisely! You cannot change this (easily)!' }
+          ]},
+          { formFields: [
+            { id: "parentId", label: "Parent Entity ID", type: "select", options: appOptions }
+          ]}
+        ] }],
+        actions : [ 
+          { id: "AddInheritFormBtn", actionName: "Create Child", actionURL: 'app/entity/inherit', 
+            update: [{ resId:'AppEntitiesTbl' }], target: "modal" }
+        ]
+      }
+    })
     return rows
   })
 
