@@ -345,6 +345,7 @@ async function getProperty( req, res ) {
     if ( pType == 'String' && dbProp.qr ) {
       pType = 'String QR/Barcode'
     }
+    
     let prop = {
       appId    : appId,
       entityId : entityId,
@@ -374,13 +375,17 @@ async function getProperty( req, res ) {
    
     let pType = propHandler.getpropTypeDef( prop )
    
+    let colWidth = 'M'
+    if ( prop.colWidth ) { colWidth = prop.colWidth }
+    if ( prop.noTable  ) { colWidth = '' }
+
     propArr.push({
       appId    : appId,
       entityId : entityId,
       propId   : propId,
       label    : prop.label,
       type     : pType,
-      colWidth : ( prop.colWidth ? prop.colWidth : 'M' ),
+      colWidth : colWidth,
       filter   : ( prop.filter   ? true : false ),
       api      : ( prop.apiManaged ? true : false ),
       noEdit   : ( prop.noEdit  ? true : false ),
@@ -648,7 +653,7 @@ async function delProperty( req, res ) {
 // ============================================================================
 
 function isValidId( str ) {
-  return /^[a-zA-Z]+[a-zA-Z0-9\-]+$/.test( str )
+  return /^[a-zA-Z@]+[a-zA-Z0-9\-]+$/.test( str )
 }
 
 

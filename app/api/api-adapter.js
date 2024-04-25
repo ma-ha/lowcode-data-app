@@ -222,23 +222,40 @@ async function getStateModel( req, res ) {
 
 async function getDocArr( req, res ) {
   log.info( 'GET data array', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let { app, tbl } = await checkApp( req, res )
+  let { app, tbl, entity } = await checkApp( req, res )
   if ( ! app ) { return }
   let qry = extractQuery( req )
   if ( qry == 'ERROR' ) { return sendErr( res, 'Query not valid' ) }
   let recs = await dta.getData( tbl, req.params.scopeId, false, qry ) 
-  log.debug( 'recs',recs)
-  res.send( recs )
+  let resultMap = {}
+  for ( let recId in recs ) {
+    let recCpy = getApiRec( recs[ recId ], entity )
+    resultMap[ recId ] = recCpy
+  }
+  log.debug( 'recs',resultMap )
+  res.send( resultMap )
 }
 
 
 async function getDoc( req, res ) {
   log.info( 'GET data by id', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId, req.params.recId )
-  let { app, tbl } = await checkApp( req, res )
+  let { app, tbl, entity } = await checkApp( req, res )
   if ( ! app ) { return }
   let rec = await dta.getDataById( tbl, req.params.recId )
-  log.debug( 'rec',rec )
-  res.send( rec )
+  let recCpy = getApiRec( rec, entity )
+  log.debug( 'rec',recCpy )
+  res.send( recCpy )
+}
+
+
+function getApiRec( rec, entity ) {
+  let recCpy = JSON.parse( JSON.stringify( rec ) )
+  for ( let propId in entity.properties ) {
+    if ( entity.properties[ propId ].type == 'API static string' ) {
+      recCpy[ propId ] = entity.properties[ propId ].apiString
+    }
+  }
+  return recCpy
 }
 
 
@@ -300,6 +317,7 @@ function chkPropValid( rec, properties, res ) {
       rec.id = helper.uuidv4()
       continue
     }
+    if ( properties[ propId ].type == 'API static string' ) { continue }
     let p = rec[ propId ]
     if ( ! p ) {
       log.warn( 'api-adapter: properties missing', propId )

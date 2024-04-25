@@ -265,7 +265,7 @@ async function scopeInherited( rootScopeId, appId, appVersion, entityId ) {
     if ( entity.scope == 'inherit' || entity.scope == 'inherit-readonly' ) { 
       inherit = true 
     }
-  } catch ( exc ) { log.error( '', exc ) }
+  } catch ( exc ) { log.error( 'scopeInherited', rootScopeId, appId, appVersion, entityId, exc ) }
   
   return inherit
 }
@@ -364,23 +364,27 @@ async function embedRefObjects( origDta, entity ) {
         // log.info( '>>>',  propId, prp.type)
         if ( prp.type == 'SelectRef' ) {
           let ref = prp.selectRef.split('/')
+          let app = await getAppById( ref[0]+'/'+ref[1]+'/'+ref[2] )
+          let entity = app.entity[ ref[3 ] ]
           let refTbl = ref[0] + ref[3]
           let refDta = await loadDataById( refTbl, dta[ propId ] )
           if ( refDta ) {
             let uri =  '/adapter/entity/'+ref[0]+'/'+ref[1]+'/'+ref[2]+'/'+ref[3]+'/'+dta[ propId ]
-            dta[ propId ] = JSON.parse( JSON.stringify( refDta ))
+            dta[ propId ] = getApiRec( refDta, entity ) //JSON.parse( JSON.stringify( refDta ))
             dta[ propId ]._uri = uri
           } else {
             log.warn( 'embedRefObjects NOT FOUND', propId, dta[ propId ] )
           }
         } else if ( prp.type == 'MultiSelectRef' ) {
           let ref = prp.multiSelectRef.split('/')
+          let app = await getAppById( ref[0]+'/'+ref[1]+'/'+ref[2] )
+          let entity = app.entity[ ref[3 ] ]
           let refTbl = ref[0] + ref[3]
           let refObArr = []
           for ( let refId of dta[ propId ] ) {
             let refDta = await loadDataById( refTbl, refId )
             if ( refDta ) {
-              let refCpy = JSON.parse( JSON.stringify( refDta ))
+              let refCpy = getApiRec( refDta, entity ) // JSON.parse( JSON.stringify( refDta ))
               refCpy._uri =  '/adapter/entity/'+ref[0]+'/'+ref[1]+'/'+ref[2]+'/'+ref[3]+'/'+refId
               refObArr.push( refCpy )
             } else {
@@ -390,6 +394,8 @@ async function embedRefObjects( origDta, entity ) {
           }
           dta[ propId ] = refObArr // replace array
         }
+      } else if ( entity.properties[ propId ].type == 'API static string' ) {
+        dta[ propId ] = entity.properties[ propId ].apiString
       }
     }
   } catch ( exc ) { log.warn( 'embedRefObjects', exc ) }
@@ -397,6 +403,16 @@ async function embedRefObjects( origDta, entity ) {
   return dta
 }
 
+function getApiRec( rec, entity ) {
+  let recCpy = JSON.parse( JSON.stringify( rec ) )
+  if ( ! entity ) { return recCpy }
+  for ( let propId in entity.properties ) {
+    if ( entity.properties[ propId ].type == 'API static string' ) {
+      recCpy[ propId ] = entity.properties[ propId ].apiString
+    }
+  }
+  return recCpy
+}
 
 async function delDataObj( tbl, id, entity ) {
   log.info( 'delDataObj', tbl, id )

@@ -1,5 +1,6 @@
 # 0.25.0
 - Adapter API: Swagger
+- Adapter API and events: add static string property (req for tmForum APIs)
 
 # 0.24.4
 - state: hide create dialog if apiManaged
