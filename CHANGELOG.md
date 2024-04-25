@@ -1,3 +1,6 @@
+# 0.25.0
+- Adapter API: Swagger
+
 # 0.24.4
 - state: hide create dialog if apiManaged
 

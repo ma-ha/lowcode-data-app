@@ -84,7 +84,8 @@ async function getApp( req, res )  {
         entitiesLnk :'<a href="index.html?layout=AppEntities-nonav&id='+appId+'">Manage&nbsp;Entities</a>',
         pagesLnk :'<a href="index.html?layout=AppPages-nonav&id='+appId+'">Manage&nbsp;Pages</a>',
         appLnk :'<a href="index.html?layout=AppEntity-nonav&id='+appId+','+app.startPage+'">Open&nbsp;App</a>',
-        expLnk :'<a href="app/json/'+appId.replaceAll('/','_').replace('_','/')+'" target="_blank">Export</a>'
+        expLnk :'<a href="app/json/'+appId.replaceAll('/','_').replace('_','/')+'" target="_blank">Export</a>',
+        swaggerLnk :'<a href="adapter/app/'+appId+'/swagger" target="_blank">Swagger</a>'
       })
     }
     res.send( apps )

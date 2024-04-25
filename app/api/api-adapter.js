@@ -7,6 +7,7 @@ const userDta    = require( '../persistence/app-dta-user' )
 const bodyParser = require( 'body-parser' )
 const helper     = require( '../helper/helper' )
 const props      = require( '../data/propertyHandler' )
+const swaggerHlp  = require( './swagger' )
 
 exports: module.exports = { 
   setupAPI  
@@ -17,9 +18,10 @@ exports: module.exports = {
 // now we need to implement the ReST service for /products 
 // this should also only be available for authenticated users
 let gui = null
-
-async function setupAPI( app, oauthCfg ) {
+let cfg = {}
+async function setupAPI( app, config ) {
   log.info( 'Starting API...' )
+  cfg = config
 
   let svc = app.getExpress()
   gui = app
@@ -30,6 +32,7 @@ async function setupAPI( app, oauthCfg ) {
   //---------------------------------------------------------------------------
   const apiAuthz = apiSec.apiAppAuthz( app )
   const provisioningApiAppAuthz = apiSec.provisioningApiAppAuthz( )
+  const guiAuthz = apiSec.userTenantAuthz( gui )
 
   svc.post(   '/adapter/scope', provisioningApiAppAuthz, creRootScope )
   svc.get(    '/adapter/scope', provisioningApiAppAuthz, getRootScopes )
@@ -42,6 +45,7 @@ async function setupAPI( app, oauthCfg ) {
   svc.get(  '/adapter/app/:scopeId', apiAuthz, getAppList )
   svc.get(  '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, getApp )
   svc.post( '/adapter/app/:scopeId/:appId/:appVersion', apiAuthz, creApp )
+  svc.get(  '/adapter/app/:scopeId/:appId/:appVersion/swagger', guiAuthz, swagger )
 
   svc.get(  '/adapter/state/:scopeId/:stateId', apiAuthz, getStateModel )
   svc.post( '/adapter/state/:scopeId/:stateId', apiAuthz, creStateModel )
@@ -178,6 +182,22 @@ async function getApp( req, res ) {
   res.send( app )
 }
 
+async function swagger( req, res ) {
+  log.info( 'getApp...')
+  let { app } = await checkApp( req, res )
+  if ( ! app ) { return }
+  let appId = req.params.scopeId +'/'+ req.params.appId +'/'+ req.params.appVersion
+  let appSwaggerSpec = swaggerHlp.genAppSwagger( 
+    app, 
+    req.params.scopeId,
+    req.params.appId,
+    req.params.appVersion, 
+    cfg 
+  )
+  res.send( appSwaggerSpec )
+}
+
+
 // ----------------------------------------------------------------------------
 async function creStateModel( req, res ) {
   log.info( 'creStateModel...')
@@ -312,7 +332,7 @@ async function chgDoc( req, res )  {
   let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rp.recId
   let result = await dta.addDataObj( tbl, req.params.recId, doc, uri, 'dta.update', entity )
   if ( result ) {
-    res.send({ status: 'OK', doc: doc })
+    res.send({ status: 'OK', id: rp.recId, doc: doc })
   } else {
     res.send({ error: '?' })
   }

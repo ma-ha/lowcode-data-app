@@ -88,7 +88,8 @@ async function init( ) {
           { id: "entitiesLnk", label: "Entities",  width: "10%", cellType: "text" },
           // { id: "pagesLnk",    label: "App Pages", width: "20%", cellType: "text" },
           { id: "appLnk",      label: "Test&nbsp;it",  width: "10%", cellType: "text" },
-          { id: "expLnk",      label: "Export",    width: "10%", cellType: "text" }
+          { id: "expLnk",      label: "Export",    width: "10%", cellType: "text" },
+          { id: "swaggerLnk",  label: "Adapter&nbsp;API",   width: "10%", cellType: "text" }
         ]
       }
     }

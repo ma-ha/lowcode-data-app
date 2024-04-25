@@ -40,8 +40,8 @@ async function init( lowCodeConfig ) {
    oidc.init( app, cfg.OIDC )
   }
 
-  await appAPI.setupAPI( app, cfg.OIDC )
-  await appAdapter.setupAPI( app, cfg.OIDC )
+  await appAPI.setupAPI( app, cfg)
+  await appAdapter.setupAPI( app, cfg )
   await appMgrAPI.setupAPI( app )
   await adminAPI.setupAPI( app, cfg )
 
@@ -63,7 +63,8 @@ function checkConfig( cfg ) {
   
   checkCfgParam( cfg, 'URL_PATH', '/' )
   checkCfgParam( cfg, 'PORT', 8888 )
-  checkCfgParam( cfg, 'GUI_URL','http://localhost:' + cfg.PORT + cfg.PATH )
+  checkCfgParam( cfg, 'HOST', 'localhost' )
+  checkCfgParam( cfg, 'GUI_URL','http://'+ cfg.HOST +':' + cfg.PORT + cfg.PATH )
 
   checkOidcParams( cfg )
   log.debug( 'CONFIG', cfg )

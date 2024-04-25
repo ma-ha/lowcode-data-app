@@ -19,10 +19,12 @@ exports: module.exports = {
 // now we need to implement the ReST service for /products 
 // this should also only be available for authenticated users
 let gui = null
+let cfg = {}
 
-async function setupAPI( app, oauthCfg ) {
+async function setupAPI( app, config ) {
   log.info( 'Starting API...' )
-
+  cfg = config
+  
   let svc = app.getExpress()
   gui = app
 
