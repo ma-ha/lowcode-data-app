@@ -15,7 +15,7 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
     basePath : cfg.URL_PATH + '/adapter/entity/'+scopeId+'/'+appId+'/'+appVersion,
     schemes : ['https'],
     consumes : "application/json;charset-utf-8",
-    consumes : "application/json;charset-utf-8",
+    produces : "application/json;charset-utf-8",
     tags: [],
     paths : {
       // ':entityId' : {
@@ -123,7 +123,7 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
 
     swagger.paths[ '/'+ entityId ] = {
       'get': {
-        response : {
+        responses : {
           '200' : {
             describtion: 'success',
             schema : {
@@ -138,75 +138,134 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
         }
       },
       'post': {
-        '200' : {
-          describtion: 'success',
-          schema : {
-            '$ref' : '#/definitions/_addDataStatusOK'
+        parameters : [
+          { name: 'entity', 
+            schema:  {
+              '$ref' : '#/definitions/'+entityId
+            },
+            required: true, 
+            in: 'body',
+            describtion: 'new data record'
           }
-        },
-        '400' : { describtion: 'Parameter Error' },
-        '401' : { describtion: 'Not authorized' }
+        ],
+        responses : {
+          '200' : {
+            describtion: 'success',  
+            schema : {
+              '$ref' : '#/definitions/_addDataStatusOK'
+            }
+          },
+          '400' : { describtion: 'Parameter Error' },
+          '401' : { describtion: 'Not authorized' }
+        }
       },
       'put': {
-        '200' : {
-          describtion: 'success',
-          schema : {
-            'type': 'object',
-            '$ref' : '#/definitions/_changeDataArrayStatusOK'
+        parameters : [
+          { name: 'entity', 
+            schema:  {
+              '$ref' : '#/definitions/'+entityId
+            },
+            required: true, 
+            in: 'body',
+            describtion: 'new data record'
           }
-        },
-        '400' : { describtion: 'Parameter Error' },
-        '401' : { describtion: 'Not authorized' }
+        ],
+        responses : {
+          '200' : {
+            describtion: 'success',
+            schema : {
+              'type': 'object',
+              '$ref' : '#/definitions/_changeDataArrayStatusOK'
+            }
+          },
+          '400' : { describtion: 'Parameter Error' },
+          '401' : { describtion: 'Not authorized' }
+        }
       },
     }
     swagger.paths[ '/'+ entityId +'/{id}' ] = {
       'get': {
-        '200' : {
-          describtion: 'success',
-          schema : {
-            type : 'object',
-            items : {
-              '$ref' : '#/definitions/'+entityId  
+        parameters : [
+          { name: 'id', type: 'String', required: true, in: 'path', describtion: 'data id' }
+        ],
+        responses : {
+          '200' : {
+            describtion: 'success',
+            schema : {
+              type : 'object',
+              items : {
+                '$ref' : '#/definitions/'+entityId  
+              }
             }
-          }
-        },
-        '400' : { describtion: 'Parameter Error' },
-        '401' : { describtion: 'Not authorized' }
+          },
+          '400' : { describtion: 'Parameter Error' },
+          '401' : { describtion: 'Not authorized' }
+        }
       },
       'post': {
-        '200' : {
-          describtion: 'success',
-          schema : {
-            type : 'array',
-            items : {
-              '$ref' : '#/definitions/_addDataStatusOK'  
-            }
+        parameters : [
+          { name: 'id', type: 'String', required: true, in: 'path', describtion: 'data id' },
+          { name: 'entity', 
+            schema:  {
+              '$ref' : '#/definitions/'+entityId
+            },
+            required: true, 
+            in: 'body',
+            describtion: 'new data record'
           }
-        },
-        '400' : { describtion: 'Parameter Error' },
-        '401' : { describtion: 'Not authorized' }
+        ],
+        responses : {
+          '200' : {
+            describtion: 'success',
+            schema : {
+              schema : {
+                '$ref' : '#/definitions/_addDataStatusOK'  
+              }
+            },
+            '400' : { describtion: 'Parameter Error' },
+            '401' : { describtion: 'Not authorized' }
+          }
+        }
       },
       'put': {
-        '200' : {
-          describtion: 'success',
-          schema : {
-            'type': 'object',
-            '$ref' : '#/definitions/_changeDataStatusOK'
+        parameters : [
+          { name: 'id', type: 'String', required: true, in: 'path', describtion: 'data id' },
+          { name: 'entity', 
+            schema:  {
+              '$ref' : '#/definitions/'+entityId
+            },
+            required: true, 
+            in: 'body',
+            describtion: 'new data record updates'
           }
-        },
-        '400' : { describtion: 'Parameter Error' },
-        '401' : { describtion: 'Not authorized' }
+        ],
+        responses : {
+          '200' : {
+            describtion: 'success',
+            schema : {
+              'type': 'object',
+              '$ref' : '#/definitions/_changeDataStatusOK'
+            }
+          },
+          '400' : { describtion: 'Parameter Error' },
+          '401' : { describtion: 'Not authorized' }
+        }
       },
       'delete': {
-        '200' : {
-          describtion: 'success',
-          schema : {
-            'type': 'object',
-            '$ref' : '#/definitions/_deleteDataStatus'
-          }
-        },
-        '400' : { describtion: 'Parameter Error' },
-        '401' : { describtion: 'Not authorized' }
+        parameters : [
+          { name: 'id', type: 'String', required: true, in: 'path', describtion: 'data id' }
+        ],
+        responses : {
+          '200' : {
+            describtion: 'success',
+            schema : {
+              'type': 'object',
+              '$ref' : '#/definitions/_deleteDataStatus'
+            }
+          },
+          '400' : { describtion: 'Parameter Error' },
+          '401' : { describtion: 'Not authorized' }
+        }
       },
     }
 
@@ -229,6 +288,9 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
       swagger.paths[ '/'+ entityId +'/state/{action}' ] = {
         'post': {
           describtion : 'Change status doing "{action}" according state model "'+entity.stateModel+'"',
+          parameters : [
+            { name: 'action', type: 'String', required: true, in: 'path', describtion: 'action id, ref state model' }
+          ],
           '200' : {
             describtion: 'success',
             schema : {
@@ -254,6 +316,10 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
         sProp.describtion = prop.label
       }
       switch ( prop.type ) {
+        case 'UUID':  
+          sProp.type   = 'string'
+          sProp.format = 'UUIDv4'
+          break;
         case 'JSON':  
           sProp.type = 'object'
           break;
