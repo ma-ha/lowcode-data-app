@@ -639,7 +639,11 @@ async function addProperty ( req, res ) {
     delete entity.properties[ id ].description
   }
 
-  await propHandler.addNewPropertyDef( entity.properties[ id ], req.body.type, req.body.ref )
+  let addResult = await propHandler.addNewPropertyDef( entity.properties[ id ], req.body.type, req.body.ref )
+  if ( addResult.error ) {
+    delete  entity.properties[ id ]
+    return res.send( 'ERROR: ' + addResult.error )
+  }
 
   log.info( 'addProperty e', entity.properties[ id ] )
 

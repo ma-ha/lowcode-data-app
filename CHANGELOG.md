@@ -1,3 +1,8 @@
+# 0.25.1
+- Property editor: fix static string property value in form
+- Property editor: fix add property error
+- fix swagger description
+
 # 0.25.0
 - Adapter API: Swagger
 - Adapter API and events: add static string property (req for tmForum APIs)

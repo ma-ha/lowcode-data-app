@@ -25,11 +25,11 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
           properties : {
             'status' : {
               type : 'string',
-              describtion : 'should be "OK"'
+              description : 'should be "OK"'
             },
             'id' : {
               type : 'string',
-              describtion : 'new record id'
+              description : 'new record id'
             },
           }
       },
@@ -38,7 +38,7 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
         properties : {
           'status' : {
             type : 'string',
-            describtion : 'should be "OK"'
+            description : 'should be "OK"'
           },
           idArr : {
               type : 'array',
@@ -48,7 +48,7 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
           },
           'docMap' : {
             type : 'object',
-            describtion : 'changed data records in a map'
+            description : 'changed data records in a map'
           },
         }
       },
@@ -57,15 +57,15 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
         properties : {
           'status' : {
             type : 'string',
-            describtion : 'should be "OK"'
+            description : 'should be "OK"'
           },
           'id' : {
             type : 'string',
-            describtion : 'new record id'
+            description : 'new record id'
           },
           'doc' : {
             type : 'object',
-            describtion : 'changed data record'
+            description : 'changed data record'
           },
         }
       },
@@ -74,11 +74,11 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
         properties : {
           'status' : {
             type : 'string',
-            describtion : 'should be "OK"'
+            description : 'should be "OK"'
           },
           'docMap' : {
             type : 'object',
-            describtion : 'changed data records in a map'
+            description : 'changed data records in a map'
           },
         }
       },
@@ -87,7 +87,7 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
         properties : {
           'status' : {
             type : 'string',
-            describtion : 'should be "OK"'
+            description : 'should be "OK"'
           }
         }
       }
@@ -100,7 +100,7 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
       'get': {
         responses : {
           '200' : {
-            describtion: 'success',
+            description: 'success',
             schema : {
               type : 'array',
               items : {
@@ -108,8 +108,8 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
               }
             }
           },
-          '400' : { describtion: 'Parameter Error' },
-          '401' : { describtion: 'Not authorized' }
+          '400' : { description: 'Parameter Error' },
+          '401' : { description: 'Not authorized' }
         }
       },
       'post': {
@@ -120,18 +120,18 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
             },
             required: true, 
             in: 'body',
-            describtion: 'new data record'
+            description: 'new data record'
           }
         ],
         responses : {
           '200' : {
-            describtion: 'success',  
+            description: 'success',  
             schema : {
               '$ref' : '#/definitions/_addDataStatusOK'
             }
           },
-          '400' : { describtion: 'Parameter Error' },
-          '401' : { describtion: 'Not authorized' }
+          '400' : { description: 'Parameter Error' },
+          '401' : { description: 'Not authorized' }
         }
       },
       'put': {
@@ -142,30 +142,30 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
             },
             required: true, 
             in: 'body',
-            describtion: 'new data record'
+            description: 'new data record'
           }
         ],
         responses : {
           '200' : {
-            describtion: 'success',
+            description: 'success',
             schema : {
               'type': 'object',
               '$ref' : '#/definitions/_changeDataArrayStatusOK'
             }
           },
-          '400' : { describtion: 'Parameter Error' },
-          '401' : { describtion: 'Not authorized' }
+          '400' : { description: 'Parameter Error' },
+          '401' : { description: 'Not authorized' }
         }
       },
     }
     swagger.paths[ '/'+ entityId +'/{id}' ] = {
       'get': {
         parameters : [
-          { name: 'id', type: 'String', required: true, in: 'path', describtion: 'data id' }
+          { name: 'id', type: 'String', required: true, in: 'path', description: 'data id' }
         ],
         responses : {
           '200' : {
-            describtion: 'success',
+            description: 'success',
             schema : {
               type : 'object',
               items : {
@@ -173,73 +173,73 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
               }
             }
           },
-          '400' : { describtion: 'Parameter Error' },
-          '401' : { describtion: 'Not authorized' }
+          '400' : { description: 'Parameter Error' },
+          '401' : { description: 'Not authorized' }
         }
       },
       'post': {
         parameters : [
-          { name: 'id', type: 'String', required: true, in: 'path', describtion: 'data id' },
+          { name: 'id', type: 'String', required: true, in: 'path', description: 'data id' },
           { name: 'entity', 
             schema:  {
               '$ref' : '#/definitions/'+entityId
             },
             required: true, 
             in: 'body',
-            describtion: 'new data record'
+            description: 'new data record'
           }
         ],
         responses : {
           '200' : {
-            describtion: 'success',
+            description: 'success',
             schema : {
               schema : {
                 '$ref' : '#/definitions/_addDataStatusOK'  
               }
             },
-            '400' : { describtion: 'Parameter Error' },
-            '401' : { describtion: 'Not authorized' }
+            '400' : { description: 'Parameter Error' },
+            '401' : { description: 'Not authorized' }
           }
         }
       },
       'put': {
         parameters : [
-          { name: 'id', type: 'String', required: true, in: 'path', describtion: 'data id' },
+          { name: 'id', type: 'String', required: true, in: 'path', description: 'data id' },
           { name: 'entity', 
             schema:  {
               '$ref' : '#/definitions/'+entityId
             },
             required: true, 
             in: 'body',
-            describtion: 'new data record updates'
+            description: 'new data record updates'
           }
         ],
         responses : {
           '200' : {
-            describtion: 'success',
+            description: 'success',
             schema : {
               'type': 'object',
               '$ref' : '#/definitions/_changeDataStatusOK'
             }
           },
-          '400' : { describtion: 'Parameter Error' },
-          '401' : { describtion: 'Not authorized' }
+          '400' : { description: 'Parameter Error' },
+          '401' : { description: 'Not authorized' }
         }
       },
       'delete': {
         parameters : [
-          { name: 'id', type: 'String', required: true, in: 'path', describtion: 'data id' }
+          { name: 'id', type: 'String', required: true, in: 'path', description: 'data id' }
         ],
         responses : {
           '200' : {
-            describtion: 'success',
+            description: 'success',
             schema : {
               'type': 'object',
               '$ref' : '#/definitions/_deleteDataStatus'
             }
           },
-          '400' : { describtion: 'Parameter Error' },
-          '401' : { describtion: 'Not authorized' }
+          '400' : { description: 'Parameter Error' },
+          '401' : { description: 'Not authorized' }
         }
       },
     }
@@ -249,7 +249,7 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
         'get': {
           responses : {
             '200' : {
-              describtion: 'success',
+              description: 'success',
               schema : {
                 type : 'array',
                 items : {
@@ -257,42 +257,44 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
                 }
               }
             },
-            '400' : { describtion: 'Parameter Error' },
-            '401' : { describtion: 'Not authorized' }
+            '400' : { description: 'Parameter Error' },
+            '401' : { description: 'Not authorized' }
           }
         }
       }
       swagger.paths[ '/'+ entityId +'/state/{action}' ] = {
         'post': {
-          describtion : 'Change status doing "{action}" according state model "'+entity.stateModel+'"',
+          description : 'Change status doing "{action}" according state model "'+entity.stateModel+'"',
           parameters : [
-            { name: 'action', type: 'String', required: true, in: 'path', describtion: 'action id, ref state model' }
+            { name: 'action', type: 'String', required: true, in: 'path', description: 'action id, ref state model' }
           ],
           responses : {
             '200' : {
-              describtion: 'success',
+              description: 'success',
               schema : {
                 'type': 'object',
                 '$ref' : '#/definitions/_changeDataStatusOK'
               }
             },
-            '400' : { describtion: 'Parameter Error' },
-            '401' : { describtion: 'Not authorized' }
+            '400' : { description: 'Parameter Error' },
+            '401' : { description: 'Not authorized' }
           }
         }
       }
     }
     swagger.definitions[ entityId ] = {
       type : 'object',
-      describtion : entity.title,
+      description : entity.title,
       properties : {}
     }
     for ( let propId in entity.properties ) {
       let prop =  entity.properties[ propId ]
       swagger.definitions[ entityId ].properties[ propId ] = { }
       let sProp =  swagger.definitions[ entityId ].properties[ propId ]
-      if ( prop.label ) {
-        sProp.describtion = prop.label
+      if ( prop.description ) {
+        sProp.description = prop.description
+      } else if ( prop.label ) {
+        sProp.description = prop.label
       }
       switch ( prop.type ) {
         case 'UUID':  
@@ -308,7 +310,7 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
           break
         case 'API static string': 
           sProp.type = 'string'
-          sProp.describtion = prop.apiString
+          sProp.description = prop.apiString
           break;
         default:
           sProp.type = 'string'
@@ -318,16 +320,16 @@ function genAppSwagger( app, scopeId, appId, appVersion, cfg ) {
     if ( entity.stateModel ) {
       swagger.definitions[ entityId ].properties[ '_state' ] = { 
         type : String,
-        describtion : 'from "'+entity.stateModel+'" state model'
+        description : 'from "'+entity.stateModel+'" state model'
       }
     }
     swagger.definitions[ entityId ].properties[ '_cre' ] = {
       type: 'integer',
-      describtion: 'Create date (epoch time stamp)'
+      description: 'Create date (epoch time stamp)'
     }
     swagger.definitions[ entityId ].properties[ '_upd' ] = {
       type: 'integer',
-      describtion: 'CreLast update  (epoch time stamp)'
+      description: 'CreLast update  (epoch time stamp)'
     }
   }
 
