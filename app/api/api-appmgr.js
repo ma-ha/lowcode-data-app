@@ -559,6 +559,15 @@ async function addProperty ( req, res ) {
   let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
   if ( ! allOK ) { return }
 
+  if ( req.body.type == 'UUID-Index' ) { // need to check that this in only once 
+    let indexKey = propHandler.getIndex( entity )  
+    if ( indexKey &&  indexKey != id ) {
+      if ( entity.properties[ indexKey ].type == 'UUID-Index' ) {
+        return res.send( 'ERROR: UUID-Index is allowed only once' )
+      }
+    }
+  }
+
   // TODO
   let jsonId = null
   let subId  = null
