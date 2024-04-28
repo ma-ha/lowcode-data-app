@@ -2,6 +2,7 @@
 - Property editor: fix static string property value in form
 - Property editor: fix add property error
 - fix swagger description
+- type UUID-Index for explicit index field support
 
 # 0.25.0
 - Adapter API: Swagger
