@@ -9,7 +9,7 @@ const USER_API_URL = 'http://localhost:8888/app/adapter/user'
 
 let HEADERS = { 'provisioning-key': 'CHANGE_ME' }
 
-describe( 'Tenant Provisioning', () => { 
+describe( 'Tenant Teardown', () => { 
 
   let scopeId = null
 

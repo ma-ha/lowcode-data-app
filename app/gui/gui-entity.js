@@ -90,6 +90,7 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
   } else {   // render simple entity page
     let entityId  = params[1]
     let filter    = ( params.length == 3 ? params[2] : null)
+    log.info( 'renderDynEntityRows', filter)
     rowArr = await renderEntityRows( app, appId, entityId, filter, user )  
   } 
 
@@ -114,6 +115,9 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
   if ( filterParam ) {
     let filterForm = tableFilterFrom( filterParam, appId, entityId )
     rows.push( filterForm )
+    let fKV = filterParam.split('=')
+    filter = {}
+    filter[ fKV[0] ] = fKV[1]
   }
 
   let tblHeight = ( entity.noEdit ? '780px' : '550px' )
@@ -322,14 +326,17 @@ function genTblColsConfig( entityId, entity, user, stateModel ) {
     availWidth -= 5
   }
 
-  if ( ! ( entity.properties.id && entity.properties.id.noTable ) ) {
-    if ( entity.properties.id && entity.properties.id.type == 'UUID' ) {
+  let indexKey = propHandler.getIndex( entity )
+  if ( indexKey ) {
+  if ( ! ( entity.properties[ indexKey ] && entity.properties[ indexKey ].noTable ) ) {
+    if ( entity.properties[ indexKey ] && entity.properties[ indexKey ].type.startsWith( 'UUID' ) ) {
       cols.push({ id: 'recId', label: "Id",  cellType: "text", width:'15%' })
       availWidth -= 15
     } else {
       cols.push({ id: 'recId', label: "Id",  cellType: "text", width:'10%' })
       availWidth -= 10
     }
+  }
   }
 
   let showUserAction = false
@@ -353,7 +360,7 @@ function genTblColsConfig( entityId, entity, user, stateModel ) {
     availWidth -= 5
   }
  
-  cols = cols.concat( propHandler.genGuiTableColsDef( appEntityPropMap, availWidth ) )
+  cols = cols.concat( propHandler.genGuiTableColsDef( entity, availWidth ) )
 
   if ( showUserAction ) {
     cols.push({ id: '_stateBtn', label: "Action",  cellType: "text", width:'10%' })
@@ -406,7 +413,7 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
         actionURL: 'guiapp/'+appId+'/entity/'+entityId,
         update: updateResArr, target: "modal" },
       { id: "ResetEntityFormBtn", actionName: "Reset", method: 'GET',
-        actionURL: 'guiapp/'+appId+'/entity/'+entityId+'?recId=_empty',
+        actionURL: 'guiapp/'+appId+'/entity/'+entityId+'?_recId=_empty',
         setData:  [ { resId : 'Add' + entityId } ] }
     ]
     if ( entity.csvUpload ) {
@@ -417,6 +424,7 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
       })
     }
   }
+  log.info( actions )
 
   let addFormView = { 
     id: 'Add' + entityId, rowId: 'Add' + entityId, type : 'pong-form',

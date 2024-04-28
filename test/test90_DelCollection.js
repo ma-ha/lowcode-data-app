@@ -11,7 +11,7 @@ let HEADERS = {
   'app-secret' : 'mochatest-supasecret-id'
 }
 
-describe( 'Data Ops', () => { 
+describe( 'Delete Collections', () => { 
 
   let scopeId = null
 

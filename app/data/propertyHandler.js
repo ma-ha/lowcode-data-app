@@ -7,6 +7,7 @@ const helper  = require( '../helper/helper' )
 exports: module.exports = {
   getPropTypes,
   setPropRef,
+  getIndex,
   getpropTypeDef,
   addNewPropertyDef,
   genGuiTableFilterDef,
@@ -26,9 +27,10 @@ function getPropTypes() {
   return [
     'String', 'String QR/Barcode', 'Text',
     'Boolean', 'Number', 'Date', 
+    'UUID', 'UUID-Index',
     'Select', 
     'DocMap', 'SelectRef', 'MultiSelectRef', /* 'RefArray',*/ 
-    'UUID', 'Metric', 'Link', 'JSON', 'Event',
+    'Metric', 'Link', 'JSON', 'Event',
     'API static string' 
   ]
 }
@@ -64,7 +66,7 @@ function setPropRef( prop, dbProp ) {
       prop.ref  = dbProp.event
       break 
     case 'API static string':
-      prop.ref = prop.apiString 
+      prop.ref = dbProp.apiString 
     default: break 
   }
 }
@@ -148,21 +150,21 @@ async function addNewPropertyDef( prop, type, ref  ) {
   } else if ( ['DocMap','SelectRef','MultiSelectRef','RefArray','Ref'].includes(  type ) ) {
 
     if ( ! ref ) {
-      return res.status(400).send( '"ref" is required' ) 
+      return { error: '"ref" is required' } 
     }
     let p = ref.split('/')
     if ( type == 'DocMap'  ) { 
       if ( p.length != 5 ) {
-        return res.status(400).send( '"ref" format must be like  "scope/app/version/entity/prop"' ) 
+        return { error: '"ref" format must be like  "scope/app/version/entity/prop"' }
       }
     } else if ( p.length != 4 ) { // shpuld be  scope/app/version/entity
-      return res.status(400).send( '"ref" format must be like  "scope/app/version/entity"' ) 
+      return { error: '"ref" format must be like  "scope/app/version/entity"' }
     }
     let refAppId    = p[0] +'/'+ p[1] +'/'+ p[2]
     let refEntityId = p[3]
     let refApp =  await dta.getAppById( refAppId )
     if ( ! refApp ) {
-      return res.status(400).send( '"ref" app "'+refAppId+'" not found' ) 
+      return { error: '"ref" app "'+refAppId+'" not found' }
     }
     if ( ! refApp.entity[ refEntityId] ) {
       refApp.entity[ refEntityId ] = {
@@ -171,7 +173,7 @@ async function addNewPropertyDef( prop, type, ref  ) {
         maintainer : ['appUser'],
         properties : {}
       }
-      addResultTxt += ', created new entity "'+ ref + '"'
+      // addResultTxt += ', created new entity "'+ ref + '"'
     }
     switch ( type ) {
       case 'DocMap':
@@ -180,7 +182,7 @@ async function addNewPropertyDef( prop, type, ref  ) {
           refApp.entity[ refEntityId ].properties[ refPropertyId ] = {
             type: "String"
           }
-          addResultTxt += ', created property "'+ refPropertyId + '"'
+          // addResultTxt += ', created property "'+ refPropertyId + '"'
         }
         prop.docMap = ref
         break
@@ -204,6 +206,7 @@ async function addNewPropertyDef( prop, type, ref  ) {
     prop.noTable   = true
     prop.filter    = false
   }
+  return { status: 'OK' }
 }
 
 // ============================================================================
@@ -230,10 +233,11 @@ function genGuiTableFilterDef( entityMap ) {
 }
 
 
-function genGuiTableColsDef( entityMap, maxWidth=80 ) {
+function genGuiTableColsDef( entity, maxWidth=80 ) {
+  let properties = entity.properties
   let cnt = 0
-  for ( let propId in entityMap ) { 
-    let prop =  entityMap[ propId ]
+  for ( let propId in properties ) { 
+    let prop =  properties[ propId ]
     if ( prop.noTable ) { continue }
     if ( prop.colWidth ) {
       switch ( prop.colWidth ) {
@@ -262,11 +266,13 @@ function genGuiTableColsDef( entityMap, maxWidth=80 ) {
     return wi + '%'
   }
 
+  let indexKey = getIndex( entity )
+
   let cols = []
-  for ( let propId in entityMap ) {
-    let prop =  entityMap[ propId ]
-    if ( propId == 'id' ) { continue }
-    if ( prop.noTable   ) { continue }
+  for ( let propId in properties ) {
+    let prop =  properties[ propId ]
+    if ( propId == indexKey ) { continue }
+    if ( prop.noTable       ) { continue }
 
     let pId = propId.replaceAll('.','_')
     let label = ( prop.label ? prop.label : propId )
@@ -293,28 +299,44 @@ function genGuiTableColsDef( entityMap, maxWidth=80 ) {
 }
 
 
-async function genGuiFormFieldsDef( entity, filter, user, stateTransition, render ) {
-  let cols = []
+function getIndex( entity ) {
+  for ( let propId in entity.properties ) {
+    if ( entity.properties[ propId ].type == 'UUID-Index' ) {
+      return propId
+    }
+  }
+  if ( entity.properties.id ) {
+    return 'id'
+  }
+  return null
+}
 
-  if ( entity.properties[ 'id' ] && entity.properties[ 'id' ].type == 'UUID' ) {
+async function genGuiFormFieldsDef( entity, filter, user, stateTransition, render ) {
+  log.info( 'genGuiFormFieldsDef', filter )
+  let cols = []
+  let fldCnt = 0
+  let fldArr = []
+  let indexKey = getIndex( entity )
+  let indexField = ( indexKey ? entity.properties[ indexKey ] : null )
+  if ( indexField && indexField.type.startsWith( 'UUID' ) ) {
     if ( !( stateTransition && stateTransition.startsWith( 'null_' ) ) ) {
-      if ( ! entity.properties[ 'id' ].noEdit ) {
-        cols.push({ formFields: [{ 
-          id: "id", 
-          label: ( entity.properties[ 'id' ].label ? entity.properties[ 'id' ].label : "Id (UUID)" ), 
+      if ( ! indexField.noEdit ) {
+        fldArr.push({ 
+          id: indexKey, 
+          label: (indexField.label ? indexField.label : "Id (UUID)" ), 
           type: "text", readonly: true, descr: 'ID is auto generated'
-        } ]})
+        })
+        fldCnt ++ 
       } else {
-        cols.push({ formFields: [{ 
-          id: "id", type: "text", hidden: true
-        } ]})
-      }  
+        fldArr.push({ id: indexKey, type: "text", hidden: true, value: '' })
+      }
     }
   } else if ( entity.stateModel ) { 
     // prevent create via the edit form
     // cols.push({ formFields: [{ id: "id", label: "Id", type: "text", readonly: true } ]})
   } else { // every data rec need an id
-    cols.push({ formFields: [{ id: "id", label: "Id", type: "text" } ]})
+    fldArr.push({  id: "id", label: "Id", type: "text" })
+    fldCnt ++
   }
 
   let fieldDefault = {}
@@ -330,7 +352,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
   }
 
   for ( let propId in entity.properties ) {
-    if ( propId == 'id' ) { continue }
+    if ( propId == indexKey ) { continue }
     let prop = entity.properties[ propId ]
     if ( prop.type == 'API static string' ) { continue }
     let lbl  = ( prop.label ? prop.label : propId )
@@ -347,9 +369,9 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         if ( ! prop.stateTransition[ stateTransition ] ) {
           if ( defaultVal ) {  
             if ( prop.noEdit ) { 
-              cols.push({ formFields: [ { id: fldId, type: 'text', value: defaultVal, hidden: true } ] })
+              fldArr.push({ id: fldId, type: 'text', value: defaultVal, hidden: true })
             } else {
-              cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', defaultVal: defaultVal, readonly: true } ] })
+              fldArr.push({ id: fldId, label: lbl, type: 'text', defaultVal: defaultVal, readonly: true })
             }
           }
           continue
@@ -360,7 +382,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
     } else if ( prop.noEdit ) { continue }
 
     if ( prop.apiManaged ) { 
-      cols.push({ formFields: [ { id: fldId, label: lbl, type: 'text', readonly: true } ] })
+      fldArr.push({ id: fldId, label: lbl, type: 'text', readonly: true })
       continue 
     }
 
@@ -372,6 +394,7 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
           fld = { id: fldId, label: lbl, type: 'text', rows: 1 }
         } else {
           fld = { id: fldId, label: lbl, type: 'text', rows: prop.lines }
+          fldCnt += prop.lines - 1
         }
         break 
       case 'Boolean':
@@ -391,9 +414,12 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         }
         break 
       case 'SelectRef':
-        fld = { id: fldId, label: lbl, type: 'select', options: [] }
+        // index.html?layout=AppEntity-nonav&id=2103/TmfServiceInventory/0.1.0,TmfIntent
         try {
-          let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
+          let ent = prop.selectRef.split('/')
+          let lnk = '<a href="index.html?layout=AppEntity-nonav&id='+ent[0]+'/'+ent[1]+'/'+ent[2]+','+ent[3]+'">'+ lbl +'</a>'
+          fld = { id: fldId, label: lnk, type: 'select', options: [] }
+          let opdTbl = await dta.getData( ent[0] + ent[3], user.scopeId )
           let refEntity = await getEntity( prop.selectRef, propId )
           for ( let recId in opdTbl ) { 
             if ( filterMatch( defaultVal, opdTbl[recId], fieldDefault ) ) {
@@ -406,9 +432,11 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         } catch ( exc ) { log.error( 'genAddDataForm', exc )  }
         break 
       case 'MultiSelectRef':
-        fld = { id: fldId, label: lbl, type: 'select', options: [], multiple: true }
         try {
-          let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
+          let ent = prop.multiSelectRef.split('/')
+          let lnk = '<a href="index.html?layout=AppEntity-nonav&id='+ent[0]+'/'+ent[1]+'/'+ent[2]+','+ent[3]+'">'+ lbl +'</a>'
+          fld = { id: fldId, label: lnk, type: 'select', options: [], multiple: true, rows: 4 }
+          let opdTbl = await dta.getData( ent[0] + ent[3], user.scopeId )
           let refEntity = await getEntity( prop.multiSelectRef, propId )
           for ( let recId in opdTbl ) { 
             if ( filterMatch( defaultVal, opdTbl[recId], fieldDefault ) ) {
@@ -444,8 +472,10 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
       case 'JSON':
         if ( render && render == 'small') {
           fld = { id: fldId, label: lbl, type: 'text', rows: 2 }
+          fldCnt ++
         } else {
           fld = { id: fldId, label: lbl, type: 'text', rows: 5 }
+          fldCnt += 4
         }
         break 
       default:   // String, Number
@@ -454,20 +484,57 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         if ( prop.qr ) { fld.qr = true }
         break 
     }
-
-    if ( filter && filter.field == propId ) { // ??
-      fld.defaultVal = filter.value
+    
+    if ( filter && filter[ propId ] ) { // ??
+      fld.value =  filter[ propId ] 
+      fld.defaultVal =  filter[ propId ] 
       fld.readonly   = "true" 
     }
     // if ( prop.apiManaged ) {
     //   fld.readonly   = true
     // }
-    if ( prop.description ) { fld.descr = renderTooltip( prop.description ) }
 
     if ( fld ) {
+      if ( prop.description ) { fld.descr = renderTooltip( prop.description ) }
+      fldCnt ++
+      fldArr.push( fld )
+    }
+  }
+
+  if ( fldCnt > 12 ) {
+    let rowMax = fldCnt / 5 
+    let i = 0
+    let formFields = []
+    for ( let  fieldSpec of fldArr ) {
+
+      formFields.push( fieldSpec )
+      if ( fieldSpec.hidden ) { continue }
+
+      //log.info( fieldSpec )
+      if ( fieldSpec.rows ) {
+        // log.info( i, fieldSpec.id,  fieldSpec.rows )
+        i += fieldSpec.rows
+      } else {
+        // log.info( i, fieldSpec.id )
+        i++
+      }
+     
+      if ( i > rowMax ) {
+        cols.push({ formFields: JSON.parse( JSON.stringify( formFields )) })
+        formFields = []
+        i = 0
+      }
+    }
+    if ( i != 0 ) {
+      cols.push({ formFields: formFields })
+    }
+
+  } else {
+    for ( fld of  fldArr ) {
       cols.push({ formFields: [ fld ] })
     }
   }
+
   return cols
 }
 
@@ -513,12 +580,24 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
   let stateId = stateTransition.split('_')[0] 
   let actionId = stateTransition.split('_')[1] 
   let newState = stateModel.state[ stateId ].actions[ actionId ].to
+
+  let indexKey = getIndex( entity )
+  let indexProp = entity.properties[ indexKey ]
+  if ( indexKey && indexProp ) {
+    fields.push({ 
+      id: indexKey, 
+      label: (indexField.label ? indexField.label : "Id" ), 
+      type: "text", 
+      readonly: true, 
+      value: rec[ indexProp ]
+    })
+  }
+  
   fields.push({ id: "_state", label: "<b>New State</b>", type: "text", readonly: true, value: newState})
-  fields.push({ id: "id", label: "Id", type: "text", readonly: true, value: rec.id })
   fields.push({ id: "scopeId", label: "Scope", type: "text", hidden: true, value: rec.scopeId })
 
   for ( let propId in entity.properties ) {
-    if ( propId == 'id' ) { continue }
+    if ( propId == indexKey ) { continue }
     if ( prop.type == 'API static string' ) { continue }
 
     let prop = entity.properties[ propId ]
@@ -556,7 +635,8 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
       case 'SelectRef':
         fld = { id: propId, label: lbl, type: 'select', options: [] }
         try {
-          let opdTbl = await dta.getData( prop.selectRef, user.scopeId )
+          let ent = prop.selectRef.split('/')
+          let opdTbl = await dta.getData( ent[0]+ent[3], user.scopeId )
           for ( let recId in opdTbl ) { 
             fld.options.push({ option: recId }) 
           }
@@ -565,7 +645,8 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
       case 'MultiSelectRef':
         fld = { id: propId, label: lbl, type: 'select', options: [], multiple: true }
         try {
-          let opdTbl = await dta.getData( prop.multiSelectRef, user.scopeId )
+          let ent = prop.multiSelectRef.split('/')
+          let opdTbl = await dta.getData( ent[0]+ent[3], user.scopeId )
           for ( let recId in opdTbl ) { 
             fld.options.push({ option: recId }) 
           }
@@ -593,7 +674,7 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
         // do nothing
         break 
       case 'JSON':
-        let jsonStr = ( rec[ propId ] ? JSON.stringify( rec[ propId ] , null, ' ' ) : '{}' )
+        let jsonStr = ( rec[ propId ] ? JSON.str.valueingify( rec[ propId ] , null, ' ' ) : '{}' )
         fld = { id: propId, label: lbl, type: 'text', rows: "5", defaultVal: jsonStr }
         break 
       default:   // String, Number
@@ -762,6 +843,7 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
         if ( prop.link ) {
           let href = prop.link
           href = href.replaceAll( '${id}', rec[ 'id' ] )
+          href = href.replaceAll( '${'+indexKey+'}', rec[ indexKey ] )
           href = href.replaceAll( '${scopeId}', rec[ 'scopeId' ] )
           for ( let replaceId in entity.properties ) {
             href = href.replaceAll( '${'+replaceId+'}', rec[ replaceId ] )
@@ -825,12 +907,13 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
 
 function reformatDataUpdateInput( entity, rec ) {
   log.debug( 'reformatDataUpdateInput', rec )
-  if ( ! rec.id ) {
-    if ( entity.properties[ 'id' ]  &&  entity.properties[ 'id' ].type == 'UUID' ) {
+  let indexKey = getIndex( entity )
+  if ( ! rec[ indexKey ] || rec[ indexKey ] === '' ) {
+    if ( entity.properties[ indexKey ]  &&  entity.properties[ indexKey ].type.startsWith( 'UUID' ) ) {
       rec.id = helper.uuidv4()
-      log.info( 'reformatDataUpdateInput rec.id',  rec.id )
-    } else if ( ! entity.properties[ 'id' ] ) {
-      rec.id = helper.uuidv4()
+      log.info( 'reformatDataUpdateInput', indexKey, rec[ indexKey ] )
+    } else if ( ! entity.properties[ indexKey ] ) {
+      rec[ indexKey ] = helper.uuidv4()
     } else {
       return { err: 'ERROR: id required' }
     }

@@ -249,7 +249,7 @@ async function addEntity( req, res ) {
     maintainer : [req.body.maintainer],
     properties : ( 
       app.entity[ req.body.entityId ] ? app.entity[ req.body.entityId ].properties : 
-      { "id": { type: "UUID", noDelete: true, noTable: true, noEdit: true } } 
+      { "id": { type: "UUID-Index", noDelete: true, noTable: true, noEdit: true } } 
     )
   }
 

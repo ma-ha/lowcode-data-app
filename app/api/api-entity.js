@@ -156,7 +156,7 @@ async function getDoc( req, res ) {
   if ( req.query.recId ) { // single doc by id
     log.debug( 'GET entity q/id', req.query.recId )
 
-    if ( req.query.recId == '_empty' ) {
+    if ( req.query._recId == '_empty' ) {
       return res.send( propHandler.genEmptyDataReturn( entity ) )
     }
 
@@ -383,6 +383,8 @@ async function uploadCsvData( req, res ) {
       toState = stateModel.state['null'].actions[ actionId ]
       if ( ! toState ){ return res.send( 'ERROR: Action not valid') }
     }
+    let indexKey = propHandler.getIndex( entity )
+
 
     let separator = ( req.body.separator ? req.body.separator : ';' )
     log.info( 'uploadCsvData separator', separator )
@@ -468,7 +470,7 @@ async function uploadCsvData( req, res ) {
               uploadOK = false
             }
           }
-          if ( c == 'id' ) {
+          if ( c == indexKey ) {
             let dbRec = await  dta.getDataById( user.rootScopeId + entityId, v[i] ) 
             if ( dbRec ) {
               parse.err = 'Error: ID exists!'

@@ -116,6 +116,14 @@ describe( 'Data Ops', () => {
     uid = result.data.id
   })
 
+  it( 'UUID: Load rec', async () => {
+    let result = await axios.get( testUuidUrl +'/'+uid, { headers: HEADERS } )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data, null )
+    assert.notEqual( result.data['@type'], null )
+    // console.log( '9', result.data  )
+  })
+
   it( 'UUID: List data', async () => {
     let result = await axios.get( testUuidUrl, { headers: HEADERS } )
     assert.equal( result.status, 200 )

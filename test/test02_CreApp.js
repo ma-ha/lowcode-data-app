@@ -24,8 +24,15 @@ const APP = {
       "maintainer": [
       ],
       "properties": {
+        "id": {
+          "type": "String"
+        },
         "Name": {
           "type": "String"
+        },
+        "@type": {
+          "apiString": "test",
+          "type": "API static string"
         }
       }
     },
@@ -45,7 +52,11 @@ const APP = {
           "selectRef": "TODO"
         },
         "id": {
-          "type": "UUID"
+          "type": "UUID-Index"
+        },
+        "@type": {
+          "apiString": "testUUID",
+          "type": "API static string"
         }
       },
       "noDelete": true,

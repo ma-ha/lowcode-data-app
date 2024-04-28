@@ -340,10 +340,15 @@ async function chgDoc( req, res )  {
   if ( ! app ) { return }
   let doc = await dta.getDataById( tbl, req.params.recId )
   if ( ! doc ) { return sendErr( res, 'Not found' ) }
+  log.info( entity )
+  let indexKey = props.getIndex( entity )
+  log.info( indexKey )
+
+  if ( ! indexKey ) { return sendErr( res, 'Change Status: Index id required' ) }
 
   let updates = req.body
   for ( let propId in updates ) {
-    if ( [ 'id', 'scopeId', '_state' ].includes( propId ) ) { continue }
+    if ( [ indexKey, 'scopeId', '_state' ].includes( propId ) ) { continue }
     doc[ propId ] = updates[ propId ]
   }
   let rp = req.params
@@ -366,6 +371,9 @@ async function chgDocs( req, res )  {
 
   if ( ! Array.isArray( req.body ) ) { return sendErr( res, 'array required' ) }
 
+  let indexKey = props.getIndex( entity )
+  if ( ! indexKey ) { return sendErr( res, 'Change Status: Index id required' ) }
+
   let docMap = {}
   for ( let updates of req.body ) { // first check all
     let doc = await dta.getDataById( tbl,updates.id )
@@ -377,7 +385,7 @@ async function chgDocs( req, res )  {
     let containUpdates = false
     if ( ! doc ) { return sendErr( res, 'Not found' ) }
     for ( let propId in updates ) {
-      if ( [ 'id', 'scopeId', '_state' ].includes( propId ) ) { continue }
+      if ( [ indexKey, 'scopeId', '_state' ].includes( propId ) ) { continue }
       doc[ propId ] = updates[ propId ]
       containUpdates = true
     }
@@ -398,7 +406,10 @@ async function changeDocStatus( req, res )  {
 
   let { stateModelId, stateModel, stateDef, stateAction } = await extractStateModel( req, res, entity )
   if ( ! stateModel ) { return }
-   
+
+  let indexKey = props.getIndex( entity )
+  if ( ! indexKey ) { return sendErr( res, 'Change Status: Index id required' ) }
+
   let rec = {}
   if ( req.params.state != 'null' ) {
     rec = await dta.getDataById( tbl, req.body.id )
@@ -409,12 +420,12 @@ async function changeDocStatus( req, res )  {
   } else {
     // create ...
     // id
-    if ( req.body.id ) {
-      let dbRec = await dta.getDataById( tbl, req.body.id )
+    if ( req.body[ indexKey ] ) {
+      let dbRec = await dta.getDataById( tbl, req.body[ indexKey ] )
       if ( dbRec ) { return sendErr( res, 'Change Status: document exists' ) }
-      rec.id = req.body.id
-    } else if ( properties.id && properties.id.type == 'UUID' ) { 
-      rec.id = helper.uuidv4()
+      rec[ indexKey ] = req.body[ indexKey ]
+    } else if ( properties.id && properties.id.type.startsWith( 'UUID' ) ) { 
+      rec[ indexKey ] = helper.uuidv4()
     } else {
       return sendErr( res, 'Change Status: id required' )
     }
@@ -432,7 +443,7 @@ async function changeDocStatus( req, res )  {
   // check re.body for all prop req in transition
   let stateActionId =  req.params.state +'_' +  req.params.action
   for ( let propId in properties ) {
-    if ( propId == 'id' ) { continue }
+    if ( propId == indexKey ) { continue }
     let propMust = false
     if ( properties[ propId ].stateTransition ) {
       if ( properties[ propId ].stateTransition[ stateActionId ] ) {

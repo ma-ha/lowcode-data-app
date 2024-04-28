@@ -77,7 +77,7 @@ async function init( ) {
         dataURL: "",
         rowId: "id",
         cols: [
-          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+          { id: 'Edit', label: "", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
           method: "GET", URL: 'app/customize', setData: [ { resId : 'CustomizeAddApp' } ] } ,
           { id: "enabled",     label: "Enabled",   width: "5%",  cellType: "checkbox" },
           { id: "id",          label: "Id",        width: "20%", cellType: "text" },
@@ -165,7 +165,7 @@ async function init( ) {
         dataURL: "",
         rowId: [ 'appId', 'entityId' ],
         cols: [
-          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+          { id: 'Edit', label: "", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AppEntitiesAdd' } ] } ,
           { id: "entityId",   label: "Id",         width: "10%", cellType: "text" },
           { id: "title",      label: "Title",      width: "10%", cellType: "text" },
@@ -177,7 +177,7 @@ async function init( ) {
           { id: "stateModel", label: "State Model",width: "10%", cellType: "text" },
           { id: "propLnk",    label: "Properties", width: "10%", cellType: "text" },
           { id: "maintainer", label: "Maintainer", width: "10%", cellType: "text" },
-          { id: 'Del', label: "&nbsp;", cellType: "button", width :'7%', icon: 'ui-icon-trash', 
+          { id: 'Del', label: "", cellType: "button", width :'7%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntitiesTbl' } ], target: "modal" }
         ]
       }
@@ -301,7 +301,7 @@ async function init( ) {
         dataURL: "",
         rowId: [ 'appId', 'entityId', 'propId' ],
         cols: [
-          { id: 'Edit', label: "&nbsp;", cellType: "button", width :'4%', icon: 'ui-icon-pencil', 
+          { id: 'Edit', label: "", cellType: "button", width :'4%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AppEntityPropAdd' } ] },
           { id: "propId",  label: "Id",       width: "15%", cellType: "text" },
           { id: "label",   label: "Label",    width: "10%", cellType: "text" },
@@ -313,9 +313,9 @@ async function init( ) {
           { id: "noEdit",  label: "No Edit",    width: "4%", cellType: "checkbox" },
           { id: "refLbl",  label: "Ref Label",  width: "4%", cellType: "checkbox" },
           { id: "notNull", label: "Not Null",   width: "4%", cellType: "checkbox" },
-          { id: 'Del', label: "&nbsp;", cellType: "button", width :'4%', icon: 'ui-icon-trash', 
+          { id: 'Del', label: "", cellType: "button", width :'4%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntityProp' } ], target: "modal" },
-          { id: 'moveDn', label: "&nbsp;", cellType: "button", width :'7%', icon: '	ui-icon-arrowthick-1-s', 
+          { id: 'moveDn', label: "", cellType: "button", width :'7%', icon: '	ui-icon-arrowthick-1-s', 
             method: "POST", URL: 'app/entity/property/move-down', update: [ { resId : 'AppEntityProp' } ] }
         ]
       }
@@ -433,7 +433,9 @@ async function init( ) {
     let entity = app.entity[ entityId ]
     if ( ! entity || ! entity.stateModel ) { return [] }
     let stateModelId = user.rootScopeId +'/'+ entity.stateModel
-    
+    let indexKey = props.getIndex( entity )
+
+
     // Entity info:
     let rows = [{ 
       id: 'AppEntityInfo', rowId: 'AppEntityInfo', title: 'Entity',  height: '80px', 
@@ -460,7 +462,7 @@ async function init( ) {
     let w = 70
     for ( let propId in entity.properties ) {
       let prop = entity.properties[ propId ]
-      if ( propId == 'id' && prop.type == 'UUID' ) { continue }
+      if ( indexKey  &&  propId == indexKey  &&  prop.type.startsWith( 'UUID' ) ) { continue }
       let pId = propId.replaceAll('.','_')
       cols.push({ 
         id       : 'prop/' + pId,  
@@ -593,7 +595,7 @@ async function init( ) {
       dataURL: "",
       rowId: ['stateModelId','stateId'],
       cols: [
-        { id: 'Edit', label: "&nbsp;", cellType: "button", width :'10%', icon: 'ui-icon-pencil', 
+        { id: 'Edit', label: "", cellType: "button", width :'10%', icon: 'ui-icon-pencil', 
           method: "GET", setData: [ { resId : 'AddStateForm' } ] },
         { id: "stateId", label: "State Id",width: "20%", cellType: "text" },
         { id: "label",   label: "Label",   width: "20%", cellType: "text" },
@@ -617,7 +619,7 @@ async function init( ) {
       dataURL: "",
       rowId: ['stateModelId','stateIdFrom','stateIdTo','actionId'],
       cols: [
-        { id: 'Edit', label: "&nbsp;", cellType: "button", width :'10%', icon: 'ui-icon-pencil', 
+        { id: 'Edit', label: "", cellType: "button", width :'10%', icon: 'ui-icon-pencil', 
           method: "GET", setData: [ { resId : 'AddStateTransitionForm' } ] },
         { id: "transition",  label: "Transition",   width: "30%", cellType: "text" },
         { id: "stateIdTo",   label: "To State",     width: "20%", cellType: "text" },
