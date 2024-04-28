@@ -265,6 +265,7 @@ async function addDocs( req, res ) { // add doc w/o id or list
   if ( ! app ) { return }
   let rp = req.params
   let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'
+  let indexKey = props.getIndex( entity )
 
   let docMap = {}
   if ( Array.isArray( req.body ) ) {
@@ -275,9 +276,9 @@ async function addDocs( req, res ) { // add doc w/o id or list
       rec.scopeId = req.params.scopeId
     }
     for ( let rec of req.body ) {
-      await dta.addDataObj( tbl, rec.id, rec, uri + rec.id, null, entity )
-      idArr.push( rec.id )
-      docMap[ rec.id ] = rec
+      await dta.addDataObj( tbl, rec[ indexKey ], rec, uri + rec[ indexKey ], null, entity )
+      idArr.push( rec[ indexKey ] )
+      docMap[ rec[ indexKey ] ] = rec
     }
     return res.send({ status: 'OK', idArr: idArr, docMap: docMap })
 
@@ -286,40 +287,44 @@ async function addDocs( req, res ) { // add doc w/o id or list
     let rec = req.body
     if ( ! chkPropValid( rec, properties, res )  ) { return }
     rec.scopeId = req.params.scopeId
-    await dta.addDataObj( tbl, rec.id, rec, uri + rec.id, null, entity )
-    return res.send({ status: 'OK', id: rec.id })
+    await dta.addDataObj( tbl, rec[ indexKey ], rec, uri + rec[ indexKey ], null, entity )
+    return res.send({ status: 'OK', id: rec[ indexKey ] })
   }
 }
 
 async function addDoc( req, res )  {
   log.info( 'Add data', req.params.scopeId, req.params.appId, req.params.appVersion, req.params.entityId )
-  let { app, tbl, entity,properties } = await checkApp( req, res )
+  let { app, tbl, entity, properties } = await checkApp( req, res )
   if ( ! app ) { return }
+  let indexKey = props.getIndex( entity )
+
   let rec = req.body
-  if ( ! rec.id ) {
-    rec.id = req.params.recId 
+  if ( ! rec[ indexKey ] ) {
+    rec[ indexKey ] = req.params.recId 
   }
   if ( ! chkPropValid( rec, properties, res )  ) { return }
   rec.scopeId = req.params.scopeId
   let rp = req.params
-  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec.id
-  let result = await dta.addDataObj( tbl, rec.id, rec, uri, null, entity )
+  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec[ indexKey ]
+  let result = await dta.addDataObj( tbl, rec[ indexKey ], rec, uri, null, entity )
   if ( result ) {
-    res.send({ status: 'OK', id: rec.id })
+    res.send({ status: 'OK', id: rec[ indexKey ] })
   } else {
     res.send({ error: '?' })
   }
 }
 
 function chkPropValid( rec, properties, res ) {
+  let hasId = false
   for ( let propId in properties ) {
-    if ( ! rec.id ) { 
-      rec.id = helper.uuidv4()
-      continue
-    }
     if ( properties[ propId ].type == 'API static string' ) { continue }
     let p = rec[ propId ]
-    if ( ! p ) {
+    if ( properties[ propId ].type == 'UUID-Index' ) { 
+      if ( ! p ) {
+        rec[ propId ] = helper.uuidv4()
+        hasId = true
+      }
+    } else if ( ! p ) {
       log.warn( 'api-adapter: properties missing', propId )
       res.status( 400 ).send( )
       return false
@@ -329,6 +334,9 @@ function chkPropValid( rec, properties, res ) {
       sendErr( res, 'api-adapter: body not valid: '+propId )
       return false
     }
+  }
+  if ( ! hasId && ! rec.id ) {
+    rec.id = helper.uuidv4()
   }
   return true
 }
@@ -340,9 +348,7 @@ async function chgDoc( req, res )  {
   if ( ! app ) { return }
   let doc = await dta.getDataById( tbl, req.params.recId )
   if ( ! doc ) { return sendErr( res, 'Not found' ) }
-  log.info( entity )
   let indexKey = props.getIndex( entity )
-  log.info( indexKey )
 
   if ( ! indexKey ) { return sendErr( res, 'Change Status: Index id required' ) }
 
@@ -376,12 +382,12 @@ async function chgDocs( req, res )  {
 
   let docMap = {}
   for ( let updates of req.body ) { // first check all
-    let doc = await dta.getDataById( tbl,updates.id )
+    let doc = await dta.getDataById( tbl,updates[ indexKey ] )
     if ( ! doc ) { return sendErr( res, 'Not found' ) }
   }
   
   for ( let updates of req.body ) { // now do all updates
-    let doc = await dta.getDataById( tbl, updates.id )
+    let doc = await dta.getDataById( tbl, updates[ indexKey ] )
     let containUpdates = false
     if ( ! doc ) { return sendErr( res, 'Not found' ) }
     for ( let propId in updates ) {
@@ -390,9 +396,9 @@ async function chgDocs( req, res )  {
       containUpdates = true
     }
     if ( containUpdates ) {
-      await dta.addDataObj( tbl, updates.id, doc, uri + updates.id, 'dta.update', entity )
+      await dta.addDataObj( tbl, updates[ indexKey ], doc, uri + updates[ indexKey ], 'dta.update', entity )
     }
-    docMap[ updates.id ] = doc
+    docMap[ updates[ indexKey ] ] = doc
   }
   res.send({ status: 'OK', docMap: docMap })
 }
@@ -412,7 +418,7 @@ async function changeDocStatus( req, res )  {
 
   let rec = {}
   if ( req.params.state != 'null' ) {
-    rec = await dta.getDataById( tbl, req.body.id )
+    rec = await dta.getDataById( tbl, req.body[ indexKey ] )
     if ( ! rec ) { return sendErr( res, 'Change Status: document not found' ) }
     if ( ! rec._state || rec._state !=  req.params.state ) {
       return sendErr( res, 'Change Status: wrong state not found' )
@@ -424,7 +430,7 @@ async function changeDocStatus( req, res )  {
       let dbRec = await dta.getDataById( tbl, req.body[ indexKey ] )
       if ( dbRec ) { return sendErr( res, 'Change Status: document exists' ) }
       rec[ indexKey ] = req.body[ indexKey ]
-    } else if ( properties.id && properties.id.type.startsWith( 'UUID' ) ) { 
+    } else if ( properties[ indexKey ] && properties[ indexKey ].type.startsWith( 'UUID' ) ) { 
       rec[ indexKey ] = helper.uuidv4()
     } else {
       return sendErr( res, 'Change Status: id required' )
@@ -469,10 +475,10 @@ async function changeDocStatus( req, res )  {
   
   rec._state = stateAction.to
   let rp = req.params
-  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec.id
-  let result = await dta.addDataObj( tbl, rec.id, rec, uri, 'dta.change-status', entity )
+  let uri = '/adapter/entity/'+rp.scopeId+'/'+rp.appId+'/'+rp.appVersion+'/'+rp.entityId+'/'+rec[ indexKey ]
+  let result = await dta.addDataObj( tbl, rec[ indexKey ], rec, uri, 'dta.change-status', entity )
   if ( result ) {
-    res.send({ status: 'OK', id: rec.id, doc: rec  })
+    res.send({ status: 'OK', id: rec[ indexKey ], doc: rec  })
   } else {
     res.send({ error: '?' })
   }

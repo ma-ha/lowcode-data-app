@@ -512,10 +512,8 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
 
       //log.info( fieldSpec )
       if ( fieldSpec.rows ) {
-        // log.info( i, fieldSpec.id,  fieldSpec.rows )
         i += fieldSpec.rows
       } else {
-        // log.info( i, fieldSpec.id )
         i++
       }
      
@@ -758,7 +756,8 @@ function genEmptyDataReturn( entity ) {
 
 
 async function reformatDataTableReturn( entity, rec, url, stateModel ) {
-  let tblRec = { recId: rec.id }
+  let indexKey = getIndex( entity )
+  let tblRec = { recId: rec[ indexKey ] }
   log.debug( 'getDoc rec', rec, stateModel )
   if ( stateModel ) {
     let stateId = rec[ '_state' ]
@@ -830,7 +829,9 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
         break 
       case 'DocMap':
         let params = prop.docMap.split('/')
-        let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ params[4] +'='+ rec.id
+        let param = params[0]+'/'+params[1]+'/'+params[2]+','+params[3] + ','+ params[4] +'='+ rec[ indexKey ]
+        param += ','+ entity.title + ' &quot;'+  getRefLabel( entity, rec[ indexKey ], rec )  +'&quot;'
+        // log.info( '>>>>>>>>>>>>>>>>>>', params)
         tblRec[ pId ] = '<a href="index.html?layout=AppEntity-nonav&id='+param+'">'+label+'</a>'
         break 
       case 'Ref':
@@ -908,14 +909,13 @@ async function reformatDataTableReturn( entity, rec, url, stateModel ) {
 function reformatDataUpdateInput( entity, rec ) {
   log.debug( 'reformatDataUpdateInput', rec )
   let indexKey = getIndex( entity )
+  if ( ! indexKey ) { return { err: 'ERROR: id required' }  }
   if ( ! rec[ indexKey ] || rec[ indexKey ] === '' ) {
     if ( entity.properties[ indexKey ]  &&  entity.properties[ indexKey ].type.startsWith( 'UUID' ) ) {
-      rec.id = helper.uuidv4()
-      log.info( 'reformatDataUpdateInput', indexKey, rec[ indexKey ] )
-    } else if ( ! entity.properties[ indexKey ] ) {
       rec[ indexKey ] = helper.uuidv4()
+      log.info( 'reformatDataUpdateInput', indexKey, rec[ indexKey ] )
     } else {
-      return { err: 'ERROR: id required' }
+      rec[ indexKey ] = helper.uuidv4()
     }
   }
 

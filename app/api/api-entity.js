@@ -43,6 +43,7 @@ async function setupAPI( app, config ) {
 
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity', guiAuthz, getDocArr )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, getDoc )
+  svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity-filtered/:entityId/:filter', guiAuthz, getDoc )
   svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId', guiAuthz, addDoc )
   svc.post( '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/:recId/:actionId', guiAuthz, docStateChange )
   svc.get(  '/guiapp/:tenantId/:appId/:appVersion/entity/:entityId/:recId/:event', guiAuthz, docEvent )
@@ -76,7 +77,7 @@ async function setScope ( req, res ) {
   } else if ( layout == 'AppEntity-nonav' ) {
     let user = await userDta.getUserInfoFromReq( gui, req )
     let appMap = await dta.getAppList( user.scopeId, user.scopeTags )
-    log.info( '>>>>>>>>>>>>>', req.query.app, appMap )
+    // log.info( '>>>>>>>>>>>>>', req.query.app, appMap )
     if ( appMap[ req.query.app ] ) {
       app = ( req.query.app ? '&id='+req.query.app : '' ) 
     } else {
@@ -143,7 +144,7 @@ async function getDocArr( req, res ) {
 
 
 async function getDoc( req, res ) {
-  log.debug( 'GET entity', req.params.tenantId, req.params.appId, req.params.appVersion, req.params.entityId, req.query )
+  log.info( 'GET entity', req.params, req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
@@ -179,6 +180,12 @@ async function getDoc( req, res ) {
 
   // else doc array
   let filter = extractFilter( req.query.dataFilter )
+  if ( req.params.filter ) {
+    if ( ! filter ) { filter = {} }
+    let f = req.params.filter.split('=')
+    filter[ f[0] ] = f[1]
+  }
+  log.debug( 'filter', filter )
 
   let dataArr = await dta.getDataObjX( user.rootScopeId,  req.params.appId, req.params.appVersion, req.params.entityId, user.scopeId, null, filter )
   let stateModel = null

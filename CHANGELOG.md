@@ -1,8 +1,9 @@
-# 0.25.1
+# 0.26.0
 - Property editor: fix static string property value in form
 - Property editor: fix add property error
 - fix swagger description
 - type UUID-Index for explicit index field support
+- docMap filter 
 
 # 0.25.0
 - Adapter API: Swagger

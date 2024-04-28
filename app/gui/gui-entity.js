@@ -89,16 +89,17 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
 
   } else {   // render simple entity page
     let entityId  = params[1]
-    let filter    = ( params.length == 3 ? params[2] : null)
+    let filter    = ( params.length >= 3 ? params[2] : null)
+    let info      = ( params.length >= 4 ? params[3] : null)
     log.info( 'renderDynEntityRows', filter)
-    rowArr = await renderEntityRows( app, appId, entityId, filter, user )  
+    rowArr = await renderEntityRows( app, appId, entityId, filter, user, info )  
   } 
 
   // log.info( JSON.stringify( rowArr, null, ' ' ) )
   return rowArr
 }
 
-async function renderEntityRows( app, appId, entityId, filterParam, user ) {
+async function renderEntityRows( app, appId, entityId, filterParam, user, info ) {
   log.debug( 'renderEntityRows', app, appId, entityId )
   let rows = []
   //let appIdX = appId.replaceAll('-','').replaceAll('.','').replaceAll('/','')
@@ -113,7 +114,7 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
 
   let filter = null
   if ( filterParam ) {
-    let filterForm = tableFilterFrom( filterParam, appId, entityId )
+    let filterForm = tableFilterFrom( filterParam, appId, entityId, info )
     rows.push( filterForm )
     let fKV = filterParam.split('=')
     filter = {}
@@ -124,9 +125,9 @@ async function renderEntityRows( app, appId, entityId, filterParam, user ) {
   if ( entity.tableHeight ) { tblHeight = entity.tableHeight }
 
   if ( entity.divs ) {
-    rows.push( genListTable( app, appId, entityId, entity, user, tblHeight, stateModel ) )
+    rows.push( genListTable( app, appId, entityId, entity, user, tblHeight, stateModel, filterParam ) )
   } else {
-    rows.push( genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel ) )
+    rows.push( genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel, filterParam ) )
   }
 
   if ( ! entity.noEdit ) {
@@ -224,14 +225,18 @@ async function stateCreateForm( appId, entity, entityId, initState, actionId, us
 }
 
 
-function tableFilterFrom( filterParam, appId, entityId ) {
+function tableFilterFrom( filterParam, appId, entityId, info ) {
   filter = {
     field: filterParam.split('=')[0],
     value: filterParam.split('=')[1]
   }
   // TODO render short info
+  let title = filter.field 
+  if ( info ) {
+    title += ' ('+ info +')'
+  }
   let filterForm = { 
-    title  : filter.field,
+    title  : title,
     rowId : 'EntityInfo' + entityId, type : 'pong-form', 
     resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
     height : '60px', decor : "decor",
@@ -247,7 +252,7 @@ function tableFilterFrom( filterParam, appId, entityId ) {
 }
 
 // ============================================================================
-function genListTable( app, appId, entityId, entity, user, tblHeight, stateModel ) {
+function genListTable( app, appId, entityId, entity, user, tblHeight, stateModel, filter ) {
   log.info( 'genListTable',  app, appId, entityId, entity, user )
   if ( entity.divs ) {
 
@@ -271,7 +276,7 @@ function genListTable( app, appId, entityId, entity, user, tblHeight, stateModel
    return lstDef 
    
   } else { // fallback
-    return genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel )  
+    return genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel, filter )  
   }
 }
 
@@ -295,16 +300,19 @@ function genDivs( divArr, properties ) { // recursive
 
 // ============================================================================
 
-function genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel ) {
+function genDataTable( app, appId, entityId, entity, user, tblHeight, stateModel, filter ) {
   log.debug( 'genDataTable', appId, entityId, entity, user, tblHeight, stateModel )
-  
+  let resourceURL = 'guiapp/'+appId+'/entity/'+entityId
+  if ( filter ) {
+    resourceURL = 'guiapp/'+appId+'/entity-filtered/'+entityId+'/'+filter
+  }
   let tblDef = { 
     rowId       : 'EntityList' + entityId,
     title       : entity.title,
     decor       : "decor",
     type        : 'pong-table',
     height      : tblHeight,
-    resourceURL : 'guiapp/'+appId+'/entity/'+entityId,
+    resourceURL : resourceURL,
     moduleConfig : genTblColsConfig( entityId, entity, user, stateModel  )
   }
   return tblDef
