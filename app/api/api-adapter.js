@@ -206,7 +206,7 @@ async function creStateModel( req, res ) {
   stateModel = req.body
   stateModel.scopeId = req.params.scopeId
   let uri = '/adapter/state/' + stateModelId
-  await dta.addDataObjNoEvent( 'state', stateModelId, stateModel, uri )
+  await dta.saveStateModel( stateModelId, stateModel )
   res.send({status: 'OK'})
 }
 
@@ -584,7 +584,7 @@ async function checkApp( req, res ) {
 // ----------------------------------------------------------------------------
 async function getStateModelById( req ) {
   let stateModelId = req.params.scopeId +'/'+ req.params.stateId
-  let stateModel  = await dta.getDataById( 'state', stateModelId )
+  let stateModel = await dta.getStateModelById( stateModelId )
   return { stateModelId: stateModelId, stateModel: stateModel}
 }
 
@@ -595,7 +595,7 @@ async function extractStateModel( req, res, entity ) {
     sendErr( res, 'Get StateModel: entity has no state' ) 
     return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }
   }
-  let stateModel = await dta.getDataById( 'state', req.params.scopeId +'/'+ stateModelId )
+  let stateModel = await dta.getStateModelById( req.params.scopeId +'/'+ stateModelId )
   if ( ! stateModel ) { 
     sendErr( res, 'Get StateMode: state model error' ) 
     return { stateModelId: null, stateModel: null, stateDef: null, stateAction: null }

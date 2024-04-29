@@ -13,7 +13,9 @@ exports: module.exports = {
   getAppById,
   addApp,
   saveApp,
+  getStateModelMap,
   getStateModelById,
+  saveStateModel,
   getData,
   getDataById: loadDataById,
   getDataObjX,
@@ -32,10 +34,10 @@ exports: module.exports = {
 
 // ============================================================================
 let DB_DIR = null
-const APP_TBL = 'app' 
-const STATE_TBL = 'state' 
+
 const ERM_TBL = 'erm'
 const EH_SUB_TBL = 'event-subscriptions'
+const SYNC_ALWAYS = true
 
 let DB = null 
 
@@ -80,8 +82,6 @@ async function init( cfg ) {
   await prepDB()
 
   userDB.init( cfg )
-
-  data[ APP_TBL ] =  JSON.parse( await readFile( fileName( APP_TBL ) ) )  
 }
 
 // ============================================================================
@@ -92,19 +92,67 @@ async function prepDB() {
     //let dbFile = 
   }
 
-  if ( ! fs.existsSync( fileName( APP_TBL ) ) ) {
-    await writeFile( fileName( APP_TBL ), "{}" ) 
-  } else {
-    await syncTbl( APP_TBL )
-    for ( let appId in data[ APP_TBL ] ) {
-      let app = data[ APP_TBL ][ appId ]
-      if ( ! app.hasOwnProperty( 'enabled' ) ) {
-        app.enabled = true
+
+  if ( ! fs.existsSync(  fileName( 'scope' ) ) ) {
+    await writeFile( fileName( 'scope' ), JSON.stringify({
+      1000: {
+        name: "Test Tenant",
+        tag: []
       }
-      if ( app.scopeId == '' ) { app.scopeId = null }
-    }
-    await writeFile( fileName( APP_TBL ), JSON.stringify( data[ APP_TBL ], null, '  ' ) )
+    }, null, ' ' ))
   }
+
+  // migrate old "app" table to "<scopeId>_app" table
+  let appMap = {}
+  if ( fs.existsSync( fileName( 'app' ) ) ) {
+    appMap = await syncTbl( 'app', SYNC_ALWAYS )
+  }
+  let scopeMap = await syncTbl( 'scope', SYNC_ALWAYS )
+  for ( let scopeId in scopeMap ) {
+    if ( scopeId.indexOf('/') == -1 ) { //root scope
+      if ( ! fs.existsSync( fileName( appTblName( scopeId ) ) ) ) {
+        let scopeAppMap = {}
+        for ( let appId in appMap ) {
+          if ( appId.startsWith( scopeId ) ) {
+            scopeAppMap[ appId ] = appMap[ appId ]
+          }
+        }
+        await writeFile( 
+          fileName( appTblName( scopeId ) ),
+          JSON.stringify( scopeAppMap, null, '  ' )
+        )
+      } 
+    }
+  }
+  if ( fs.existsSync( fileName( 'app' ) ) ) {
+    await rm( fileName( 'app' ) )
+  }
+
+   // migrate old "state" table to "<scopeId>_state" table
+   let stateMap = {}
+   if ( fs.existsSync( fileName( 'state' ) ) ) {
+    stateMap = await syncTbl( 'state', SYNC_ALWAYS )
+   }
+   for ( let scopeId in scopeMap ) {
+     if ( scopeId.indexOf('/') == -1 ) { //root scope
+       if ( ! fs.existsSync( fileName( stateTblName( scopeId ) ) ) ) {
+         let scopeStateMap = {}
+         for ( let stateId in stateMap ) {
+           if ( stateId.startsWith( scopeId ) ) {
+            scopeStateMap[ stateId ] = stateMap[ stateId ]
+           }
+         }
+         await writeFile( 
+           fileName( stateTblName( scopeId ) ),
+           JSON.stringify( scopeStateMap, null, '  ' )
+         )
+       } 
+     }
+   }
+   if ( fs.existsSync( fileName( 'state' ) ) ) {
+     await rm( fileName( 'state' ) )
+   }
+
   if ( ! fs.existsSync( fileName( 'user-auth' )) ) {
     const { createHash } = require( 'node:crypto' )
     let pwd = createHash('sha256').update('demo').digest('hex')
@@ -124,16 +172,14 @@ async function prepDB() {
       }
     }, null, ' ' ))
   }
+}
 
-  if ( ! fs.existsSync(  fileName( 'user-auth' ) ) ) {
-    await writeFile( fileName( 'scope' ), JSON.stringify({
-      1000: {
-        name: "Test Tenant",
-        tag: []
-      }
-    }, null, ' ' ))
-  }
+function appTblName( scopeId ) {
+  return scopeId +'_app'
+}
 
+function stateTblName( scopeId ) {
+  return scopeId + '_state'
 }
 
 // ============================================================================
@@ -143,10 +189,10 @@ async function getAppList( scopeId, scopeTags, mode ) {
   if ( scopeId.indexOf('/') > 0 ) {
     rootScope = scopeId.substring(0, scopeId.indexOf('/') )  
   }
-  // log.info( 'getAppList rootScope', rootScope )
+  log.info( 'getAppList rootScope', rootScope, scopeId, scopeTags, mode )
 
   let apps = {}
-  let appMap = await loadData( APP_TBL )
+  let appMap = await loadData( appTblName( rootScope ) )
   for ( let appId in appMap ) {
     if ( ! appId.startsWith( rootScope ) ) { continue }
     let app = appMap[ appId ]
@@ -181,30 +227,60 @@ async function getApp( scopeId, appId ) {
 
 async function getAppById( fullAppId ) {
   log.debug( 'getAppById',fullAppId )
-  return await loadDataById( APP_TBL, fullAppId )
+  let { scopeId } = splitAppId( fullAppId )
+  log.info( 'getAppById',fullAppId, scopeId )
+  return await loadDataById( appTblName( scopeId ), fullAppId )
 }
 
 async function addApp( fullAppId, app ) {
   log.debug( 'getApp',fullAppId )
-  await addDataObjNoEvent( APP_TBL, fullAppId, app )
+  let { scopeId } = splitAppId( fullAppId )
+  await addDataObjNoEvent( appTblName( scopeId ), fullAppId, app )
   let uri = '/adapter/app/' + fullAppId
-  eh.publishDataChgEvt( 'app.add', fullAppId, uri, APP_TBL, app )
+  eh.publishDataChgEvt( 'app.add', fullAppId, uri, 'app', app )
 }
 
 async function saveApp( fullAppId, app ) {
   log.info( 'saveApp',fullAppId )
-  await addDataObjNoEvent( APP_TBL, fullAppId, app )
+  let { scopeId } = splitAppId( fullAppId )
+  await addDataObjNoEvent( appTblName( scopeId ), fullAppId, app )
   let uri = '/adapter/app/' + fullAppId
-  eh.publishDataChgEvt( 'app.chg', fullAppId, uri, APP_TBL, app )
+  eh.publishDataChgEvt( 'app.chg', fullAppId, uri, 'app', app )
+}
+
+function splitAppId( fullAppId ) {
+  let idPart = fullAppId.split( '/' )
+  return {
+    scopeId : idPart[0],
+    appName : idPart[1],
+    appVer  : idPart[2]
+  }
 }
 
 // ============================================================================
 
-async function getStateModelById( rootScopeId, stateModelId ) {
-  log.debug( 'getStateModelById', rootScopeId, stateModelId  )
-  let stateModel = await loadDataById( 'state', rootScopeId +'/'+ stateModelId )
+async function getStateModelMap( rootScopeId ) {
+  log.debug( 'getStateModelMap', rootScopeId  )
+  let stateModeMap = await syncTbl( rootScopeId+'_state' )
+  return stateModeMap
+}
+
+async function getStateModelById( stateModelId ) {
+  let rootScopeId = stateModelId.split('/')[0]
+  log.info( 'getStateModelById', rootScopeId, stateModelId  )
+  let stateModel = await loadDataById( rootScopeId+'_state', stateModelId )
   return stateModel
 }
+
+async function saveStateModel( stateModelId, stateModel ) {
+  let rootScopeId = stateModel.scopeId
+  if ( stateModelId.indexOf('/') != -1 ) {
+    let part = stateModelId.split('/')
+    rootScopeId = part[0]
+  }
+  await addDataObjNoEvent( rootScopeId+'_state', stateModelId, stateModel )
+}
+
 // ============================================================================
 
 // tbl param can be like "1000city" or "1000/region-mgr/1.0.0/city"
@@ -531,8 +607,12 @@ async function delCollection( scopeId, entityId ) {
 
 async function delRootScope( scopeId ) {
   log.info( 'delRootScope', scopeId  )
-  cleanUpScopeInTbl( APP_TBL, scopeId )
-  cleanUpScopeInTbl( STATE_TBL, scopeId )
+  if ( fs.existsSync( appTblName( scopeId ) ) ) {
+    await rm( appTblName( scopeId ) )
+  }
+  if ( fs.existsSync( stateTblName( scopeId ) ) ) {
+    await rm( stateTblName( scopeId ) )
+  }
   cleanUpScopeInTbl( ERM_TBL, scopeId )
   cleanUpScopeInTbl( EH_SUB_TBL, scopeId )
   return 'OK'

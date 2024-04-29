@@ -1,186 +1,4 @@
 {
-  "dev/locode-entity-editor/0.1.0": {
-    "scopeId": "dev",
-    "title": "Entity Editor",
-    "entity": {
-      "app": {
-        "title": "App",
-        "scope": "inherit",
-        "maintainer": [
-          "dev"
-        ],
-        "properties": {
-          "title": {
-            "type": "String",
-            "label": "App Name"
-          },
-          "entity": {
-            "type": "DocMap",
-            "docMap": "appEntity",
-            "label": "Entities"
-          },
-          "page": {
-            "type": "DocMap",
-            "docMap": "appPage",
-            "label": "App Page"
-          }
-        }
-      },
-      "appEntity": {
-        "title": "Entity",
-        "scope": "inherit",
-        "maintainer": [
-          "dev"
-        ],
-        "properties": {
-          "name": {
-            "type": "String"
-          },
-          "scope": {
-            "type": "Select",
-            "options": [
-              "inherit",
-              "inherit-readonly",
-              "no-inherit"
-            ]
-          },
-          "maintainer": {
-            "type": "Select",
-            "options": [
-              "appUser",
-              "admin"
-            ]
-          },
-          "masterData": {
-            "type": "Boolean"
-          },
-          "property": {
-            "type": "DocMap",
-            "docMap": "appEntityProperty"
-          }
-        }
-      },
-      "appTabView": {
-        "title": "Tab View",
-        "scope": "inherit",
-        "maintainer": [
-          "dev"
-        ],
-        "properties": {
-          "title": {
-            "type": "String",
-            "label": "Page"
-          },
-          "views": {
-            "type": "DocMap",
-            "docMap": "appView"
-          }
-        }
-      },
-      "appView": {
-        "title": "View",
-        "scope": "inherit",
-        "maintainer": [
-          "dev"
-        ],
-        "properties": {
-          "title": {
-            "type": "String"
-          },
-          "type": {
-            "type": "Select",
-            "options": [
-              "table",
-              "form"
-            ]
-          },
-          "entity": {
-            "type": "SelectRef",
-            "selectRef": "appEntity"
-          },
-          "search": {
-            "type": "Boolean"
-          },
-          "edit": {
-            "type": "Boolean"
-          },
-          "add": {
-            "type": "Boolean"
-          }
-        }
-      },
-      "appEntityProperty": {
-        "title": "Property",
-        "scope": "inherit",
-        "maintainer": [
-          "dev"
-        ],
-        "properties": {
-          "Name": {
-            "type": "String"
-          },
-          "Type": {
-            "type": "Select",
-            "options": []
-          },
-          "Can_be_null": {
-            "type": "Boolean"
-          },
-          "Short": {
-            "type": "Boolean"
-          },
-          "Filter": {
-            "type": "Boolean"
-          },
-          "Options": {
-            "type": "SelectRef",
-            "selectRef": "appSelectValues"
-          }
-        }
-      },
-      "appSelectValues": {
-        "title": "Select Values",
-        "scope": "inherit",
-        "maintainer": [
-          "dev"
-        ],
-        "properties": {
-          "Key": {
-            "type": "String"
-          },
-          "Value": {
-            "type": "String"
-          }
-        }
-      }
-    },
-    "startPage": "app",
-    "view": {
-      "Apps": {
-        "title": "Apps",
-        "type": "table",
-        "entity": "app",
-        "edit": true,
-        "add": true
-      },
-      "Selects": {
-        "title": "Selects",
-        "type": "table",
-        "entity": "appSelectValues",
-        "add": true,
-        "edit": true
-      }
-    },
-    "scope": {
-      "dev": {
-        "role": [
-          "dev"
-        ],
-        "srcURL": ""
-      }
-    },
-    "enabled": true
-  },
   "1000/device-inventory-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
     "scopeId": null,
@@ -902,7 +720,10 @@
         ]
       }
     },
-    "enabled": true
+    "enabled": true,
+    "id": "1000/city-light-mgr/1.0.0",
+    "_cre": 1714413324675,
+    "_upd": 1714413335366
   },
   "1000/ticket-mgr/1.0.0": {
     "require": {},
@@ -1001,7 +822,8 @@
         },
         "noDelete": true,
         "csvUpload": true,
-        "stateModel": "Ticket"
+        "stateModel": "Ticket",
+        "stateTransition": {}
       }
     },
     "page": {},
@@ -1029,7 +851,7 @@
     "img": "img/k8s-fire.png",
     "id": "1000/ticket-mgr/1.0.0",
     "_cre": 1711692745036,
-    "_upd": 1712381559047,
+    "_upd": 1714413925341,
     "description": "Task management"
   }
 }

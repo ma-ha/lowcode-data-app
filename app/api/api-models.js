@@ -175,7 +175,8 @@ async function getStateModels( req, res )  {
   }
 
   let stateArr = []
-  let stateModeMap = await dta.getData( 'state', user.rootScopeId )
+  let stateModeMap = await dta.getStateModelMap(user.rootScopeId )
+
   for ( let stateModelId in stateModeMap ) {
     let st = stateModeMap[ stateModelId ]
     let stateLst = []
@@ -203,7 +204,8 @@ async function addStateModel( req, res )  {
   if ( ! req.body.scopeId || ! req.body.stateModelId ) {
     return res.status(400).send( ) 
   }
-  if ( await dta.getDataById( 'state', req.body.scopeId +'/'+ req.body.stateModelId ) ) {
+  let stateModel = await dta.getStateModelById( req.body.scopeId +'/'+ req.body.stateModelId )
+  if ( stateModel ) {
     return res.status(400).send( 'exits' ) 
   }
 
@@ -217,7 +219,8 @@ async function addStateModel( req, res )  {
       null : { actions : { } }
     }
   }
-  let result = await dta.addDataObjNoEvent( 'state', req.body.scopeId +'/'+id, newState ) 
+  await dta.saveStateModel( req.body.scopeId +'/'+id, newState )
+
   res.send(( result ? 'OK' : 'FAILED!!' ))
 }
 
@@ -231,7 +234,7 @@ async function getStateJSON( req, res )  {
   }
 
   if ( req.query.id ) { // single one
-    let stateModel = await dta.getDataById( 'state', req.query.id ) 
+    let stateModel = await dta.getStateModelById(req.query.id )
     let exportModel = JSON.parse( JSON.stringify( stateModel ) )
     let name = req.query.id.split('/')
     delete exportModel.id
@@ -261,7 +264,7 @@ async function uploadStateModelJSON( req, res )  {
     uploadStateResult += 'JSON OK'
     let stateModelId = user.rootScopeId +'/'+ newStateModel.name
     uploadStateResult += '<br><b>'+stateModelId+'</b>'
-    let dbSM = await dta.getData( 'state', user.rootScopeId )
+    let dbSM = await dta.getStateModelMap( user.rootScopeId )
     if ( dbSM[ stateModelId ] ) { 
       uploadStateResult += '<br>ERROR: State Model exists!'
       return res.send( 'ERROR' )
@@ -308,7 +311,7 @@ async function importStateModel( req, res ) {
   if ( ! impDta ) { return res.status(400).send( 'UID not found' ) }
   if ( ! impDta.stateModel ) { return res.status(400).send( 'Temp Model not found' ) }
 
-  await dta.addDataObjNoEvent( 'state', impDta.stateModel.id, impDta.stateModel )
+  await dta.saveStateModel( impDta.stateModel.id, stateModel )
   await dta.delDataObjNoEvent( 'app-temp', req.params.uid )
 
   res.redirect( '../../index.html?layout=StateAdmin-nonav' ) 
@@ -321,7 +324,6 @@ async function genStateFrm( req, res )  {
   let imgOpts = []
   try {
     fs.readdirSync( __dirname + '/../gui/img' ).forEach( file => {
-      // log.info( 'img', file, file.startsWith( 'state' ) , file.endsWith( '.png'))
       if ( file.startsWith( 'state' ) && file.endsWith( '.png') ) {
         log.debug( 'img', file )
         imgOpts.push({ value: file })
@@ -364,7 +366,7 @@ async function getState( req, res )  {
   }
 
   if ( req.query.id ) {  // this is StateModel ID, so get list of states
-    let stateModel = await dta.getDataById( 'state', req.query.id ) 
+    let stateModel = await dta.getStateModelById( req.query.id )
     if ( ! stateModel ) { return res.status(400).send( 'model not found' ) }
   
     let stateArr = []
@@ -385,7 +387,8 @@ async function getState( req, res )  {
   } else 
   if ( req.query.stateModelId && req.query.stateId ) {
     // get data for edit form
-    let stateModel = await dta.getDataById( 'state', req.query.stateModelId ) 
+    let stateModel = await dta.getStateModelById( req.query.stateModelId )
+
     if ( ! stateModel ) { return res.status(400).send( 'model not found' ) }
     let state = stateModel.state[ req.query.stateId ]
     if ( ! state ) { return res.status(400).send( 'state not found' ) }
@@ -412,7 +415,7 @@ async function udpState( req, res )  {
   }
   if ( req.body.stateModelId && req.body.stateId ) {
     // get data for edit form
-    let stateModel = await dta.getDataById( 'state', req.body.stateModelId ) 
+    let stateModel = await dta.getStateModelById( req.body.stateModelId )
     if ( ! stateModel ) { return res.status(400).send( 'model not found' ) }
     let state = stateModel.state[ req.body.stateId ]
     if ( ! state ) {
@@ -440,7 +443,7 @@ async function udpState( req, res )  {
       state.label = req.body.label
     }
 
-    await dta.addDataObjNoEvent( 'state', req.body.stateModelId, stateModel ) 
+    await dta.saveStateModel( req.body.stateModelId, stateModel )
 
     return res.send( 'OK' )
   }
@@ -450,7 +453,7 @@ async function udpState( req, res )  {
 
 async function moveState( req, res ) {
   log.debug( 'moveState', req.body, req.params )
-  let stateModel = await dta.getDataById( 'state', req.body.stateModelId ) 
+  let stateModel = await dta.getStateModelById( req.body.stateModelId )
   if ( ! stateModel ) { return res.status(400).send( 'Model not found!' )}
   let state = stateModel.state[ req.body.stateId ]
   if ( ! state ) { return res.status(400).send( 'State not found!' )}
@@ -461,13 +464,13 @@ async function moveState( req, res ) {
     case 's': if ( state.y <  400 ) { state.y +=20 }; break
     default:  return res.status(400).send( 'Wrong dir' )
   }
-  await dta.addDataObjNoEvent( 'state', stateModel.id, stateModel ) 
+  await dta.saveStateModel( stateModel.id, stateModel )
   res.send()
 }
 
 
 async function getStateTransFrm( req, res )  {
-  let stateModel = await dta.getDataById( 'state', req.query.id ) 
+  let stateModel = await dta.getStateModelById( req.query.id )
   let fromOpts = []
   let toOpts   = []
   if ( stateModel ) {
@@ -516,7 +519,7 @@ async function getStateTransitions( req, res )  {
   }
   if ( req.query.id ) {  
     // get array for stateModelId for table 
-    let stateModel = await dta.getDataById( 'state', req.query.id   ) 
+    let stateModel = await dta.getStateModelById( req.query.id )
     if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
 
     let tbl = []
@@ -539,7 +542,7 @@ async function getStateTransitions( req, res )  {
     return res.send( tbl )
   } else if ( req.query.stateModelId && req.query.stateIdFrom && req.query.stateIdTo && req.query.actionId ) {
     // get one rec for edit form
-    let stateModel = await dta.getDataById( 'state', req.query.stateModelId   ) 
+    let stateModel = await dta.getStateModelById( req.query.stateModelId )
     if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
     let stateFrom = stateModel.state[ req.query.stateIdFrom ]
     let stateTo   = stateModel.state[ req.query.stateIdTo ]
@@ -579,7 +582,7 @@ async function setStateTransitions( req, res )  {
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   if ( req.body.stateModelId && req.body.stateIdFrom && req.body.stateIdTo && req.body.actionId ) {
-    let stateModel = await dta.getDataById( 'state', req.body.stateModelId ) 
+    let stateModel = await dta.getStateModelById( req.body.stateModelId )
     if ( ! stateModel ) { return res.status(400).send( 'not found' ) }
     let stateFrom = stateModel.state[ req.body.stateIdFrom ]
     let stateTo   = stateModel.state[ req.body.stateIdTo ]
@@ -635,7 +638,7 @@ async function setStateTransitions( req, res )  {
 
     log.info( 'action', action )
 
-    await dta.addDataObjNoEvent( 'state', req.body.stateModelId, stateModel ) 
+    await dta.saveStateModel( req.body.stateModelId, stateModel )
 
     return res.send( 'OK' )
 
@@ -649,7 +652,7 @@ async function delStateTransitions( req, res )  {
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'Login required' ) }
   if ( req.body.stateModelId && req.body.stateIdFrom && req.body.actionId ) {
-    let stateModel = await dta.getDataById( 'state', req.body.stateModelId ) 
+    let stateModel = await dta.getStateModelById( req.body.stateModelId )
     if ( ! stateModel ) { return res.status(400).send( 'StateModel not found' ) }
     let stateFrom = stateModel.state[ req.body.stateIdFrom ]
     if ( ! stateFrom ) { return res.status(400).send( 'StateFrom not found' ) }
@@ -657,7 +660,7 @@ async function delStateTransitions( req, res )  {
       return res.status(400).send( 'ActionId not found' )
     }
     delete stateFrom.actions[ req.body.actionId ]
-    await dta.addDataObjNoEvent( 'state', req.body.stateModelId, stateModel ) 
+    await dta.saveStateModel( stateModelId, stateModel )
     return res.send( 'OK' )
   }
   res.status(400).send( ) 
@@ -680,8 +683,9 @@ async function getStateModel( req, res )  {
   } else {
     return res.send({})
   }
+  log.info( 'GET STM ', modelId )
 
-  let stateModel = await dta.getStateModelById( user.rootScopeId, modelId )
+  let stateModel = await dta.getStateModelById( user.rootScopeId+'/'+modelId )
   if ( ! stateModel ) { 
     log.warn( 'stateModel no found', stateModel, modelId )
     return res.status(400).send( 'not found required' ) 

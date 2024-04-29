@@ -190,7 +190,7 @@ async function getDoc( req, res ) {
   let dataArr = await dta.getDataObjX( user.rootScopeId,  req.params.appId, req.params.appVersion, req.params.entityId, user.scopeId, null, filter )
   let stateModel = null
   if ( entity.stateModel ) {
-    stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
+    stateModel = await dta.getStateModelById( user.rootScopeId +'/'+ entity.stateModel )
   }
 
   let result = []
@@ -222,7 +222,7 @@ async function addDoc( req, res )  {
   //   return  res.send( 'ID '+  req.body.id +' already used in scope'+  existRec.scopeId )
   // }
   let rec = req.body
-  rec.scopeId = user.scopeId
+  log.debug( 'Add entity', rec )
   
   let parse = propHandler.reformatDataUpdateInput( entity, rec )
   if ( parse.err ) {
@@ -384,7 +384,7 @@ async function uploadCsvData( req, res ) {
     let actionId = ( req.params.actionId ? req.params.actionId : null ) 
     let toState = null
     if ( entity.stateModel ) {
-      let stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
+      let stateModel = await dta.getStateModelById( user.rootScopeId +'/'+ entity.stateModel )
       if ( ! stateModel ) { return res.send( 'ERROR: StateModel not found') }
       if ( ! actionId ){ return res.send( 'ERROR: Action required') }
       toState = stateModel.state['null'].actions[ actionId ]

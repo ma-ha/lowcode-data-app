@@ -184,7 +184,7 @@ async function init( ) {
     })
 
     let stateModels = [{ option: '' }]
-    let states = await dta. getData( 'state', user.rootScopeId )
+    let states = await dta.getStateModelMap( user.rootScopeId )
     for ( let statesId in states ) {
       stateModels.push({ option: statesId.split('/')[1] })
     }
@@ -433,7 +433,7 @@ async function init( ) {
     let entity = app.entity[ entityId ]
     if ( ! entity || ! entity.stateModel ) { return [] }
     let stateModelId = user.rootScopeId +'/'+ entity.stateModel
-    let indexKey = props.getIndex( entity )
+    let indexKey = propHandler.getIndex( entity )
 
 
     // Entity info:

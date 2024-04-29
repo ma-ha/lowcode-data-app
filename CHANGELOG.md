@@ -1,4 +1,9 @@
 # 0.26.0
+- "app" table (file) per scope
+- "state" table (file) per scope
+- fixes
+
+# 0.26.0
 - Property editor: fix static string property value in form
 - Property editor: fix add property error
 - fix swagger description

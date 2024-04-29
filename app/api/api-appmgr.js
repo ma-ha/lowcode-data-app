@@ -451,7 +451,7 @@ async function getPropertyStatus( req, res ) {
   let stateModelId = entity.stateModel
   if ( ! stateModelId ) {  log.warn('GET /app/entity/property: app entity has no stateModel'); return res.status(400).send([]) }
 
-  let states = await dta. getData( 'state', user.rootScopeId )
+  let states = await dta.getStateModelMap( user.rootScopeId )
   if ( ! states || ! states[ user.rootScopeId +'/'+ stateModelId ] ) {  log.warn('GET /app/entity/property: stateModel not found'); return res.status(400).send([]) }
   
   let stateModel = states[ user.rootScopeId +'/'+ stateModelId ].state

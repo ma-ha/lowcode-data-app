@@ -63,5 +63,70 @@
     "id": "1000",
     "_cre": 1706551717817,
     "_upd": 1710440736436
+  },
+  "2103": {
+    "2103/TmfServiceInventory/0.1.0/TmfEntity": {
+      "x": 50,
+      "y": 60
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfService": {
+      "x": 530,
+      "y": 30
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfIntent": {
+      "x": 1000,
+      "y": 250
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfServiceSpecificationRef_FVO": {
+      "x": 710,
+      "y": 400
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfRelatedPlaceRefOrValue": {
+      "x": 860,
+      "y": 400
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfNote": {
+      "x": 550,
+      "y": 400
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfRelatedServiceOrderItem": {
+      "x": 100,
+      "y": 250
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfFeature": {
+      "x": 250,
+      "y": 250
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfExternalIdentifier": {
+      "x": 400,
+      "y": 250
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfRelatedEntityRefOrValue": {
+      "x": 550,
+      "y": 250
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfEntityRefOrValue": {
+      "x": 700,
+      "y": 250
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfRelatedPartyRefOrPartyRoleRef": {
+      "x": 850,
+      "y": 250
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfCharacteristic": {
+      "x": 100,
+      "y": 400
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfServiceRefOrValue": {
+      "x": 250,
+      "y": 400
+    },
+    "2103/TmfServiceInventory/0.1.0/TmfResourceRef": {
+      "x": 400,
+      "y": 400
+    },
+    "id": "2103",
+    "_cre": 1714149529344,
+    "_upd": 1714149594155
   }
 }

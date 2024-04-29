@@ -3,19 +3,25 @@
     "name": "Demo",
     "role": {
       "dev": [
-        "1000"
+        "1000",
+        "2095",
+        "2103"
       ],
       "admin": [
-        "1000"
+        "1000",
+        "2095",
+        "2103"
       ],
       "appUser": [
-        "1000"
+        "1000",
+        "2095",
+        "2103"
       ],
       "api": []
     },
     "password": "2a97516c354b68848cdbd8f54a226a0a55b21ed138e207ad6c5cbb9c00aa5aea",
     "expires": null,
-    "lastLogin": 1712380071390
+    "lastLogin": 1714415633123
   },
   "demo-admin": {
     "name": "Demo Admin",
@@ -45,6 +51,20 @@
       ]
     },
     "password": "5a095719-cfbe-49d3-8927-a55da94221ed",
+    "expires": null
+  },
+  "2a80a57c-36b0-465a-8098-ef22ccbca4ab": {
+    "name": "manager-pod",
+    "sp": true,
+    "role": {
+      "dev": [],
+      "admin": [],
+      "appUser": [],
+      "api": [
+        "2095"
+      ]
+    },
+    "password": "db675961-112a-4a44-8272-55ad5e1fedbe",
     "expires": null
   }
 }

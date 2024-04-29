@@ -4,11 +4,12 @@
     "_state": "InProgress",
     "scopeId": "1000/DE",
     "Task": "Very important task",
-    "Description": "Need to do it",
     "Assignee": "me",
+    "Description": "Need to do it",
+    "Approval": "",
     "Resolution": "ok again",
     "_cre": 1708158430768,
-    "_upd": 1708668283269
+    "_upd": 1714415820218
   },
   "10": {
     "id": "10",

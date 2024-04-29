@@ -149,7 +149,7 @@ async function renderEntityRows( app, appId, entityId, filterParam, user, info )
 async function stateCreateFormRow( rows, app, appId, entityId, user ) {
   log.info( 'stateCreateFormRow...', entityId )
   let entity = app.entity[ entityId ]
-  let stateModel = await dta.getStateModelById( user.rootScopeId, entity.stateModel )
+  let stateModel = await dta.getStateModelById( user.rootScopeId +'/'+ entity.stateModel )
   if ( ! stateModel ) { log.warn('renderEntityRows: stateModel not found'); return null }
   let initState = stateModel.state[ 'null' ]
   if ( ! initState || ! initState.actions ) { log.warn('renderEntityRows: stateModel not found'); return null }
@@ -466,7 +466,7 @@ async function renderDynEntityActionRows( staticRows, req, pageName ) {
   let user = await userDta.getUserInfoFromReq( gui, req )
   let app  = await dta.getAppById( appId )
   let entity =  app.entity[ entityId ]
-  let stateModel = await dta.getStateModelById( rootScopeId, entity.stateModel  )
+  let stateModel = await dta.getStateModelById( user.rootScopeId +'/'+ entity.stateModel  )
   let rec = await dta.getDataById( rootScopeId + entityId, recId )
   log.info( 'rec', rec )
   if ( ! app || ! user || !entity || ! stateModel ) { 
