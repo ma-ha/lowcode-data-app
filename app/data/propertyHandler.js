@@ -584,10 +584,10 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
   if ( indexKey && indexProp ) {
     fields.push({ 
       id: indexKey, 
-      label: (indexField.label ? indexField.label : "Id" ), 
+      label: (indexProp.label ? indexProp.label : "Id" ), 
       type: "text", 
       readonly: true, 
-      value: rec[ indexProp ]
+      value: rec[ indexKey ]
     })
   }
   
@@ -596,9 +596,9 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
 
   for ( let propId in entity.properties ) {
     if ( propId == indexKey ) { continue }
+    let prop = entity.properties[ propId ]
     if ( prop.type == 'API static string' ) { continue }
 
-    let prop = entity.properties[ propId ]
     let lbl  = ( prop.label ? prop.label : propId )
     let defaultVal = null 
     if ( prop.stateTransition && prop.stateTransition[ stateTransition+'_default' ] ) {
