@@ -35,7 +35,6 @@ exports: module.exports = {
 // ============================================================================
 let DB_DIR = null
 
-const ERM_TBL = 'erm'
 const EH_SUB_TBL = 'event-subscriptions'
 const SYNC_ALWAYS = true
 
@@ -128,31 +127,58 @@ async function prepDB() {
     await rm( fileName( 'app' ) )
   }
 
-   // migrate old "state" table to "<scopeId>_state" table
-   let stateMap = {}
-   if ( fs.existsSync( fileName( 'state' ) ) ) {
+  // migrate old "state" table to "<scopeId>_state" table
+  let stateMap = {}
+  if ( fs.existsSync( fileName( 'state' ) ) ) {
     stateMap = await syncTbl( 'state', SYNC_ALWAYS )
-   }
-   for ( let scopeId in scopeMap ) {
-     if ( scopeId.indexOf('/') == -1 ) { //root scope
-       if ( ! fs.existsSync( fileName( stateTblName( scopeId ) ) ) ) {
-         let scopeStateMap = {}
-         for ( let stateId in stateMap ) {
-           if ( stateId.startsWith( scopeId ) ) {
-            scopeStateMap[ stateId ] = stateMap[ stateId ]
-           }
-         }
-         await writeFile( 
-           fileName( stateTblName( scopeId ) ),
-           JSON.stringify( scopeStateMap, null, '  ' )
-         )
-       } 
-     }
-   }
-   if ( fs.existsSync( fileName( 'state' ) ) ) {
-     await rm( fileName( 'state' ) )
-   }
+  }
+  for ( let scopeId in scopeMap ) {
+    if ( scopeId.indexOf('/') == -1 ) { //root scope
+      if ( ! fs.existsSync( fileName( stateTblName( scopeId ) ) ) ) {
+        let scopeStateMap = {}
+        for ( let stateId in stateMap ) {
+          if ( stateId.startsWith( scopeId ) ) {
+          scopeStateMap[ stateId ] = stateMap[ stateId ]
+          }
+        }
+        await writeFile( 
+          fileName( stateTblName( scopeId ) ),
+          JSON.stringify( scopeStateMap, null, '  ' )
+        )
+      } 
+    }
+  }
+  if ( fs.existsSync( fileName( 'state' ) ) ) {
+    await rm( fileName( 'state' ) )
+  }
 
+  // migrate old "erm" table to "<scopeId>_erm" table
+  let ermMap = {}
+  if ( fs.existsSync( fileName( 'erm' ) ) ) {
+    ermMap = await syncTbl( 'erm', SYNC_ALWAYS )
+  }
+  for ( let scopeId in scopeMap ) {
+    if ( scopeId.indexOf('/') == -1 ) { //root scope
+      if ( ! fs.existsSync( ermTblName( scopeId ) ) ) {
+        let scopeErmMap = {}
+        for ( let ermId in ermMap ) {
+          if ( ermId.startsWith( scopeId ) ) {
+            scopeErmMap[ ermId ] = ermMap[ ermId ]
+          }
+        }
+        await writeFile( 
+          fileName( ermTblName( scopeId ) ),
+          JSON.stringify( scopeErmMap, null, '  ' )
+        )
+      } 
+    }
+  }
+  if ( fs.existsSync( fileName( 'erm' ) ) ) {
+    await rm( fileName( 'erm' ) )
+  }
+
+
+  // initialiye empty DB with 1st tenant
   if ( ! fs.existsSync( fileName( 'user-auth' )) ) {
     const { createHash } = require( 'node:crypto' )
     let pwd = createHash('sha256').update('demo').digest('hex')
@@ -180,6 +206,10 @@ function appTblName( scopeId ) {
 
 function stateTblName( scopeId ) {
   return scopeId + '_state'
+}
+
+function ermTblName( scopeId ) {
+  return scopeId +'_erm'
 }
 
 // ============================================================================
@@ -613,7 +643,9 @@ async function delRootScope( scopeId ) {
   if ( fs.existsSync( stateTblName( scopeId ) ) ) {
     await rm( stateTblName( scopeId ) )
   }
-  cleanUpScopeInTbl( ERM_TBL, scopeId )
+  if ( fs.existsSync( ermTblName( scopeId ) ) ) {
+    await rm( ermTblName( scopeId ) )
+  }
   cleanUpScopeInTbl( EH_SUB_TBL, scopeId )
   return 'OK'
 }

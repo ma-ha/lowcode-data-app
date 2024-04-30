@@ -61,7 +61,7 @@ async function getERM( req, res )  {
     let app = await dta.getAppById( appId )
     res.send( app )
   } else {
-    let ermCfg = await dta.getDataById( 'erm', user.rootScopeId )
+    let ermCfg = await dta.getDataById( user.rootScopeId+'_erm', user.rootScopeId )
     if ( ! ermCfg ) { ermCfg = {} }
     let appMap = await dta.getAppList( user.scopeId, [], 'admin' )
     let erm = {
@@ -155,7 +155,7 @@ async function saveERM( req, res ) {
         y : req.body.entity[ e ].y
       }
     }
-    await dta.addDataObjNoEvent( 'erm', user.rootScopeId, ermCfg )
+    await dta.addDataObjNoEvent( user.rootScopeId+'_erm', user.rootScopeId, ermCfg )
   } catch ( exc ) { log.error( 'POST erm', exc ) } 
   res.send( {} )
 }
