@@ -1,4 +1,4 @@
-# 0.26.0
+# 0.27.0
 - "app" table (file) per scope
 - "state" table (file) per scope
 - "erm" table (file) per scope
