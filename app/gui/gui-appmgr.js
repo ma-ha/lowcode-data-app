@@ -676,10 +676,10 @@ function addOptions( optArr, selected ) {
     let option = { option : opt }
     if ( selected == opt ) { 
       option.selected = true 
-    } else if ( selected instanceof Array && selected.indexOf( opt ) >= 0 ) { 
+    } else if ( selected instanceof Array && selected.includes( opt )) { 
       option.selected = true 
     }
-    if ( [ 'Metric',  'Event', 'BLOB' ].indexOf( opt ) >= 0 ) {
+    if ( [ 'Metric',  'Event', 'BLOB' ].includes( opt )  ) {
       option.disabled = true
     }
     opts.push( option )

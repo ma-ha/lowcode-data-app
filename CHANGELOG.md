@@ -2,6 +2,7 @@
 - "app" table (file) per scope
 - "state" table (file) per scope
 - "erm" table (file) per scope
+- param type: disable TODOs
 - fixes
 
 # 0.26.0
