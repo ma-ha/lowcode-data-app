@@ -312,7 +312,7 @@ function getIndex( entity ) {
 }
 
 async function genGuiFormFieldsDef( entity, filter, user, stateTransition, render ) {
-  log.info( 'genGuiFormFieldsDef', filter )
+  log.debug( 'genGuiFormFieldsDef filter', filter )
   let cols = []
   let fldCnt = 0
   let fldArr = []
