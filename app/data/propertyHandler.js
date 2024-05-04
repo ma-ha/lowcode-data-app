@@ -30,7 +30,7 @@ function getPropTypes() {
     'UUID', 'UUID-Index',
     'Select', 
     'DocMap', 'SelectRef', 'MultiSelectRef', /* 'RefArray',*/ 
-    'Metric', 'Link', 'JSON', 'Event',
+    'Metric', 'Link', 'JSON', 'Event', 'BLOB',
     'API static string' 
   ]
 }
