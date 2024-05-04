@@ -258,7 +258,7 @@ async function getApp( scopeId, appId ) {
 async function getAppById( fullAppId ) {
   log.debug( 'getAppById',fullAppId )
   let { scopeId } = splitAppId( fullAppId )
-  log.info( 'getAppById',fullAppId, scopeId )
+  log.debug( 'getAppById',fullAppId, scopeId )
   return await loadDataById( appTblName( scopeId ), fullAppId )
 }
 
@@ -297,7 +297,7 @@ async function getStateModelMap( rootScopeId ) {
 
 async function getStateModelById( stateModelId ) {
   let rootScopeId = stateModelId.split('/')[0]
-  log.info( 'getStateModelById', rootScopeId, stateModelId  )
+  log.debug( 'getStateModelById', rootScopeId, stateModelId  )
   let stateModel = await loadDataById( rootScopeId+'_state', stateModelId )
   return stateModel
 }
