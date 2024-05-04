@@ -181,7 +181,7 @@ async function addApp( req, res ) {
 // --------------------------------------------------------------------------
 
 async function getEntity( req, res )  {
-  log.info( 'GET entity',  req.query )
+  log.debug( 'GET entity',  req.query )
   let { allOK, user, app, appId } = await checkUserApp( req, res )
   if ( ! allOK ) { return }
  
