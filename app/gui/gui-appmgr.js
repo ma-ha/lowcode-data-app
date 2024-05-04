@@ -268,7 +268,6 @@ async function init( ) {
     let ids = req.query.id
     if ( ! ids ) { return [] }
     let appId = ids.split(',')[0]
-    log.info( appId )
     if ( ! appId ) { return [] }
     let app = await dta.getAppById( appId ) 
     if ( ! app ) { return [] }
@@ -425,7 +424,6 @@ async function init( ) {
 
     if ( ! ids ) { return [] }
     let appId = ids.split(',')[0]
-    log.info( appId )
     if ( ! appId ) { return [] }
     let app = await dta.getAppById( appId )
     if ( ! app ) { return [] }
