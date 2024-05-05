@@ -72,74 +72,74 @@
   "22a28213-5434-4f5c-829c-8063389906e9": {
     "id": "22a28213-5434-4f5c-829c-8063389906e9",
     "MetricKey": "TicketStatusCnt",
-    "MetricVal": "20",
+    "MetricVal": "30",
     "MetricText": "Closed",
     "MetricDescr": "",
     "MetricDate": "",
     "MetricStyle": "background-color:red;",
     "scopeId": "1000/DE",
     "_cre": 1714896968159,
-    "_upd": 1714903852263
+    "_upd": 1714909880102
   },
   "3a10b399-7953-4ba3-96bd-179c8cfcaacd": {
     "id": "3a10b399-7953-4ba3-96bd-179c8cfcaacd",
     "MetricKey": "TicketOpen",
-    "MetricVal": "40",
+    "MetricVal": "-20",
     "MetricText": "w-5",
     "MetricDescr": "",
     "MetricDate": "",
     "MetricStyle": "",
     "scopeId": "1000/DE",
     "_cre": 1714901586064,
-    "_upd": 1714901651038
+    "_upd": 1714909888343
   },
   "d0dddadd-c282-4b73-ae4d-f0475354f57a": {
     "id": "d0dddadd-c282-4b73-ae4d-f0475354f57a",
     "MetricKey": "TicketOpen",
-    "MetricVal": "10",
+    "MetricVal": "-5",
     "MetricText": "w-4",
     "MetricDescr": "",
     "MetricDate": "",
     "MetricStyle": "",
     "scopeId": "1000/DE",
     "_cre": 1714901596411,
-    "_upd": 1714901656785
+    "_upd": 1714909896113
   },
   "25778967-295a-4680-9cac-b869f3b4fb8e": {
     "id": "25778967-295a-4680-9cac-b869f3b4fb8e",
     "MetricKey": "TicketOpen",
-    "MetricVal": "30",
+    "MetricVal": "10",
     "MetricText": "w-3",
     "MetricDescr": "",
     "MetricDate": "",
     "MetricStyle": "",
     "scopeId": "1000/DE",
     "_cre": 1714901608578,
-    "_upd": 1714901608578
+    "_upd": 1714909788836
   },
   "b6bf458a-9d6b-4f3f-96ba-150c5ec634ac": {
     "id": "b6bf458a-9d6b-4f3f-96ba-150c5ec634ac",
     "MetricKey": "TicketOpen",
-    "MetricVal": "-30",
+    "MetricVal": "30",
     "MetricText": "w-2",
     "MetricDescr": "",
     "MetricDate": "",
     "MetricStyle": "",
     "scopeId": "1000/DE",
     "_cre": 1714901619652,
-    "_upd": 1714901619652
+    "_upd": 1714909833576
   },
   "e85953d7-5abf-4a1e-b923-19636a75a36e": {
     "id": "e85953d7-5abf-4a1e-b923-19636a75a36e",
     "MetricKey": "TicketOpen",
-    "MetricVal": "-10",
+    "MetricVal": "25",
     "MetricText": "w-1",
     "MetricDescr": "",
     "MetricDate": "",
     "MetricStyle": "",
     "scopeId": "1000/DE",
     "_cre": 1714901629116,
-    "_upd": 1714901629116
+    "_upd": 1714909841212
   },
   "fdfca1c2-20ac-4471-aee2-062079a97b4c": {
     "id": "fdfca1c2-20ac-4471-aee2-062079a97b4c",
