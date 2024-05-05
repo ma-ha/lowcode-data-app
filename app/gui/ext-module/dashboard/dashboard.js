@@ -140,25 +140,83 @@ function dashboardFn_panel_Distribution( divId, metricDivId, metric, dta ) {
 }
 
 function dashboardFn_panel_Pie180( divId, metricDivId, metric, dta ) {
-  // TODO
+  console.log( 'dashboardFn_panel_Pie180', divId, metricDivId, metric, dta )
+  if ( ! dta || dta.length < 1 ) { return }
+  try { 
+    let cId = metricDivId.replace('#','') +'_Canvas'
+    $( metricDivId ).html( '<canvas id="'+cId+'" width="auto" height="auto"></canvas>' )
+    var canvas = document.getElementById( cId );
+    canvas.width  = $( metricDivId ).innerWidth()
+    canvas.height = $( metricDivId ).innerHeight()
+    var cw = canvas.width
+    var ch = canvas.height
+    if ( ch < cw ) { cw = ch } else { ch = cw }
+    if ( cw /2 < ch ) { ch = cw /2 }
+    var ctx = canvas.getContext("2d")
+
+    ctx.beginPath()
+    ctx.strokeStyle = "#DDD"
+    ctx.lineWidth = ch/2
+    console.log( 'ch=', ch,'cw=', cw)
+    ctx.arc( canvas.width/2, ch, 0.7*ch, 0, Math.PI, true )
+    ctx.stroke()
+    
+    let sum = 0
+
+    for ( let rec of dta ) {
+      let val = Number.parseFloat( rec[ metric.Prop ] )
+      sum += val 
+    }
+    let col = [ '#024b6d','#01699b','#017cb5','#0396db','#1fa2df','#39afe6','#56b9e7','#76c2e6','#a9d3e7' ]
+
+    var start = Math.PI;
+    let i = 0
+    for ( let rec of dta ) {
+      let val = Number.parseFloat( rec[ metric.Prop ] )
+      var range = Math.PI * val / sum
+      //console.log( '.....', rec[ metric.Desc ], val, start, range )
+      ctx.beginPath();
+      ctx.strokeStyle = col[i];
+      ctx.lineWidth = ch/2;
+      ctx.arc( canvas.width/2, ch, 0.7*ch, start, (start+range), false );
+      ctx.stroke();
+      if ( val > 0 ) {
+        ctx.strokeStyle = '#FFF' 
+        ctx.lineWidth = 0.7
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle' 
+        if ( rec[ metric.Desc ] && rec[ metric.Desc ] != '' ) {
+          var tx = canvas.width/2 + Math.cos( start + range/2 ) * 0.7 * ch;
+          var ty = ch + Math.sin( start + range/2 ) * 0.7 * ch;
+          ctx.beginPath();
+          console.log( '.....', rec[ metric.Desc ],  tx, ty  )
+          ctx.strokeStyle = '#444' 
+          ctx.strokeText( rec[ metric.Desc ], tx+1, ty+1 );        
+          ctx.strokeStyle = '#FFF' 
+          ctx.strokeText( rec[ metric.Desc ], tx, ty );        
+        }
+      }
+      start += range;
+      i ++
+      if ( i == col.length ) { i = 0 }
+    }
+  } catch ( exc ) { console.error( 'dashboardFn_panel_Pie180', exc )}
 } 
+
 
 function dashboardFn_panel_Pie360( divId, metricDivId, metric, dta ) {
   // TODO
 }
 
 function dashboardFn_panel_Table( divId, metricDivId, metric, dta ) {
-  console.log( 'dashboardFn_panel_Table', divId, metricDivId, metric, dta )
+  //console.log( 'dashboardFn_panel_Table', divId, metricDivId, metric, dta )
   if ( ! dta || dta.length < 1 ) { return }
   try { 
     let cols = metric.Prop.split(',')
-    console.log( 'dashboardFn_panel_Table >>>>>', cols)
     let html = '<div class="lc-dashboard-metric-table-div"><table class="lc-dashboard-metric-table">' 
     for ( let rec of dta ) {
-      console.log( 'dashboardFn_panel_Table >>>>> rec', rec )
       html += '<tr>'
       for ( let col of cols ) {
-        console.log( 'dashboardFn_panel_Table >>>>> col', col, rec[ col ] )
         html += '<td>'
         html += rec[ col ] 
         html += '</td>'
