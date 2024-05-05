@@ -76,13 +76,47 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
         tabs   : [] 
       }
       for ( let entityId of app.startPage ) {
-        let entity = app.entity[ entityId ]
-        let tabSpec = {
-          tabId  : 'Tab' + entityId, 
-          title  : ( entity.title ? entity.title : entityId ),
-          rows: await renderEntityRows( app, appId, entityId, null, user )  
+
+        if ( entityId.startsWith( 'dashboard/' ) ) {
+
+          let parts = entityId.split('/')
+          let boardName = parts[1]
+          
+          let boardId   = boardName.replaceAll( ' ', '_' )
+          let moduleConfig = {
+            id: boardId
+          }
+          if ( parts[2] ) {
+            moduleConfig.entity = parts[2]
+          }
+
+          let tabSpec = {
+            tabId  : 'Tab' + boardId, 
+            title  : boardName,
+            rows:  [{ 
+              id     : 'AppDashboard'+boardId, 
+              rowId  : 'AppDashboard'+boardId, 
+              title  : '',  
+              height : '800px', 
+              decor  : 'none',
+              type   : 'dashboard', 
+              resourceURL  : 'dashboard', 
+              moduleConfig : moduleConfig
+            }]
+          }
+          tabRow.tabs.push( tabSpec )
+
+        } else {
+
+          let entity = app.entity[ entityId ]
+          let tabSpec = {
+            tabId  : 'Tab' + entityId, 
+            title  : ( entity.title ? entity.title : entityId ),
+            rows: await renderEntityRows( app, appId, entityId, null, user )  
+          }
+          tabRow.tabs.push( tabSpec )
+
         }
-        tabRow.tabs.push( tabSpec )
       }
       rowArr = [ tabRow ]
     }
@@ -98,6 +132,8 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
   // log.info( JSON.stringify( rowArr, null, ' ' ) )
   return rowArr
 }
+
+// ----------------------------------------------------------------------------
 
 async function renderEntityRows( app, appId, entityId, filterParam, user, info ) {
   log.debug( 'renderEntityRows', app, appId, entityId )
@@ -432,7 +468,7 @@ async function genAddDataForm( appId, entityId, entity, updateResArr, filter, us
       })
     }
   }
-  log.info( actions )
+  log.debug( 'actions', actions )
 
   let addFormView = { 
     id: 'Add' + entityId, rowId: 'Add' + entityId, type : 'pong-form',

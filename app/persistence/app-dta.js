@@ -383,7 +383,7 @@ async function idExists( tbl, id  ) {
 }
 
 async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams ) {
-  log.debug( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams )
+  log.info( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams )
   let tbl = rootScopeId + entityId
   await syncTbl( tbl )
   let inherit = await scopeInherited( rootScopeId, appId, appVersion, entityId )

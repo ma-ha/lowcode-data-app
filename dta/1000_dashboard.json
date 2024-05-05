@@ -1,0 +1,150 @@
+{
+  "111": {
+    "id": "111",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Tickets",
+    "SubText":"",
+    "Type":"Number",
+    "Pos": [0,0],
+    "Size": [1,1],
+    "Metric": {
+      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query":{"MetricKey":"TestNumber"},
+      "Prop":"MetricVal",
+      "Desc":"MetricDescr"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
+  "112": {
+    "id": "112",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Ticket Done",
+    "SubText":"... of non-closed",
+    "Type":"ProgressBar",
+    "Pos": [1,0],
+    "Size": [2,1],
+    "Metric": {
+      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query":{"MetricKey":"Complete"},
+      "Prop":"MetricVal",
+      "Desc":"MetricDescr"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
+  "113": {
+    "id": "113",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Ticket by Status",
+    "SubText":"... as mixed bar",
+    "Type":"Distribution",
+    "Pos": [3,0],
+    "Size": [2,1],
+    "Metric": {
+      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query":{"MetricKey":"TicketStatusCnt"},
+      "Prop":"MetricVal",
+      "Desc":"MetricText",
+      "Style":"MetricStyle"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
+  "123": {
+    "id": "123",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Ticket by Status",
+    "SubText":"... as pie 180",
+    "Type":"Pie180",
+    "Pos": [3,1],
+    "Size": [2,2],
+    "Metric": {
+      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query":{"MetricKey":"TicketStatusCnt"},
+      "Prop":"MetricVal",
+      "Desc":"MetricText",
+      "Style":"MetricStyle"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
+  "114": {
+    "id": "114",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Tickets in Progress",
+    "SubText":"... also this",
+    "Type":"Bars",
+    "Pos": [5,0],
+    "Size": [2,2],
+    "Metric": {
+      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query":{"MetricKey":"TicketOpen"},
+      "Prop":"MetricVal",
+      "Desc":"MetricText",
+      "Style":"MetricStyle"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
+  "115": {
+    "id": "114",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Top Prio",
+    "SubText":"... tickets",
+    "Type":"Items",
+    "Pos": [0,1],
+    "Size": [3,2],
+    "Metric": {
+      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query":{"MetricKey":"TicketPrio1"},
+      "Prop":"MetricText",
+      "Desc":"MetricDescr"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
+  "116": {
+    "id": "116",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Top Prio",
+    "SubText":"... tickets",
+    "Type":"Table",
+    "Pos": [0,3],
+    "Size": [5,1],
+    "Metric": {
+      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query":{"MetricKey":"TicketPrio1"},
+      "Prop": "MetricVal,MetricText,MetricDescr,"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
+  "117": {
+    "id": "117",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Top Prio",
+    "SubText":"... tickets",
+    "Type":"Graph",
+    "Pos": [5,2],
+    "Size": [3,2],
+    "Metric": {
+      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query":{"MetricKey":"TicketPrio1"},
+      "Prop":"MetricVal",
+      "X":"MetricDate",
+      "Desc":"MetricDescr"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  }
+
+}

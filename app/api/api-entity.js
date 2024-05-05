@@ -53,6 +53,9 @@ async function setupAPI( app, config ) {
   svc.post( '/guiapp/csv/:tenantId/:appId/:appVersion/:entityId/:actionId', fileupload(),guiAuthz, uploadCsvData )
   svc.get(  '/guiapp/csv/html', guiAuthz, getUploadCsvResult )
   svc.get(  '/guiapp/csv/import/:uid', guiAuthz, importCsvData )
+
+  svc.get(  '/dashboard/panel', guiAuthz, getDashboardPanels )
+
 }
 
 // --------------------------------------------------------------------------
@@ -192,6 +195,7 @@ async function getDoc( req, res ) {
   if ( entity.stateModel ) {
     stateModel = await dta.getStateModelById( user.rootScopeId +'/'+ entity.stateModel )
   }
+  log.info( 'dataArr', filter )
 
   let result = []
   for ( let rec of dataArr ) {
@@ -241,6 +245,9 @@ async function addDoc( req, res )  {
     if ( entity.stateModel && ! rec[ '_state' ]  ) {
       return res.send( 'ERROR: Create not allowed' ) 
     }
+  }
+  if ( ! rec.scopeId ) {
+    rec.scopeId = user.scopeId
   }
 
   for ( let propId in entity.properties ) {
@@ -553,4 +560,21 @@ async function importCsvData( req, res ) {
   await dta.delDataObjNoEvent( 'csv-temp', req.params.uid )
 
   res.redirect( '../../../index.html?layout=AppEntity-nonav&id='+ impDta.appId ) 
+}
+
+
+async function getDashboardPanels( req, res ) {
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  log.info( 'GET /dashboard/panels', req.query.id  ) 
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.query.id ) { return res.status(400).send( 'id required' ) }
+
+   let panels = await dta.getData( 
+    user.rootScopeId + '_dashboard', 
+    user.rootScopeId,
+    false,
+    { "Board": req.query.id } 
+  )
+  log.debug( 'panels', panels )
+  res.send( panels )
 }

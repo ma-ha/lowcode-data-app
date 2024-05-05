@@ -96,8 +96,9 @@ async function publishDataChgEvt( dtaOp, dtaId, uri, dtaType, data ) {
     if ( dtaType.indexOf( scope) == 0 ) {
       for ( let app in subscriptions[ scope ] ) {
         log.info( 'evt app', scope, app )
+        let sub = {}
         try {
-          let sub = subscriptions[ scope ][ app ]
+          sub = subscriptions[ scope ][ app ]
           if ( sub.filter ) {
             if ( ! isQueried( data,  sub.filter.data ) ) { continue }
             if ( ! isQueried( dtaOp, sub.op ) ) { continue }
@@ -105,7 +106,7 @@ async function publishDataChgEvt( dtaOp, dtaId, uri, dtaType, data ) {
           log.info( 'evt post', sub.webHook )
           let result = await axios.post( sub.webHook, evt )
           log.info( 'evt post', sub.webHook ,result.status )
-        } catch ( exc ) { log.warn( 'event err', app ) }
+        } catch ( exc ) { log.warn( 'could not post event', app, sub.webHook ) }
       }  
     }
   }

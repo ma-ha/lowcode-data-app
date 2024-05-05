@@ -141,12 +141,53 @@
             "noDelete": true
           }
         }
+      },
+      "Metric": {
+        "title": "",
+        "scope": "inherit",
+        "maintainer": [
+          "appUser"
+        ],
+        "properties": {
+          "id": {
+            "type": "UUID-Index",
+            "noDelete": true,
+            "noEdit": true
+          },
+          "MetricKey": {
+            "type": "String",
+            "notNull": true,
+            "noDelete": true
+          },
+          "MetricVal": {
+            "type": "Number",
+            "noDelete": true
+          },
+          "MetricText": {
+            "type": "String",
+            "noDelete": true
+          },
+          "MetricDescr": {
+            "type": "String",
+            "noDelete": true
+          },
+          "MetricDate": {
+            "type": "Date",
+            "noDelete": true
+          },
+          "MetricStyle": {
+            "type": "String",
+            "noDelete": true
+          }
+        },
+        "noDelete": true
       }
     },
     "startPage": [
       "DeviceOrder",
       "Invoice",
-      "Customer"
+      "Customer",
+      "Metric"
     ],
     "role": [
       "appUser"
@@ -165,7 +206,10 @@
         "srcURL": ""
       }
     },
-    "enabled": true
+    "enabled": true,
+    "id": "1000/device-inventory-app/1.0.0",
+    "_cre": 1714889694051,
+    "_upd": 1714896025339
   },
   "1000/device-mgr-app/1.0.0": {
     "type": "dev/locode-entity-editor/0.1.0",
@@ -828,6 +872,7 @@
     },
     "page": {},
     "startPage": [
+      "dashboard/Ticket Dashboard",
       "Ticket"
     ],
     "scopeId": null,

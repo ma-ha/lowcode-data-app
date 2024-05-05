@@ -1,3 +1,7 @@
+# 0.28.0
+- fix scopeId
+- metric dashboard
+
 # 0.27.0
 - "app" table (file) per scope
 - "state" table (file) per scope

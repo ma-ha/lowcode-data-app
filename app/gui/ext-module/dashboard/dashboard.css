@@ -1,0 +1,140 @@
+.lc-dashboard-panel {
+  background-color: #fafafa;
+}
+.lc-dashboard {
+  overflow: hidden;
+}
+.lc-dashboard-title {
+  position: absolute;
+  font-size: 2em;
+  top: 5px;
+  left: 5px;
+  color: var(--theme-color);
+}
+
+.lc-dashboard-metric {
+}
+
+.lc-dashboard-metric-number {
+  position: absolute;
+  top: 30px;
+  font-size: 2.6em;
+  width: 100%;
+  text-align: center;
+}
+
+.lc-dashboard-metric-number {
+  position: absolute;
+  top: 30px;
+  font-size: 2.6em;
+  width: 100%;
+  text-align: center;
+}
+
+.lc-dashboard-metric-items-div {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+.lc-dashboard-metric-items {
+  color: var(--theme-color);
+  font-size: 1.3em;
+}
+.lc-dashboard-metric-item-descr {
+  font-size: 0.8em;
+  font-style: italic;
+  color: var(--link-color);
+}
+
+.lc-dashboard-metric-table-div {
+  overflow: auto;
+  height: 100%;
+  width: 100%;
+}
+.lc-dashboard-metric-table table {
+  border: 1px solid var(--menu-bg-hover-color);
+}
+.lc-dashboard-metric-table th, 
+.lc-dashboard-metric-table td {
+  border: 1px solid var(--menu-bg-hover-color);
+  padding: 0.5rem;
+}
+
+
+
+.lc-dashboard-metric-progress {
+  position: absolute;
+  top: 30px;
+  left: 5%
+}
+.lc-dashboard-metric-progress-done {
+  float: left;
+  background-color:  var(--theme-color);
+}
+.lc-dashboard-metric-progress-todo {
+  float: left;
+  background-color:  var(--content-h-bg-color);
+}
+.lc-dashboard-metric-progress-text {
+  position: absolute;
+  top: 90px;
+  color: var(--theme-color);
+  font-size: 1.5em;
+  width: 100%;
+  text-align: center;
+}
+
+
+.lc-dashboard-metric-distribution {
+  position: absolute;
+  top: 30px;
+  left: 5%
+}
+.lc-dashboard-metric-distribution-bar {
+  float: left;
+}
+
+.lc-dashboard-metric-bars {
+  left: 5%;
+  position: absolute;
+}
+
+.lc-dashboard-metric-bar {
+  float: left;
+}
+
+.color0 {
+  background-color: #024b6d;
+}
+.color1 {
+  background-color: #01699b;
+}
+.color2 {
+  background-color: #017cb5;
+}
+.color3 {
+  background-color: #0396db;
+}
+.color4 {
+  background-color: #1fa2df;
+}
+.color5 {
+  background-color: #39afe6;
+}
+.color6 {
+  background-color: #56b9e7;
+}
+.color7 {
+  background-color: #76c2e6;
+}
+.color8 {
+  background-color: #a9d3e7;
+}
+
+.lc-dashboard-sub {
+  position: absolute;
+  bottom: 5px;
+  left: 6px;
+  color:  var(--menu-bg-color);
+
+}
