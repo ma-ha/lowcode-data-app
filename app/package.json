@@ -1,6 +1,6 @@
 {
   "name": "lowcode-data-app",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "LowCode App Environment",
   "main": "app.js",
   "scripts": {
@@ -31,6 +31,8 @@
     "GUI",
     "lowcode",
     "low code",
+    "Metric",
+    "Dashboard",
     "OpenID Connect",
     "OIDC",
     "Platform",
