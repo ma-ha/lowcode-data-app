@@ -147,7 +147,7 @@ async function getDocArr( req, res ) {
 
 
 async function getDoc( req, res ) {
-  log.info( 'GET entity', req.params, req.query )
+  log.debug( 'GET entity', req.params, req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 

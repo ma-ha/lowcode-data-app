@@ -4,15 +4,23 @@
     "scopeId": "1000",
     "Board": "Ticket_Dashboard",
     "Title": "Tickets",
-    "SubText":"",
-    "Type":"Number",
-    "Pos": [0,0],
-    "Size": [1,1],
+    "SubText": "",
+    "Type": "Number",
+    "Pos": [
+      0,
+      0
+    ],
+    "Size": [
+      1,
+      1
+    ],
     "Metric": {
-      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
-      "Query":{"MetricKey":"TestNumber"},
-      "Prop":"MetricVal",
-      "Desc":"MetricDescr"
+      "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query": {
+        "MetricKey": "TestNumber"
+      },
+      "Prop": "MetricVal",
+      "Desc": "MetricDescr"
     },
     "_cre": 1707026935716,
     "_upd": 1707026935716
@@ -22,15 +30,23 @@
     "scopeId": "1000",
     "Board": "Ticket_Dashboard",
     "Title": "Ticket Done",
-    "SubText":"... of non-closed",
-    "Type":"ProgressBar",
-    "Pos": [1,0],
-    "Size": [2,1],
+    "SubText": "... of non-closed",
+    "Type": "ProgressBar",
+    "Pos": [
+      1,
+      0
+    ],
+    "Size": [
+      2,
+      1
+    ],
     "Metric": {
-      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
-      "Query":{"MetricKey":"Complete"},
-      "Prop":"MetricVal",
-      "Desc":"MetricDescr"
+      "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query": {
+        "MetricKey": "Complete"
+      },
+      "Prop": "MetricVal",
+      "Desc": "MetricDescr"
     },
     "_cre": 1707026935716,
     "_upd": 1707026935716
@@ -40,54 +56,24 @@
     "scopeId": "1000",
     "Board": "Ticket_Dashboard",
     "Title": "Ticket by Status",
-    "SubText":"... as mixed bar",
-    "Type":"Distribution",
-    "Pos": [3,0],
-    "Size": [2,1],
+    "SubText": "... as mixed bar",
+    "Type": "Distribution",
+    "Pos": [
+      3,
+      0
+    ],
+    "Size": [
+      2,
+      1
+    ],
     "Metric": {
-      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
-      "Query":{"MetricKey":"TicketStatusCnt"},
-      "Prop":"MetricVal",
-      "Desc":"MetricText",
-      "Style":"MetricStyle"
-    },
-    "_cre": 1707026935716,
-    "_upd": 1707026935716
-  },
-  "123": {
-    "id": "123",
-    "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
-    "Title": "Ticket by Status",
-    "SubText":"... as pie 180",
-    "Type":"Pie180",
-    "Pos": [3,1],
-    "Size": [2,2],
-    "Metric": {
-      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
-      "Query":{"MetricKey":"TicketStatusCnt"},
-      "Prop":"MetricVal",
-      "Desc":"MetricText",
-      "Style":"MetricStyle"
-    },
-    "_cre": 1707026935716,
-    "_upd": 1707026935716
-  },
-  "123a": {
-    "id": "123a",
-    "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
-    "Title": "Ticket by Status",
-    "SubText":"... as pie 180",
-    "Type":"Pie180",
-    "Pos": [7,0],
-    "Size": [2,1],
-    "Metric": {
-      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
-      "Query":{"MetricKey":"TicketStatusCnt"},
-      "Prop":"MetricVal",
-      "Desc":"MetricText",
-      "Style":"MetricStyle"
+      "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query": {
+        "MetricKey": "TicketStatusCnt"
+      },
+      "Prop": "MetricVal",
+      "Desc": "MetricText",
+      "Style": "MetricStyle"
     },
     "_cre": 1707026935716,
     "_upd": 1707026935716
@@ -97,16 +83,24 @@
     "scopeId": "1000",
     "Board": "Ticket_Dashboard",
     "Title": "Tickets in Progress",
-    "SubText":"... also this",
-    "Type":"Bars",
-    "Pos": [5,0],
-    "Size": [2,2],
+    "SubText": "... also this",
+    "Type": "Bars",
+    "Pos": [
+      5,
+      0
+    ],
+    "Size": [
+      2,
+      2
+    ],
     "Metric": {
-      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
-      "Query":{"MetricKey":"TicketOpen"},
-      "Prop":"MetricVal",
-      "Desc":"MetricText",
-      "Style":"MetricStyle"
+      "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query": {
+        "MetricKey": "TicketOpen"
+      },
+      "Prop": "MetricVal",
+      "Desc": "MetricText",
+      "Style": "MetricStyle"
     },
     "_cre": 1707026935716,
     "_upd": 1707026935716
@@ -116,15 +110,23 @@
     "scopeId": "1000",
     "Board": "Ticket_Dashboard",
     "Title": "Top Prio",
-    "SubText":"... tickets",
-    "Type":"Items",
-    "Pos": [0,1],
-    "Size": [3,2],
+    "SubText": "... tickets",
+    "Type": "Items",
+    "Pos": [
+      0,
+      1
+    ],
+    "Size": [
+      3,
+      2
+    ],
     "Metric": {
-      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
-      "Query":{"MetricKey":"TicketPrio1"},
-      "Prop":"MetricText",
-      "Desc":"MetricDescr"
+      "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query": {
+        "MetricKey": "TicketPrio1"
+      },
+      "Prop": "MetricText",
+      "Desc": "MetricDescr"
     },
     "_cre": 1707026935716,
     "_upd": 1707026935716
@@ -134,13 +136,21 @@
     "scopeId": "1000",
     "Board": "Ticket_Dashboard",
     "Title": "Top Prio",
-    "SubText":"... tickets",
-    "Type":"Table",
-    "Pos": [0,3],
-    "Size": [5,1],
+    "SubText": "... tickets",
+    "Type": "Table",
+    "Pos": [
+      0,
+      3
+    ],
+    "Size": [
+      5,
+      1
+    ],
     "Metric": {
-      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
-      "Query":{"MetricKey":"TicketPrio1"},
+      "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query": {
+        "MetricKey": "TicketPrio1"
+      },
       "Prop": "MetricVal,MetricText,MetricDescr"
     },
     "_cre": 1707026935716,
@@ -150,20 +160,156 @@
     "id": "117",
     "scopeId": "1000",
     "Board": "Ticket_Dashboard",
-    "Title": "Top Prio",
-    "SubText":"... tickets",
-    "Type":"Graph",
-    "Pos": [5,2],
-    "Size": [3,2],
+    "Title": "Ticket Count",
+    "SubText": "... tickets",
+    "Type": "BarGraph",
+    "Pos": [
+      5,
+      2
+    ],
+    "Size": [
+      3,
+      2
+    ],
     "Metric": {
-      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
-      "Query":{"MetricKey":"TicketPrio1"},
-      "Prop":"MetricVal",
-      "X":"MetricDate",
-      "Desc":"MetricDescr"
+      "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query": {
+        "MetricKey": "BarGraph"
+      },
+      "Prop": "MetricVal",
+      "Desc": "MetricDate",
+      "Style": "MetricStyle"
     },
     "_cre": 1707026935716,
     "_upd": 1707026935716
+  },
+  "123": {
+    "id": "123",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Ticket by Status",
+    "SubText": "... as pie 180",
+    "Type": "Pie180",
+    "Pos": [
+      3,
+      1
+    ],
+    "Size": [
+      2,
+      2
+    ],
+    "Metric": {
+      "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query": {
+        "MetricKey": "TicketStatusCnt"
+      },
+      "Prop": "MetricVal",
+      "Desc": "MetricText",
+      "Style": "MetricStyle"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
+  "123a": {
+    "id": "123a",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Ticket by Status",
+    "SubText": "... as pie 180",
+    "Type": "Pie180",
+    "Pos": [
+      7,
+      0
+    ],
+    "Size": [
+      2,
+      1
+    ],
+    "Metric": {
+      "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query": {
+        "MetricKey": "TicketStatusCnt"
+      },
+      "Prop": "MetricVal",
+      "Desc": "MetricText",
+      "Style": "MetricStyle"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
+  "d4fb017c-c24a-40dc-a4d0-602923003f1a": {
+    "scopeId": "1000",
+    "Board": "City_Light_Manager",
+    "Type": "Number",
+    "Title": "ab",
+    "SubText": "aaa",
+    "Pos": [
+      1,
+      1
+    ],
+    "Size": [
+      1,
+      1
+    ],
+    "Metric": {
+      "Entity": "",
+      "Query": "",
+      "Prop": "",
+      "Descr": "",
+      "Style": ""
+    },
+    "id": "d4fb017c-c24a-40dc-a4d0-602923003f1a",
+    "_cre": 1714936301785,
+    "_upd": 1714936313071
+  },
+  "208b4a26-2919-42f9-86d9-19dac9e2ff0b": {
+    "scopeId": "1000",
+    "Board": "City_Light_Manager",
+    "Type": "Number",
+    "Title": "bc",
+    "SubText": "",
+    "Pos": [
+      1,
+      1
+    ],
+    "Size": [
+      1,
+      1
+    ],
+    "Metric": {
+      "Entity": "",
+      "Query": "",
+      "Prop": "",
+      "Descr": "",
+      "Style": ""
+    },
+    "id": "208b4a26-2919-42f9-86d9-19dac9e2ff0b",
+    "_cre": 1714936307318,
+    "_upd": 1714936307318
+  },
+  "7b8c35a4-b2d7-4d4a-868f-82d5bcbea411": {
+    "scopeId": "1000",
+    "Board": "City_Light_Manager",
+    "Type": "ItemBars",
+    "Title": "rrr",
+    "SubText": "",
+    "Pos": [
+      1,
+      1
+    ],
+    "Size": [
+      1,
+      1
+    ],
+    "Metric": {
+      "Entity": "",
+      "Query": "",
+      "Prop": "",
+      "Descr": "",
+      "Style": ""
+    },
+    "id": "7b8c35a4-b2d7-4d4a-868f-82d5bcbea411",
+    "_cre": 1714936629339,
+    "_upd": 1714936629339
   }
-
 }

@@ -85,6 +85,7 @@ async function init( ) {
           { id: "scope",       label: "Scope",     width: "15%", cellType: "text" },
           { id: "tags",        label: "Tags",      width: "15%", cellType: "text" },
           { id: "role",        label: "Role",      width: "10%", cellType: "text" },
+          { id: "dashboardLnk",label: "Dashboard", width: "7%",  cellType: "text" },
           { id: "entitiesLnk", label: "Entities",  width: "10%", cellType: "text" },
           // { id: "pagesLnk",    label: "App Pages", width: "20%", cellType: "text" },
           { id: "appLnk",      label: "Test&nbsp;it",  width: "10%", cellType: "text" },
@@ -116,7 +117,10 @@ async function init( ) {
             { id: "role",  label: "Role",  type: "select",
               options: addOptions([ "appUser", "admin", 'dev', '-' ]) }
           ]},
-          { formFields: [{ id: "enabled",  label: "Enabled", type: "checkbox" } ]},
+          { formFields: [
+             { id: "enabled",   label: "Enabled",   type: "checkbox" },
+             { id: "dashboard", label: "Dashboard", type: "checkbox" } 
+          ]},
           { formFields: [{ id: "description", label: "Description", type: "text", rows: 4 } ]}
         ] }],
         actions : [ 
@@ -338,7 +342,7 @@ async function init( ) {
           { formFields: [ { id: "propId",  label: "Id", type: "text" },
                           { id: "label",   label: "Label", type: "text" } ]},
           { formFields: [{ id: "type",     label: "Type", type: "select",
-                           options: addOptions( propHandler.getPropTypes() ) },
+                           options: addOptions( propHandler.getPropTypes(), 'x', [ 'Metric',  'Event', 'BLOB' ] ) },
             { id: "ref", label: "Ref", type: "text", options: refOptions } ]},
           { formFields: [ { id: "filter",  label: "Filter", type: "checkbox" },
                           { id: "apiManaged",  label: "API managed", type: "checkbox",
@@ -631,6 +635,96 @@ async function init( ) {
     type : 'pong-form', resourceURL: 'state-model/transition'
   })
 
+    // --------------------------------------------------------------------------
+
+  let dashboardPg = gui.addPage( 'AppDashboardPanels-nonav' ) 
+  dashboardPg.title    = 'Dashboard Panels'
+  dashboardPg.navLabel = 'Dashboard Panels'
+  dashboardPg.setPageWidth( '90%' )
+
+  dashboardPg.dynamicRow( async ( staticRows, req, pageName ) => {
+    let boardId = req.query.id
+
+    let rows =  [{ 
+      id: 'AppDashboarInfo', rowId: 'AppDashboarInfo', title: 'Entity',  height: '80px', 
+      type : 'pong-form', resourceURL: 'app', decor: 'decor',
+      moduleConfig : {
+        description: "AppDashboarInfo",
+        id: 'AppDashboarInfoForm',
+        fieldGroups:[{ columns: [
+          { formFields: [
+            { id: "boardId", label: "Noard Id", type: "text", defaultVal: boardId.replaceAll('_',' '), readonly: true } ]}
+        ] }]
+      }
+    }]
+
+    rows.push({ id: 'Scopes', 
+      rowId: 'DashboardPanels', title: 'Dashboard Panels',
+      height: '520px',  decor: 'decor',
+      type : 'pong-table', resourceURL: 'app/dashboard/panel',
+      moduleConfig : {
+        dataURL: "",
+        rowId: 'panelId',
+        cols: [
+          { id: 'Edit', label: "", cellType: "button", width :'10%', icon: 'ui-icon-pencil', 
+            method: "GET", setData: [ { resId : 'AddDashboardPanel' } ] },
+          { id: "Title",  label: "Title", width: "30%", cellType: "text" },
+          { id: "Type",   label: "Type",  width: "20%", cellType: "text" },
+          { id: "Pos",    label: "Pos",   width: "10%", cellType: "text" },
+          { id: "Size",   label: "Size",  width: "10%", cellType: "text" },
+          { id: "Entity", label: "Entity",width: "30%", cellType: "text" }
+        ]
+      }
+    })
+
+    rows.push({  id: 'AddDashboardPanel', rowId: 'AddDashboardPanel',
+      title: 'Add / Edit Dashboard Panel',  
+      height: '200px',  decor: 'decor',
+      type : 'pong-form', resourceURL: 'app/dashboard/panel',
+      moduleConfig : {
+  //      label:'Add Scope',
+  //      description: "Add Scope",
+        id: 'AddDashboardPanelForm',
+        fieldGroups:[{ columns: [
+          { formFields: [
+            { id: "panelId",  type: "text", readonly: true },
+            { id: "boardId",  type: "text", hidden: true, value: boardId },
+            { id: "Type",   label: "Type",    type: "select",  
+              options: addOptions(['Number','Text','ProgressBar','Distribution','Pie180',
+                'Pie360','Table','Items','ItemBars','Graph','Bars','BarGraph'], 'Number', ['Pie360','Graph']) },
+            { id: "Title",  label: "Title",   type: "text" },
+            { id: "SubText",label: "Sub Text",type: "text" } 
+          ]},
+          { formFields: [
+            { id: "PosX",   label: "Pos X",   type: "select",  
+              options: addOptions(['1','2','3','4','5','6','7','8']) },
+            { id: "PosY",   label: "Pos y",   type: "select",  
+              options: addOptions(['1','2','3','4','5','6','7','8']) },
+            { id: "Size",   label: "Size",    type: "select", 
+              options: addOptions(['1x1','1x2','1x3','1x4','2x1','2x2','2x3','2x4','3x1','3x2','3x3','3x4']) }
+          ]},  
+          { formFields: [
+            { id: "Entity", label: "Entity",  type: "text" },
+            { id: "Query",  label: "Query",   type: "JSON", rows:1 },
+          ]},
+          { formFields: [
+            { id: "Prop",   label: "Prop ",   type: "text" },
+            { id: "Descr",  label: "Descr",   type: "text" },
+            { id: "Style",  label: "Style",   type: "text" } 
+          ]}
+        ] }],
+        actions : [ 
+          { id: "AddDashboardPanelBtn", actionName: "Add / Update", update: [{ resId:'DashboardPanels' }], 
+            actionURL: 'app/dashboard/panel', target: "modal" },
+          { id: "AddDashboardPanelReset", actionName: "Reset", method: 'GET',
+            actionURL: 'app/dashboard/panel?_recId=_empty&bId='+boardId,
+            setData: [{ resId : 'AddDashboardPanel' }] }
+        ]
+      }
+    })
+    return rows
+  })
+
 }
 
 // ============================================================================
@@ -668,7 +762,7 @@ function uploadOut( uploadType ) {
 
 // ============================================================================
 
-function addOptions( optArr, selected ) {
+function addOptions( optArr, selected, disabledArr ) {
   let opts = []
   for ( let opt of optArr ) {
     let option = { option : opt }
@@ -676,6 +770,9 @@ function addOptions( optArr, selected ) {
       option.selected = true 
     } else if ( selected instanceof Array && selected.includes( opt )) { 
       option.selected = true 
+    }
+    if ( disabledArr instanceof Array && disabledArr.includes( opt )  ) {
+      option.disabled = true
     }
     if ( [ 'Metric',  'Event', 'BLOB' ].includes( opt )  ) {
       option.disabled = true

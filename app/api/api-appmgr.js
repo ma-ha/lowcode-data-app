@@ -7,6 +7,7 @@ const userDta    = require( '../persistence/app-dta-user' )
 const appImport  = require( './api-app-import' )
 const propHandler= require( '../data/propertyHandler' )
 const models     = require( './api-models' )
+const helper     = require( '../helper/helper' )
 
 exports: module.exports = { 
   setupAPI
@@ -44,6 +45,10 @@ async function setupAPI( app ) {
   svc.get(    '/app/entity/property/status-change', guiAuthz, getPropertyStatus )
   svc.post(   '/app/entity/property/status-change', guiAuthz, setPropertyStatus )
 
+  svc.get(    '/app/dashboard/panel', guiAuthz, getDashboardPanel )
+  svc.post(   '/app/dashboard/panel', guiAuthz, addDashboardPanel )
+  svc.delete( '/app/dashboard/panel', guiAuthz, delDashboardPanel )
+ 
   // svc.get(  '/erm', getERM )
   // svc.post( '/erm', saveERM )
 
@@ -74,6 +79,10 @@ async function getApp( req, res )  {
     let apps = []
     for ( let appId in appMap ) {
       let app = appMap[ appId ]
+      let dashboardLnk = ''
+      if ( app.dashboard ) {
+        dashboardLnk = '<a href="index.html?layout=AppDashboardPanels-nonav&id='+app.title.replaceAll(' ','_')+'">Configure</a>'
+      }
       apps.push({
         active : ( app.role.length > 0),
         id : appId,
@@ -82,7 +91,8 @@ async function getApp( req, res )  {
         tags  : getTagsCSV( app.scope ),
         role  : ( app.role ? app.role.join() : '' ),
         enabled  : ( app.enabled ? true : false ),
-        entitiesLnk :'<a href="index.html?layout=AppEntities-nonav&id='+appId+'">Manage&nbsp;Entities</a>',
+        dashboardLnk : dashboardLnk, 
+        entitiesLnk : '<a href="index.html?layout=AppEntities-nonav&id='+appId+'">Manage&nbsp;Entities</a>',
         pagesLnk :'<a href="index.html?layout=AppPages-nonav&id='+appId+'">Manage&nbsp;Pages</a>',
         appLnk :'<a href="index.html?layout=AppEntity-nonav&id='+appId+','+app.startPage+'">Open&nbsp;App</a>',
         expLnk :'<a href="app/json/'+appId.replaceAll('/','_').replace('_','/')+'" target="_blank">Export</a>',
@@ -150,6 +160,16 @@ async function addApp( req, res ) {
   app.scopeId = ( req.body.scope == '' ? null : req.body.scope )
   app.title   = ( req.body.name ? req.body.name : req.body.id )
   app.enabled = ( req.body.enabled ? true : false )
+  app.dashboard = ( req.body.dashboard ? true : false )
+  if ( app.dashboard ) {
+   if ( ! app.startPage[0] || ! app.startPage[0].startsWith( 'dashboard/' ) ) {
+    app.startPage.unshift( 'dashboard/' + app.title + ' Dashboard' )
+   }
+  } else  {
+    if ( app.startPage[0] &&  app.startPage[0].startsWith( 'dashboard/' ) ) {
+      app.startPage.shift()
+    }
+  }
   if ( req.body.role == '-' ) {
     app.role = []
   } else {
@@ -682,6 +702,113 @@ async function delProperty( req, res ) {
   }  else { 
     return res.status(401).send( 'Property not found' )
   }
+}
+
+// ============================================================================
+
+async function getDashboardPanel( req, res ) {
+  log.info( 'GET /app/dashboard/panel', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+
+  let panelArr = []
+  if ( req.query._recId == '_empty' ) {
+    return res.send({
+      panelId : '',
+      boardId : req.query.bId,
+      scopeId : user.rootScopeId,
+      Type    : 'Number',
+      Title   : '',
+      SubText : '',
+      PosX    : '1',
+      PosY    : '1',
+      Size    : '1x1',
+      Entity  : '',
+      Query   : '',
+      Prop    : '',
+      Descr   : '',
+      Style   : ''
+    })
+  } else if ( req.query.id  &&  req.query.layout ) { // board id
+    let panels = await dta.getData( 
+      user.rootScopeId + '_dashboard', 
+      user.rootScopeId,
+      false,
+      { "Board": req.query.id } 
+    )
+    for ( let panelId in panels ) {
+      let panel = panels[ panelId ]
+      panelArr.push({
+        panelId : panel.id,
+        scopeId : panel.scopeId,
+        Board   : panel.Board,
+        Title   : panel.Title,
+        Type    : panel.Type,
+        Pos     : panel.Pos[0]+','+panel.Pos[1],
+        Size    : panel.Size[0]+'x'+panel.Size[1],
+        Entity  : panel.Metric.Entity
+      })
+    }
+    return res.send( panelArr )
+  } else if ( req.query.panelId ) {
+    let p = await dta.getDataById( user.rootScopeId + '_dashboard', req.query .panelId )
+    if ( ! p ) { return res.status(401).send( 'not found' ) }
+    let panel = {
+      panelId : p.id,
+      boardId : p.Board,
+      scopeId : p.scopeId,
+      Type    : p.Type,
+      Title   : p.Title,
+      SubText : p.SubText,
+      PosX    : p.Pos[0],
+      PosY    : p.Pos[1],
+      Size    : p.Size[0] +'x'+ p.Size[1],
+      Entity  : p.Entity,
+      Query   : p.Metric.Query,
+      Prop    : p.Metric.Prop,
+      Descr   : p.Metric.Descr,
+      Style   : p.Metric.Style
+    }
+    log.info( 'panel', panel )
+    return res.send( panel )
+  }
+  res.send([])
+}
+
+async function addDashboardPanel( req, res ) {
+  log.info( 'POST /app/dashboard/panel', req.query, req.body )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  let s = req.body.Size.split('x')
+  let size = [ Number.parseInt( s[0] ),  Number.parseInt( s[1] ) ]
+  let panel = {
+    scopeId : user.rootScopeId,
+    Board   : req.body.boardId,
+    Type    : req.body.Type,
+    Title   : req.body.Title,
+    SubText : req.body.SubText,
+    Pos : [ Number.parseInt( req.body.PosX ), Number.parseInt( req.body.PosY ) ],
+    Size :  size,
+    Metric : {
+      Entity : req.body.Entity,
+      Query  : req.body.Query,
+      Prop   : req.body.Prop,
+      Descr  : req.body.Descr,
+      Style  : req.body.Style
+    } 
+  }
+  if ( req.body.panelId  &&  req.body.panelId != 'undefined' ) {
+    panel.id = req.body.panelId
+  } else {
+    panel.id = helper.uuidv4()
+  }
+  await dta.addDataObjNoEvent( user.rootScopeId + '_dashboard', panel.id, panel )
+  res.send( 'OK' )
+}
+
+
+async function delDashboardPanel( req, res ) {
+  res.send('TODO')
 }
 
 // ============================================================================

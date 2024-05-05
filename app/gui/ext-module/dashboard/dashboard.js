@@ -74,6 +74,7 @@ async function dashboardFn_panelContent( divId ) {
       case 'ItemBars': dashboardFn_panel_ItemBars( divId, metricDivId, panel.Metric, dtaArr ); break;
       case 'Graph': dashboardFn_panel_Graph( divId, metricDivId, panel.Metric, dtaArr ); break;
       case 'Bars': dashboardFn_panel_Bars( divId, metricDivId, panel.Metric, dtaArr ); break;
+      case 'BarGraph': dashboardFn_panel_Bars( divId, metricDivId, panel.Metric, dtaArr, true ); break;
 
       default:
         break;
@@ -255,7 +256,7 @@ function dashboardFn_panel_ItemBars( divId, metricDivId, metric, dta ) {
   // TODO
 }
 
-function dashboardFn_panel_Bars( divId, metricDivId, metric, dta ) {
+function dashboardFn_panel_Bars( divId, metricDivId, metric, dta, graphMode ) {
   // console.log( 'dashboardFn_panel_Distribution', divId, metricDivId, metric, dta )
   if ( ! dta || dta.length < 1 ) { return }
   try { 
@@ -289,12 +290,33 @@ function dashboardFn_panel_Bars( divId, metricDivId, metric, dta ) {
       }
       // console.log( val, 'hTup=', hTup, 'hBar=', hBar, "hTlo=",hTlo)
       html += '<div class="lc-dashboard-metric-bar" style="height:100%;width:'+100/dta.length+'%" title="'+ rec[ metric.Desc ]+'">'
-      let style = ''
-      if ( metric.Style && rec[ metric.Style ] ) {
-        style += rec[ metric.Style ]
-      }
       html += '<div class="lc-dashboard-metric-bar-val" style="width:100%;height:'+hTup+'%;"  title="'+ rec[ metric.Desc ]+'"></div>' 
-      html += '<div class="lc-dashboard-metric-bar-val color'+i+'" style="width:100%;height:'+hBar+'%;'+style+'" title="'+ rec[ metric.Desc ]+'\n'+val+'"></div>' 
+      if ( graphMode ) {
+        let colU = [130,195,232] //'81c3e8'
+        let colM = [  1,105,155] //'01699b'
+        let colL = [ 68, 68, 68] // '444444'
+        let col = "background-color: #01699b;"
+        if ( val > 0 ) { 
+          let vPerc = val / max;
+          let cR = colM[0] + ( colU[0] - colM[0] ) * vPerc;
+          let cG = colM[1] + ( colU[1] - colM[1] ) * vPerc;
+          let cB = colM[2] + ( colU[2] - colM[2] ) * vPerc;
+          col = `background: linear-gradient( rgb(${cR},${cG},${cB}), #01699b);`
+        } else {
+          let vPerc =  Math.abs( val / min );
+          let cR = colM[0] + ( colL[0] - colM[0] ) * vPerc;
+          let cG = colM[1] + ( colL[1] - colM[1] ) * vPerc;
+          let cB = colM[2] + ( colL[2] - colM[2] ) * vPerc;
+          col = `background: linear-gradient( #01699b, rgb(${cR},${cG},${cB}));`
+        }
+        html += '<div class="lc-dashboard-metric-bar-val" style="width:100%;height:'+hBar+'%;'+col+'" title="'+ rec[ metric.Desc ]+'\n'+val+'"></div>' 
+      } else {
+        let style = ''
+        if ( metric.Style && rec[ metric.Style ] ) {
+          style += rec[ metric.Style ]
+        }
+        html += '<div class="lc-dashboard-metric-bar-val color'+i+'" style="width:100%;height:'+hBar+'%;'+style+'" title="'+ rec[ metric.Desc ]+'\n'+val+'"></div>'   
+      }
       html += '<div class="lc-dashboard-metric-bar-val" style="width:100%;height:'+hTlo+'%;"  title="'+ rec[ metric.Desc ]+'"></div>' 
 
       i++

@@ -750,6 +750,7 @@
       }
     },
     "startPage": [
+      "dashboard/City Light Manager Dashboard",
       "gateway",
       "CtTest",
       "OrderGW"
@@ -767,7 +768,10 @@
     "enabled": true,
     "id": "1000/city-light-mgr/1.0.0",
     "_cre": 1714413324675,
-    "_upd": 1714413335366
+    "_upd": 1714926555243,
+    "description": "",
+    "img": "",
+    "dashboard": true
   },
   "1000/ticket-mgr/1.0.0": {
     "require": {},

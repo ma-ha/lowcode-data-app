@@ -174,6 +174,36 @@ For "select" the condition can be `val $eq ...`.
 
 A CSV upload for the "create" action is available.
 
+# Metric Dashboard (WIP)
+
+Dashboards can visualize data in simple way.
+
+![dashboard examle](app/gui/img/dashboard-example.jpg)
+
+TODO: Dashboard editor
+
+Two types of dashboards are available:
+1. General dashboard: Every visualization has its own data source.
+2. Entity dashboard: Board has a selector per entity, e.g. per product.
+
+Available visualizations: 
+- Number
+- Text
+- ProgressBar
+- Distribution
+- Pie180
+- Pie360 (TODO)
+- Table
+- Items
+- ItemBars
+- Graph (TODO)
+- Bars
+- BarGraph
+
+In general the raw data is mostly not prepared to show easily on a dashboard. 
+The approach is to aggregate metrics via cron-jobs: read data via API and write metric in dedicated table. 
+An universal metric table may have properties: Id, metric-key, value, text, description, timestamp.
+
 # Integration 
 
 ## APIs
