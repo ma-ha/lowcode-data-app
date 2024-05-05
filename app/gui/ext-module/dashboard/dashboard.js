@@ -145,20 +145,26 @@ function dashboardFn_panel_Pie180( divId, metricDivId, metric, dta ) {
   try { 
     let cId = metricDivId.replace('#','') +'_Canvas'
     $( metricDivId ).html( '<canvas id="'+cId+'" width="auto" height="auto"></canvas>' )
-    var canvas = document.getElementById( cId );
+    let canvas = document.getElementById( cId );
     canvas.width  = $( metricDivId ).innerWidth()
     canvas.height = $( metricDivId ).innerHeight()
-    var cw = canvas.width
-    var ch = canvas.height
-    if ( ch < cw ) { cw = ch } else { ch = cw }
-    if ( cw /2 < ch ) { ch = cw /2 }
-    var ctx = canvas.getContext("2d")
+
+    let centerX =  canvas.width / 2
+    let radius = 0.75 * canvas.height
+    if (  1.4 * canvas.height > canvas.width ) {
+      radius = 0.35 * canvas.width
+    } 
+    let lineWidth = radius * 0.7;
+    let centerY = canvas.height - ( canvas.height - radius ) / 2 + lineWidth * 0.3
+    console.log( 'cw=',  canvas.width, 'ch=',  canvas.height )
+    console.log( '   >>',   centerX, centerY, radius )
+
+    let ctx = canvas.getContext("2d")
 
     ctx.beginPath()
     ctx.strokeStyle = "#DDD"
-    ctx.lineWidth = ch/2
-    console.log( 'ch=', ch,'cw=', cw)
-    ctx.arc( canvas.width/2, ch, 0.7*ch, 0, Math.PI, true )
+    ctx.lineWidth = lineWidth;
+    ctx.arc( centerX, centerY, radius, 0, Math.PI, true )
     ctx.stroke()
     
     let sum = 0
@@ -169,16 +175,16 @@ function dashboardFn_panel_Pie180( divId, metricDivId, metric, dta ) {
     }
     let col = [ '#024b6d','#01699b','#017cb5','#0396db','#1fa2df','#39afe6','#56b9e7','#76c2e6','#a9d3e7' ]
 
-    var start = Math.PI;
+    let start = Math.PI;
     let i = 0
     for ( let rec of dta ) {
       let val = Number.parseFloat( rec[ metric.Prop ] )
-      var range = Math.PI * val / sum
+      let range = Math.PI * val / sum
       //console.log( '.....', rec[ metric.Desc ], val, start, range )
       ctx.beginPath();
       ctx.strokeStyle = col[i];
-      ctx.lineWidth = ch/2;
-      ctx.arc( canvas.width/2, ch, 0.7*ch, start, (start+range), false );
+      ctx.lineWidth = lineWidth;
+      ctx.arc( centerX, centerY, radius, start, (start+range), false );
       ctx.stroke();
       if ( val > 0 ) {
         ctx.strokeStyle = '#FFF' 
@@ -186,8 +192,8 @@ function dashboardFn_panel_Pie180( divId, metricDivId, metric, dta ) {
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle' 
         if ( rec[ metric.Desc ] && rec[ metric.Desc ] != '' ) {
-          var tx = canvas.width/2 + Math.cos( start + range/2 ) * 0.7 * ch;
-          var ty = ch + Math.sin( start + range/2 ) * 0.7 * ch;
+          let tx = centerX + Math.cos( start + range/2 ) * radius;
+          let ty = centerY + Math.sin( start + range/2 ) * radius;
           ctx.beginPath();
           console.log( '.....', rec[ metric.Desc ],  tx, ty  )
           ctx.strokeStyle = '#444' 
@@ -350,9 +356,9 @@ function dashboard_SetTitle( divId, pageName ) {
 
 // ----------------------------------------------------------------------------
 
-var mousePosition;
-var offset = [0,0];
-var isDown = false;
+let mousePosition;
+let offset = [0,0];
+let isDown = false;
 
 function getDragDrop( divId ) {
   try {

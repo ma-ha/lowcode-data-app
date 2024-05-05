@@ -144,49 +144,49 @@
   "fdfca1c2-20ac-4471-aee2-062079a97b4c": {
     "id": "fdfca1c2-20ac-4471-aee2-062079a97b4c",
     "MetricKey": "TicketPrio1",
-    "MetricVal": "",
+    "MetricVal": "123",
     "MetricText": "Lorem ipsum dolor ",
     "MetricDescr": "sit amet, consectetur adipiscing elit",
     "MetricDate": "",
     "MetricStyle": "",
     "scopeId": "1000/DE",
     "_cre": 1714903076564,
-    "_upd": 1714903174961
+    "_upd": 1714910016573
   },
   "0e6efe0a-712d-4175-b3b0-7037ed011ede": {
     "id": "0e6efe0a-712d-4175-b3b0-7037ed011ede",
     "MetricKey": "TicketPrio1",
-    "MetricVal": "",
+    "MetricVal": "234",
     "MetricText": "Ut enim ad minim veniam",
     "MetricDescr": "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
     "MetricDate": "",
     "MetricStyle": "",
     "scopeId": "1000/DE",
     "_cre": 1714903096548,
-    "_upd": 1714903189758
+    "_upd": 1714910020815
   },
   "4f90a384-f755-49f8-85cf-cd59ba5ed756": {
     "id": "4f90a384-f755-49f8-85cf-cd59ba5ed756",
     "MetricKey": "TicketPrio1",
-    "MetricVal": "",
+    "MetricVal": "555",
     "MetricText": "Duis aute irure dolor",
     "MetricDescr": "",
     "MetricDate": "",
     "MetricStyle": "",
     "scopeId": "1000/DE",
     "_cre": 1714903122282,
-    "_upd": 1714903122282
+    "_upd": 1714910032044
   },
   "8b0d9f2f-90e8-48fe-8ac9-7841f6606fcf": {
     "id": "8b0d9f2f-90e8-48fe-8ac9-7841f6606fcf",
     "MetricKey": "TicketPrio1",
-    "MetricVal": "",
+    "MetricVal": "678",
     "MetricText": "Excepteur sint occaecat",
     "MetricDescr": "cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
     "MetricDate": "",
     "MetricStyle": "",
     "scopeId": "1000/DE",
     "_cre": 1714903165300,
-    "_upd": 1714903165300
+    "_upd": 1714910038004
   }
 }

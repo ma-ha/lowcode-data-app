@@ -73,6 +73,25 @@
     "_cre": 1707026935716,
     "_upd": 1707026935716
   },
+  "123a": {
+    "id": "123a",
+    "scopeId": "1000",
+    "Board": "Ticket_Dashboard",
+    "Title": "Ticket by Status",
+    "SubText":"... as pie 180",
+    "Type":"Pie180",
+    "Pos": [7,0],
+    "Size": [2,1],
+    "Metric": {
+      "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
+      "Query":{"MetricKey":"TicketStatusCnt"},
+      "Prop":"MetricVal",
+      "Desc":"MetricText",
+      "Style":"MetricStyle"
+    },
+    "_cre": 1707026935716,
+    "_upd": 1707026935716
+  },
   "114": {
     "id": "114",
     "scopeId": "1000",
@@ -122,7 +141,7 @@
     "Metric": {
       "Entity":"1000/device-inventory-app/1.0.0/entity/Metric",
       "Query":{"MetricKey":"TicketPrio1"},
-      "Prop": "MetricVal,MetricText,MetricDescr,"
+      "Prop": "MetricVal,MetricText,MetricDescr"
     },
     "_cre": 1707026935716,
     "_upd": 1707026935716
