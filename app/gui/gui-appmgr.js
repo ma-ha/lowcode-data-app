@@ -666,7 +666,7 @@ async function init( ) {
         dataURL: "",
         rowId: 'panelId',
         cols: [
-          { id: 'Edit', label: "", cellType: "button", width :'10%', icon: 'ui-icon-pencil', 
+          { id: 'Edit', label: "", cellType: "button", width :'4%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AddDashboardPanel' } ] },
           { id: "Title",  label: "Title", width: "15%", cellType: "text" },
           { id: "Type",   label: "Type",  width: "10%", cellType: "text" },
@@ -695,7 +695,7 @@ async function init( ) {
             { id: "Type",   label: "Type",    type: "select",  
               options: addOptions(['Number','Text','ProgressBar','Distribution','Pie180',
                 'Pie360','Table','Items','KeyValue','ItemBars','Graph','Bars','BarGraph'], 
-                'Number', ['Pie360','Graph','ItemBars','KezValue']) },
+                'Number', ['Pie360','Graph','ItemBars','KeyValue']) },
             { id: "Title",  label: "Title",   type: "text" },
             { id: "SubText",label: "Sub Text",type: "text" } 
           ]},
