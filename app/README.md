@@ -176,7 +176,7 @@ Dashboards can visualize data in simple way.
 
 ![dashboard example](doc/dashboard-example.jpg)
 
-TODO: Dashboard editor
+TODO: WYSIWYG Dashboard editor
 
 Two types of dashboards are available:
 1. General dashboard: Every visualization has its own data source.
