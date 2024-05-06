@@ -29,12 +29,11 @@
     "_upd": 1714983555514
   },
   "112": {
-    "id": "112",
     "scopeId": "1000",
     "Board": "Task_List",
+    "Type": "ProgressBar",
     "Title": "Ticket Done",
     "SubText": "... of non-closed",
-    "Type": "ProgressBar",
     "Pos": [
       1,
       0
@@ -43,24 +42,27 @@
       2,
       1
     ],
+    "CSS": "M",
+    "Img": "",
     "Metric": {
       "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
       "Query": {
         "MetricKey": "Complete"
       },
       "Prop": "MetricVal",
-      "Desc": "MetricDescr"
+      "Descr": "MetricText",
+      "Style": ""
     },
+    "id": "112",
     "_cre": 1707026935716,
-    "_upd": 1707026935716
+    "_upd": 1715018670626
   },
   "113": {
-    "id": "113",
     "scopeId": "1000",
     "Board": "Task_List",
+    "Type": "Distribution",
     "Title": "Ticket by Status",
     "SubText": "... as mixed bar",
-    "Type": "Distribution",
     "Pos": [
       3,
       0
@@ -69,25 +71,27 @@
       2,
       1
     ],
+    "CSS": "S",
+    "Img": "",
     "Metric": {
       "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
       "Query": {
         "MetricKey": "TicketStatusCnt"
       },
       "Prop": "MetricVal",
-      "Desc": "MetricText",
+      "Descr": "MetricText",
       "Style": "MetricStyle"
     },
+    "id": "113",
     "_cre": 1707026935716,
-    "_upd": 1707026935716
+    "_upd": 1715018679153
   },
   "114": {
-    "id": "114",
     "scopeId": "1000",
     "Board": "Task_List",
+    "Type": "Bars",
     "Title": "Tickets in Progress",
     "SubText": "... also this",
-    "Type": "Bars",
     "Pos": [
       5,
       0
@@ -96,25 +100,27 @@
       2,
       2
     ],
+    "CSS": "M",
+    "Img": "",
     "Metric": {
       "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
       "Query": {
         "MetricKey": "TicketOpen"
       },
       "Prop": "MetricVal",
-      "Desc": "MetricText",
+      "Descr": "MetricText",
       "Style": "MetricStyle"
     },
+    "id": "114",
     "_cre": 1707026935716,
-    "_upd": 1707026935716
+    "_upd": 1715019653900
   },
   "115": {
-    "id": "114",
     "scopeId": "1000",
     "Board": "Task_List",
+    "Type": "Items",
     "Title": "Top Prio",
     "SubText": "... tickets",
-    "Type": "Items",
     "Pos": [
       0,
       1
@@ -123,16 +129,20 @@
       3,
       2
     ],
+    "CSS": "M",
+    "Img": "",
     "Metric": {
       "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
       "Query": {
         "MetricKey": "TicketPrio1"
       },
       "Prop": "MetricText",
-      "Desc": "MetricDescr"
+      "Descr": "",
+      "Style": ""
     },
+    "id": "115",
     "_cre": 1707026935716,
-    "_upd": 1707026935716
+    "_upd": 1715018313155
   },
   "116": {
     "id": "116",

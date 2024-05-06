@@ -4,12 +4,22 @@
 .lc-dashboard {
   overflow: hidden;
 }
+
 .lc-dashboard-title {
   position: absolute;
-  font-size: 2em;
   top: 5px;
   left: 5px;
   color: var(--theme-color);
+}
+.lc-title-L,
+.lc-title {
+  font-size: 2em;
+}
+.lc-title-M {
+  font-size: 1.6em;
+}
+.lc-title-S {
+  font-size: 1.4em;
 }
 
 .lc-dashboard-metric {
@@ -38,12 +48,31 @@
 }
 .lc-dashboard-metric-items {
   color: var(--theme-color);
+}
+.lc-item,
+.lc-item-L {
   font-size: 1.3em;
+}
+.lc-item-M {
+  font-size: 1.1em;
+}
+.lc-item-S {
+  font-size: 0.9em;
 }
 .lc-dashboard-metric-item-descr {
   font-size: 0.8em;
   font-style: italic;
   color: var(--link-color);
+}
+.lc-item-descr,
+.lc-item-descr-L {
+  font-size: 0.9em;
+}
+.lc-item-descr-M {
+  font-size: 0.8em;
+}
+.lc-item-descr-S {
+  font-size: 0.7em;
 }
 
 .lc-dashboard-metric-table-div {
@@ -92,15 +121,32 @@
 }
 .lc-dashboard-metric-distribution-bar {
   float: left;
+  color: aliceblue;
+  font-size: 0.7em;
+  display: flex;
+  align-items: center;
+}
+.lc-distribution-bar-text {
+  text-align: center;
+  width: 100%;
 }
 
 .lc-dashboard-metric-bars {
   left: 5%;
   position: absolute;
 }
-
 .lc-dashboard-metric-bar {
   float: left;
+}
+.lc-dashboard-metric-bar-val {
+  display: grid;
+}
+.lc-metric-bar-text {
+  color: aliceblue;
+  text-align: center;
+  width: 100%;
+  display: grid;
+  align-items: center;
 }
 
 .color0 {
@@ -136,5 +182,4 @@
   bottom: 5px;
   left: 6px;
   color:  var(--menu-bg-color);
-
 }

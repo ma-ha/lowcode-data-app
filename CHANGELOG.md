@@ -1,7 +1,10 @@
+# 0.28.5
+- dashboard panel: S/M/L
+- dashboard panel: bar labels 
+
 # 0.28.4
 - dashboard panel editor: fix edit
 - dashboard panel img and CSS option 
-
 
 # 0.28.1
 - fix dashboard id

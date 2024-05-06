@@ -40,12 +40,13 @@ function dashboardFn_drwPanel( divId, panelId, panel, panelSize ) {
     let y = ( panelSize ) * panel.Pos[1] + 34;
     let w = panelSize * panel.Size[0];
     let h = panelSize * panel.Size[1];
+    let sizing = getCssSizing( panel );
     let style = `position:absolute;left:${x}px;top:${y}px;width:${w-5}px;height:${h-5}px;`;
     let mStyle =  `position:absolute;left:0px;top:50px;width:${w-5}px;height:${h-80}px;`;
     // let eId = htmlId( entity.id );
     // let id = divId+'MicrSvc-'+eId;
     html.push( `<div id="${divId}_${panelId}" class="lc-dashboard-panel ${panelId}" style="${style}">` );
-    html.push( `<div id="${divId}_${panelId}_title" class="lc-dashboard-title">${panel.Title}</div>` );
+    html.push( `<div id="${divId}_${panelId}_title" class="lc-dashboard-title lc-title${sizing}">${panel.Title}</div>` );
     html.push( `<div id="${divId}_${panelId}_metric" class="lc-dashboard-metric" style="${mStyle}">... ${panel.Type} ...</div>` );
     html.push( `<div id="${divId}_${panelId}_sub" class="lc-dashboard-sub">${panel.SubText}</div>` );
     html.push( '</div>');  
@@ -53,28 +54,35 @@ function dashboardFn_drwPanel( divId, panelId, panel, panelSize ) {
   } catch ( exc ) { console.error( 'dashboardFn_drwEntity', exc ); return ''; } 
 }
 
+function getCssSizing( panel ) {
+  let sizing = ''
+  if ( panel.CSS && ['S','M','L'].includes( panel.CSS ) ) { sizing = '-'+panel.CSS }
+  return sizing
+}
+
 // ----------------------------------------------------------------------------
 
 async function dashboardFn_panelContent( divId ) {
   for ( let panelId in dashboardPanels[ divId ] ) {
     let panel = dashboardPanels[ divId ][ panelId ]
+    let sizing = getCssSizing( panel )
     let dtaArr = await dashboardFn_loadMetric( panel.Metric ) 
     let rec = ( dtaArr.length == 1 ? dtaArr[0] : null )
     let metricDivId = '#'+ divId +'_'+ panelId +'_metric'
     // console.log( 'dashboardFn_panelContent', rec, dtaArr )
     switch ( panel.Type ) {
-      case 'Number': dashboardFn_panel_Number( divId, metricDivId, panel.Metric, rec ); break;
-      case 'Text':   dashboardFn_panel_Text( divId, metricDivId, panel.Metric, rec ); break;
-      case 'ProgressBar':  dashboardFn_panel_ProgressBar( divId, metricDivId, panel.Metric, rec ); break;
-      case 'Distribution': dashboardFn_panel_Distribution( divId, metricDivId, panel.Metric, dtaArr ); break;
-      case 'Pie180': dashboardFn_panel_Pie180( divId, metricDivId, panel.Metric, dtaArr ); break;
-      case 'Pie360': dashboardFn_panel_Pie360( divId, metricDivId, panel.Metric, dtaArr ); break;
-      case 'Table': dashboardFn_panel_Table( divId, metricDivId, panel.Metric, dtaArr ); break;
-      case 'Items': dashboardFn_panel_Items( divId, metricDivId, panel.Metric, dtaArr ); break;
-      case 'ItemBars': dashboardFn_panel_ItemBars( divId, metricDivId, panel.Metric, dtaArr ); break;
-      case 'Graph': dashboardFn_panel_Graph( divId, metricDivId, panel.Metric, dtaArr ); break;
-      case 'Bars': dashboardFn_panel_Bars( divId, metricDivId, panel.Metric, dtaArr ); break;
-      case 'BarGraph': dashboardFn_panel_Bars( divId, metricDivId, panel.Metric, dtaArr, true ); break;
+      case 'Number': dashboardFn_panel_Number( divId, metricDivId, panel.Metric, rec, sizing ); break;
+      case 'Text':   dashboardFn_panel_Text( divId, metricDivId, panel.Metric, rec, sizing ); break;
+      case 'ProgressBar':  dashboardFn_panel_ProgressBar( divId, metricDivId, panel.Metric, rec, sizing ); break;
+      case 'Distribution': dashboardFn_panel_Distribution( divId, metricDivId, panel.Metric, dtaArr, sizing ); break;
+      case 'Pie180': dashboardFn_panel_Pie180( divId, metricDivId, panel.Metric, dtaArr, sizing ); break;
+      case 'Pie360': dashboardFn_panel_Pie360( divId, metricDivId, panel.Metric, dtaArr, sizing ); break;
+      case 'Table': dashboardFn_panel_Table( divId, metricDivId, panel.Metric, dtaArr, sizing ); break;
+      case 'Items': dashboardFn_panel_Items( divId, metricDivId, panel.Metric, dtaArr, sizing ); break;
+      case 'ItemBars': dashboardFn_panel_ItemBars( divId, metricDivId, panel.Metric, dtaArr, sizing ); break;
+      case 'Graph': dashboardFn_panel_Graph( divId, metricDivId, panel.Metric, dtaArr, sizing ); break;
+      case 'Bars': dashboardFn_panel_Bars( divId, metricDivId, panel.Metric, dtaArr, false, sizing ); break;
+      case 'BarGraph': dashboardFn_panel_Bars( divId, metricDivId, panel.Metric, dtaArr, true, sizing ); break;
 
       default:
         break;
@@ -82,21 +90,21 @@ async function dashboardFn_panelContent( divId ) {
   }
 }
 
-function dashboardFn_panel_Number( divId, metricDivId, metric, dta ) {
+function dashboardFn_panel_Number( divId, metricDivId, metric, dta, sizing ) {
   if ( ! dta || ! dta[ metric.Prop ] ) { return }
   $( metricDivId ).html(  
     '<div class="lc-dashboard-metric-number">' +  dta[ metric.Prop ] + '</div>'
   );
 }
 
-function dashboardFn_panel_Text( divId, metricDivId, metric, dta ) {
+function dashboardFn_panel_Text( divId, metricDivId, metric, dta, sizing ) {
   if ( ! dta || ! dta[ metric.Prop ] ) { return }
   $( metricDivId ).html(  
     '<div class="lc-dashboard-metric-text">' +  dta[ metric.Prop ] + '</div>'
   );
 }
 
-function dashboardFn_panel_ProgressBar( divId, metricDivId, metric, dta ) {
+function dashboardFn_panel_ProgressBar( divId, metricDivId, metric, dta, sizing ) {
   if ( ! dta || ! dta[ metric.Prop ] ) { return }
   try {
     let pVal = Math.round( Number.parseFloat( dta[ metric.Prop ] ) * 100 )
@@ -110,7 +118,7 @@ function dashboardFn_panel_ProgressBar( divId, metricDivId, metric, dta ) {
   } catch ( exc ) { console.error( 'dashboardFn_panel_ProgressBar', exc )}
 }
 
-function dashboardFn_panel_Distribution( divId, metricDivId, metric, dta ) {
+function dashboardFn_panel_Distribution( divId, metricDivId, metric, dta, sizing ) {
   // console.log( 'dashboardFn_panel_Distribution', divId, metricDivId, metric, dta )
   if ( ! dta || dta.length < 1 ) { return }
   try { 
@@ -131,8 +139,14 @@ function dashboardFn_panel_Distribution( divId, metricDivId, metric, dta ) {
       if ( metric.Style && rec[ metric.Style ] ) {
         style += rec[ metric.Style ]
       }
-      html += '<div class="lc-dashboard-metric-distribution-bar color'+i+'"' +
-        ' style="'+style+'" title="'+ rec[ metric.Desc ]+'\n'+val+'"></div>' 
+      if ( pVal > 8 ) {
+        html += '<div class="lc-dashboard-metric-distribution-bar color'+i+'"' +
+        ' style="'+style+'" title="'+ rec[ metric.Descr ]+'\n'+val+'">' +
+        '<span class="lc-distribution-bar-text">'+ rec[ metric.Descr ]+'</span></div>' 
+      } else {
+        html += '<div class="lc-dashboard-metric-distribution-bar color'+i+'"' +
+        ' style="'+style+'" title="'+ rec[ metric.Descr ]+'\n'+val+'"></div>' 
+      }
       i++
     }
     html += '</div>'
@@ -140,8 +154,8 @@ function dashboardFn_panel_Distribution( divId, metricDivId, metric, dta ) {
   } catch ( exc ) { console.error( 'dashboardFn_panel_Distribution', exc )}
 }
 
-function dashboardFn_panel_Pie180( divId, metricDivId, metric, dta ) {
-  console.log( 'dashboardFn_panel_Pie180', divId, metricDivId, metric, dta )
+function dashboardFn_panel_Pie180( divId, metricDivId, metric, dta, sizing ) {
+  // console.log( 'dashboardFn_panel_Pie180', divId, metricDivId, metric, dta )
   if ( ! dta || dta.length < 1 ) { return }
   try { 
     let cId = metricDivId.replace('#','') +'_Canvas'
@@ -211,11 +225,11 @@ function dashboardFn_panel_Pie180( divId, metricDivId, metric, dta ) {
 } 
 
 
-function dashboardFn_panel_Pie360( divId, metricDivId, metric, dta ) {
+function dashboardFn_panel_Pie360( divId, metricDivId, metric, dta, sizing ) {
   // TODO
 }
 
-function dashboardFn_panel_Table( divId, metricDivId, metric, dta ) {
+function dashboardFn_panel_Table( divId, metricDivId, metric, dta, sizing ) {
   //console.log( 'dashboardFn_panel_Table', divId, metricDivId, metric, dta )
   if ( ! dta || dta.length < 1 ) { return }
   try { 
@@ -235,15 +249,15 @@ function dashboardFn_panel_Table( divId, metricDivId, metric, dta ) {
   } catch ( exc ) { console.error( 'dashboardFn_panel_Table', exc )}
 }
 
-function dashboardFn_panel_Items( divId, metricDivId, metric, dta ) {
-  // console.log( 'dashboardFn_panel_Items', divId, metricDivId, metric, dta )
+function dashboardFn_panel_Items( divId, metricDivId, metric, dta, sizing ) {
+  // console.log( 'dashboardFn_panel_Items', divId, metricDivId, metric, dta, sizing )
   if ( ! dta || dta.length < 1 ) { return }
   try { 
     let html = '<div class="lc-dashboard-metric-items-div"><ul class="lc-dashboard-metric-items">' 
     for ( let rec of dta ) {
-      html += '<li class="lc-dashboard-metric-item">' + rec[ metric.Prop ] 
+      html += '<li class="lc-dashboard-metric-item"><span class="lc-item'+sizing+'">' + rec[ metric.Prop ] +'</span>'
       if ( rec[ metric.Desc ] || rec[ metric.Desc ] != '' ) {
-        html += '<br><span class="lc-dashboard-metric-item-descr">' + rec[ metric.Desc ] + '</span>'
+        html += '<br><span class="lc-dashboard-metric-item-descr lc-item-descr'+sizing+'">' + rec[ metric.Desc ] + '</span>'
       }
       html += '</li>'
     }
@@ -256,7 +270,7 @@ function dashboardFn_panel_ItemBars( divId, metricDivId, metric, dta ) {
   // TODO
 }
 
-function dashboardFn_panel_Bars( divId, metricDivId, metric, dta, graphMode ) {
+function dashboardFn_panel_Bars( divId, metricDivId, metric, dta, graphMode, sizing ) {
   // console.log( 'dashboardFn_panel_Distribution', divId, metricDivId, metric, dta )
   if ( ! dta || dta.length < 1 ) { return }
   try { 
@@ -289,8 +303,8 @@ function dashboardFn_panel_Bars( divId, metricDivId, metric, dta, graphMode ) {
         hTlo = loPer - hBar
       }
       // console.log( val, 'hTup=', hTup, 'hBar=', hBar, "hTlo=",hTlo)
-      html += '<div class="lc-dashboard-metric-bar" style="height:100%;width:'+100/dta.length+'%" title="'+ rec[ metric.Desc ]+'">'
-      html += '<div class="lc-dashboard-metric-bar-val" style="width:100%;height:'+hTup+'%;"  title="'+ rec[ metric.Desc ]+'"></div>' 
+      html += '<div class="lc-dashboard-metric-bar" style="height:100%;width:'+100/dta.length+'%" title="'+ rec[ metric.Descr ]+'">'
+      html += '<div class="lc-dashboard-metric-bar-val" style="width:100%;height:'+hTup+'%;"  title="'+ rec[ metric.Descr ]+'"></div>' 
       if ( graphMode ) {
         let colU = [130,195,232] //'81c3e8'
         let colM = [  1,105,155] //'01699b'
@@ -309,15 +323,23 @@ function dashboardFn_panel_Bars( divId, metricDivId, metric, dta, graphMode ) {
           let cB = colM[2] + ( colL[2] - colM[2] ) * vPerc;
           col = `background: linear-gradient( #01699b, rgb(${cR},${cG},${cB}));`
         }
-        html += '<div class="lc-dashboard-metric-bar-val" style="width:100%;height:'+hBar+'%;'+col+'" title="'+ rec[ metric.Desc ]+'\n'+val+'"></div>' 
+        html += '<div class="lc-dashboard-metric-bar-val" style="width:100%;height:'+hBar+'%;'+col+'" title="'+ rec[ metric.Descr ]+'\n'+val+'"></div>' 
       } else {
         let style = ''
         if ( metric.Style && rec[ metric.Style ] ) {
           style += rec[ metric.Style ]
         }
-        html += '<div class="lc-dashboard-metric-bar-val color'+i+'" style="width:100%;height:'+hBar+'%;'+style+'" title="'+ rec[ metric.Desc ]+'\n'+val+'"></div>'   
+        if ( w > 8 ) {
+          html += '<div class="lc-dashboard-metric-bar-val color'+i+'" '+
+            'style="width:100%;height:'+hBar+'%;'+style+'" title="'+ rec[ metric.Descr ]+'\n'+val+'">'+
+              '<span class="lc-metric-bar-text">' + rec[ metric.Descr ] + '</span>'+
+            '</div>'
+        } else {
+          html += '<div class="lc-dashboard-metric-bar-val color'+i+'" '+
+            'style="width:100%;height:'+hBar+'%;'+style+'" title="'+ rec[ metric.Descr ]+'\n'+val+'"></div>'
+        }
       }
-      html += '<div class="lc-dashboard-metric-bar-val" style="width:100%;height:'+hTlo+'%;"  title="'+ rec[ metric.Desc ]+'"></div>' 
+      html += '<div class="lc-dashboard-metric-bar-val" style="width:100%;height:'+hTlo+'%;"  title="'+ rec[ metric.Descr ]+'"></div>' 
 
       i++
       html += '</div>'
@@ -327,7 +349,7 @@ function dashboardFn_panel_Bars( divId, metricDivId, metric, dta, graphMode ) {
   } catch ( exc ) { console.error( 'dashboardFn_panel_ProgressBar', exc )}
 }
 
-function dashboardFn_panel_Graph( divId, metricDivId, metric, dta ) {
+function dashboardFn_panel_Graph( divId, metricDivId, metric, dta, sizing ) {
   // console.log( 'dashboardFn_panel_Distribution', divId, metricDivId, metric, dta )
   if ( ! dta || dta.length < 1 ) { return }
   try { 
