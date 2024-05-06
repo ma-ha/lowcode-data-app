@@ -180,7 +180,7 @@ TODO: Dashboard editor
 
 Two types of dashboards are available:
 1. General dashboard: Every visualization has its own data source.
-2. Entity dashboard: Board has a selector per entity, e.g. per product.
+2. Entity dashboard: Board has a selector per entity, e.g. per product. (TODO)
 
 Available visualizations: 
 - Number

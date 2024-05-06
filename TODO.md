@@ -1,10 +1,8 @@
 # TODOs / Ideas
 
-- [ ] Metrics field type
+- [ ] Metrics field type (timeseries) + query options
 - [ ] BLOB field type
 - [ ] Reset password fix
 - [ ] Improve content config
 - [ ] clean up CSS
-
-Rest-web-gui
-- [ ] fix: update date field
+- [ ] entity dashboard
