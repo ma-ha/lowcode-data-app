@@ -727,7 +727,9 @@ async function getDashboardPanel( req, res ) {
       Query   : '{}',
       Prop    : '',
       Descr   : '',
-      Style   : ''
+      Style   : '',
+      CSS     : 'L',
+      Img     : ''
     })
   } else if ( req.query.id  &&  req.query.layout ) { // board id
     let panels = await dta.getData( 
@@ -738,21 +740,26 @@ async function getDashboardPanel( req, res ) {
     )
     for ( let panelId in panels ) {
       let panel = panels[ panelId ]
+      let e = panel.Metric.Entity.split('/')
       panelArr.push({
         panelId : panel.id,
         scopeId : panel.scopeId,
         Board   : panel.Board,
         Title   : panel.Title,
+        CSS     : ( panel.CSS ? panel.CSS : 'L' ),
         Type    : panel.Type,
         Pos     : panel.Pos[0]+','+panel.Pos[1],
         Size    : panel.Size[0]+'x'+panel.Size[1],
-        Entity  : panel.Metric.Entity
+        Entity  : e[0]+'/'+e[1]+'/'+e[2]+'/'+e[4],
+        Query   : JSON.stringify( panel.Metric.Query ),
+        Prop    : panel.Metric.Prop
       })
     }
     return res.send( panelArr )
   } else if ( req.query.panelId ) {
     let p = await dta.getDataById( user.rootScopeId + '_dashboard', req.query .panelId )
     if ( ! p ) { return res.status(401).send( 'not found' ) }
+    let e = p.Metric.Entity.split('/')
     let panel = {
       panelId : p.id,
       boardId : p.Board,
@@ -763,11 +770,13 @@ async function getDashboardPanel( req, res ) {
       PosX    : p.Pos[0],
       PosY    : p.Pos[1],
       Size    : p.Size[0] +'x'+ p.Size[1],
-      Entity  : p.Metric.Entity,
+      Entity  : e[0]+'/'+e[1]+'/'+e[2]+'/'+e[4],
       Query   : JSON.stringify( p.Metric.Query ),
       Prop    : p.Metric.Prop,
       Descr   : p.Metric.Descr,
-      Style   : p.Metric.Style
+      Style   : p.Metric.Style,
+      CSS     : p.CSS,
+      Img     : p.Img
     }
     log.debug( 'panel', panel )
     return res.send( panel )
@@ -781,16 +790,21 @@ async function addDashboardPanel( req, res ) {
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   let s = req.body.Size.split('x')
   let size = [ Number.parseInt( s[0] ),  Number.parseInt( s[1] ) ]
+  let e = req.body.Entity.split('/')
+  log.info(' >>>', e )
+  if ( ! e || e.length != 4 ) { return res.send('ERROR: Entity must have format: "scope/app-name/ver/entity-name"') }
   let panel = {
     scopeId : user.rootScopeId,
     Board   : req.body.boardId,
     Type    : req.body.Type,
     Title   : req.body.Title,
     SubText : req.body.SubText,
-    Pos : [ Number.parseInt( req.body.PosX ), Number.parseInt( req.body.PosY ) ],
-    Size :  size,
-    Metric : {
-      Entity : req.body.Entity,
+    Pos     : [ Number.parseInt( req.body.PosX ), Number.parseInt( req.body.PosY ) ],
+    Size    : size,
+    CSS     : req.body.CSS,
+    Img     : req.body.Img,
+    Metric  : {
+      Entity : e[0]+'/'+e[1]+'/'+e[2]+'/entity/'+e[3],
       Query  : JSON.parse( req.body.Query ),
       Prop   : req.body.Prop,
       Descr  : req.body.Descr,

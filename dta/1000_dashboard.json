@@ -1,11 +1,10 @@
 {
   "111": {
-    "id": "111",
     "scopeId": "1000",
     "Board": "Task_List",
+    "Type": "Number",
     "Title": "Tickets",
     "SubText": "",
-    "Type": "Number",
     "Pos": [
       0,
       0
@@ -14,16 +13,20 @@
       1,
       1
     ],
+    "CSS": "",
+    "Img": "",
     "Metric": {
       "Entity": "1000/device-inventory-app/1.0.0/entity/Metric",
       "Query": {
         "MetricKey": "TestNumber"
       },
       "Prop": "MetricVal",
-      "Desc": "MetricDescr"
+      "Descr": "",
+      "Style": ""
     },
+    "id": "111",
     "_cre": 1707026935716,
-    "_upd": 1707026935716
+    "_upd": 1714983555514
   },
   "112": {
     "id": "112",
@@ -251,6 +254,8 @@
       1,
       1
     ],
+    "CSS": "L",
+    "Img": "",
     "Metric": {
       "Entity": "x/z/y",
       "Query": {
@@ -262,7 +267,7 @@
     },
     "id": "5d331940-2dac-4597-a182-da30171a89a6",
     "_cre": 1714969523934,
-    "_upd": 1714981979770
+    "_upd": 1714982669819
   },
   "128ba5f9-d5db-44fd-abfa-29586e709c70": {
     "scopeId": "1000",
@@ -278,6 +283,8 @@
       1,
       1
     ],
+    "CSS": "L",
+    "Img": "",
     "Metric": {
       "Entity": "",
       "Query": "",
@@ -287,6 +294,6 @@
     },
     "id": "128ba5f9-d5db-44fd-abfa-29586e709c70",
     "_cre": 1714969635054,
-    "_upd": 1714969727917
+    "_upd": 1714982676330
   }
 }

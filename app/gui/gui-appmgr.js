@@ -668,11 +668,14 @@ async function init( ) {
         cols: [
           { id: 'Edit', label: "", cellType: "button", width :'10%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AddDashboardPanel' } ] },
-          { id: "Title",  label: "Title", width: "30%", cellType: "text" },
-          { id: "Type",   label: "Type",  width: "20%", cellType: "text" },
-          { id: "Pos",    label: "Pos",   width: "10%", cellType: "text" },
-          { id: "Size",   label: "Size",  width: "10%", cellType: "text" },
-          { id: "Entity", label: "Entity",width: "30%", cellType: "text" }
+          { id: "Title",  label: "Title", width: "15%", cellType: "text" },
+          { id: "Type",   label: "Type",  width: "10%", cellType: "text" },
+          { id: "CSS",    label: "CSS",   width: "6%", cellType: "text" },
+          { id: "Pos",    label: "Pos",   width: "6%", cellType: "text" },
+          { id: "Size",   label: "Size",  width: "6%", cellType: "text" },
+          { id: "Entity", label: "Entity",width: "20%", cellType: "text" },
+          { id: "Query",  label: "Query", width: "15%", cellType: "text" },
+          { id: "Prop",   label: "Property",width: "15%", cellType: "text" }
         ]
       }
     })
@@ -702,7 +705,7 @@ async function init( ) {
             { id: "PosY",   label: "Pos y",   type: "select",  
               options: addOptions(['0','1','2','3','4','5','6','7','8']) },
             { id: "Size",   label: "Size",    type: "select", 
-              options: addOptions(['1x1','1x2','1x3','1x4','2x1','2x2','2x3','2x4','3x1','3x2','3x3','3x4']) }
+              options: addOptions(['1x1','2x1','3x1','4x1','1x2','2x2','3x2','4x2','1x3','2x3','3x3','4x3']) }
           ]},  
           { formFields: [
             { id: "Entity", label: "Entity",  type: "text" },
@@ -711,8 +714,13 @@ async function init( ) {
           { formFields: [
             { id: "Prop",   label: "Prop ",   type: "text" },
             { id: "Descr",  label: "Descr",   type: "text" },
-            { id: "Style",  label: "Style",   type: "text" } 
+            { id: "Style",  label: "Style Prop",   type: "text" } 
+          ]},
+          { formFields: [
+            { id: "Img",    label: "Img",   type: "text" },
+            { id: "CSS",    label: "Style",  type: "select", options: addOptions(['L','M','S']) }
           ]}
+
         ] }],
         actions : [ 
           { id: "AddDashboardPanelBtn", actionName: "Add / Update", update: [{ resId:'DashboardPanels' }], 
