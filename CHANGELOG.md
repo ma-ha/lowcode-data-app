@@ -1,3 +1,7 @@
+# 0.28.4
+- dashboard panel editor: fix edit
+
+
 # 0.28.1
 - fix dashboard id
 
