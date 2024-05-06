@@ -2,7 +2,7 @@
   "111": {
     "id": "111",
     "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
+    "Board": "Task_List",
     "Title": "Tickets",
     "SubText": "",
     "Type": "Number",
@@ -28,7 +28,7 @@
   "112": {
     "id": "112",
     "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
+    "Board": "Task_List",
     "Title": "Ticket Done",
     "SubText": "... of non-closed",
     "Type": "ProgressBar",
@@ -54,7 +54,7 @@
   "113": {
     "id": "113",
     "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
+    "Board": "Task_List",
     "Title": "Ticket by Status",
     "SubText": "... as mixed bar",
     "Type": "Distribution",
@@ -81,7 +81,7 @@
   "114": {
     "id": "114",
     "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
+    "Board": "Task_List",
     "Title": "Tickets in Progress",
     "SubText": "... also this",
     "Type": "Bars",
@@ -108,7 +108,7 @@
   "115": {
     "id": "114",
     "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
+    "Board": "Task_List",
     "Title": "Top Prio",
     "SubText": "... tickets",
     "Type": "Items",
@@ -134,7 +134,7 @@
   "116": {
     "id": "116",
     "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
+    "Board": "Task_List",
     "Title": "Top Prio",
     "SubText": "... tickets",
     "Type": "Table",
@@ -159,7 +159,7 @@
   "117": {
     "id": "117",
     "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
+    "Board": "Task_List",
     "Title": "Ticket Count",
     "SubText": "... tickets",
     "Type": "BarGraph",
@@ -186,7 +186,7 @@
   "123": {
     "id": "123",
     "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
+    "Board": "Task_List",
     "Title": "Ticket by Status",
     "SubText": "... as pie 180",
     "Type": "Pie180",
@@ -213,7 +213,7 @@
   "123a": {
     "id": "123a",
     "scopeId": "1000",
-    "Board": "Ticket_Dashboard",
+    "Board": "Task_List",
     "Title": "Ticket by Status",
     "SubText": "... as pie 180",
     "Type": "Pie180",

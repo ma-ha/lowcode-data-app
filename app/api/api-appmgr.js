@@ -163,7 +163,7 @@ async function addApp( req, res ) {
   app.dashboard = ( req.body.dashboard ? true : false )
   if ( app.dashboard ) {
    if ( ! app.startPage[0] || ! app.startPage[0].startsWith( 'dashboard/' ) ) {
-    app.startPage.unshift( 'dashboard/' + app.title + ' Dashboard' )
+    app.startPage.unshift( 'dashboard/' + app.title )
    }
   } else  {
     if ( app.startPage[0] &&  app.startPage[0].startsWith( 'dashboard/' ) ) {

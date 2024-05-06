@@ -874,7 +874,7 @@
     },
     "page": {},
     "startPage": [
-      "dashboard/Ticket Dashboard",
+      "dashboard/Task List",
       "Ticket"
     ],
     "scopeId": null,
@@ -895,6 +895,7 @@
       }
     },
     "enabled": true,
+    "dashboard": true,
     "img": "img/k8s-fire.png",
     "id": "1000/ticket-mgr/1.0.0",
     "_cre": 1711692745036,
