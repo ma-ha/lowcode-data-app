@@ -178,7 +178,7 @@ A CSV upload for the "create" action is available.
 
 Dashboards can visualize data in simple way.
 
-![dashboard examle](app/gui/img/dashboard-example.jpg)
+![dashboard example](doc/dashboard-example.jpg)
 
 TODO: Dashboard editor
 
