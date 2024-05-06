@@ -195,7 +195,7 @@ async function getDoc( req, res ) {
   if ( entity.stateModel ) {
     stateModel = await dta.getStateModelById( user.rootScopeId +'/'+ entity.stateModel )
   }
-  log.info( 'dataArr', filter )
+  log.debug( 'dataArr', dataArr )
 
   let result = []
   for ( let rec of dataArr ) {

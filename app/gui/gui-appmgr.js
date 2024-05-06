@@ -697,9 +697,9 @@ async function init( ) {
           ]},
           { formFields: [
             { id: "PosX",   label: "Pos X",   type: "select",  
-              options: addOptions(['1','2','3','4','5','6','7','8']) },
+              options: addOptions(['0','1','2','3','4','5','6','7','8']) },
             { id: "PosY",   label: "Pos y",   type: "select",  
-              options: addOptions(['1','2','3','4','5','6','7','8']) },
+              options: addOptions(['0','1','2','3','4','5','6','7','8']) },
             { id: "Size",   label: "Size",    type: "select", 
               options: addOptions(['1x1','1x2','1x3','1x4','2x1','2x2','2x3','2x4','3x1','3x2','3x3','3x4']) }
           ]},  

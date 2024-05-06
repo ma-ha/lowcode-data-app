@@ -315,7 +315,7 @@ async function saveStateModel( stateModelId, stateModel ) {
 
 // tbl param can be like "1000city" or "1000/region-mgr/1.0.0/city"
 async function getData( tbl, scopeId, admin, qry ) {  
-  log.info( 'getData',  tbl, scopeId )
+  log.debug( 'getData',  tbl, scopeId )
   let table = tbl
   await syncTbl( tbl )
   let inheritData = false
@@ -383,7 +383,7 @@ async function idExists( tbl, id  ) {
 }
 
 async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams ) {
-  log.info( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams )
+  log.debug( 'getDataObjX', rootScopeId, appId, appVersion, entityId, userScopeId, id, filterParams )
   let tbl = rootScopeId + entityId
   await syncTbl( tbl )
   let inherit = await scopeInherited( rootScopeId, appId, appVersion, entityId )

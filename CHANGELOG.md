@@ -1,3 +1,6 @@
+# 0.28.1
+- fix dashboard id
+
 # 0.28.0
 - fix scopeId
 - metric dashboard

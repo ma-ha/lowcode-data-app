@@ -769,7 +769,7 @@ async function getDashboardPanel( req, res ) {
       Descr   : p.Metric.Descr,
       Style   : p.Metric.Style
     }
-    log.info( 'panel', panel )
+    log.debug( 'panel', panel )
     return res.send( panel )
   }
   res.send([])
