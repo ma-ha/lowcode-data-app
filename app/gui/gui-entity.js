@@ -62,7 +62,7 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
     
     } else if ( typeof app.startPage === 'array' || app.startPage instanceof Array ) {
   
-      if (  app.startPage.length == 1 ) {
+      if (  app.startPage.length == 1 &&  ! app.startPage[0].startsWith( 'dashboard/' ) ) {
         // render simple entity page
         let entityId  = app.startPage[0]
         rowArr = renderEntityRows( app, appId, entityId, null, user )

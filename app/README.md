@@ -176,8 +176,6 @@ Dashboards can visualize data in simple way.
 
 ![dashboard example](doc/dashboard-example.jpg)
 
-TODO: WYSIWYG Dashboard editor
-
 Two types of dashboards are available:
 1. General dashboard: Every visualization has its own data source.
 2. Entity dashboard: Board has a selector per entity, e.g. per product. (TODO)
@@ -191,7 +189,8 @@ Available visualizations:
 - Pie360 (TODO)
 - Table
 - Items
-- ItemBars
+- ItemBars (TODO)
+- KeyValue (TODO)
 - Graph (TODO)
 - Bars
 - BarGraph
@@ -199,6 +198,7 @@ Available visualizations:
 In general the raw data is mostly not prepared to show easily on a dashboard. 
 The approach is to aggregate metrics via cron-jobs: read data via API and write metric in dedicated table. 
 An universal metric table may have properties: Id, metric-key, value, text, description, timestamp.
+
 
 # Integration 
 
