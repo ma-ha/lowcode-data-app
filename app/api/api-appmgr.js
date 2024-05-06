@@ -724,7 +724,7 @@ async function getDashboardPanel( req, res ) {
       PosY    : '1',
       Size    : '1x1',
       Entity  : '',
-      Query   : '',
+      Query   : '{}',
       Prop    : '',
       Descr   : '',
       Style   : ''
@@ -763,8 +763,8 @@ async function getDashboardPanel( req, res ) {
       PosX    : p.Pos[0],
       PosY    : p.Pos[1],
       Size    : p.Size[0] +'x'+ p.Size[1],
-      Entity  : p.Entity,
-      Query   : p.Metric.Query,
+      Entity  : p.Metric.Entity,
+      Query   : JSON.stringify( p.Metric.Query ),
       Prop    : p.Metric.Prop,
       Descr   : p.Metric.Descr,
       Style   : p.Metric.Style
@@ -791,7 +791,7 @@ async function addDashboardPanel( req, res ) {
     Size :  size,
     Metric : {
       Entity : req.body.Entity,
-      Query  : req.body.Query,
+      Query  : JSON.parse( req.body.Query ),
       Prop   : req.body.Prop,
       Descr  : req.body.Descr,
       Style  : req.body.Style

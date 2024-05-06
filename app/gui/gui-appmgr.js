@@ -691,7 +691,8 @@ async function init( ) {
             { id: "boardId",  type: "text", hidden: true, value: boardId },
             { id: "Type",   label: "Type",    type: "select",  
               options: addOptions(['Number','Text','ProgressBar','Distribution','Pie180',
-                'Pie360','Table','Items','ItemBars','Graph','Bars','BarGraph'], 'Number', ['Pie360','Graph']) },
+                'Pie360','Table','Items','KeyValue','ItemBars','Graph','Bars','BarGraph'], 
+                'Number', ['Pie360','Graph','ItemBars','KezValue']) },
             { id: "Title",  label: "Title",   type: "text" },
             { id: "SubText",label: "Sub Text",type: "text" } 
           ]},
@@ -705,7 +706,7 @@ async function init( ) {
           ]},  
           { formFields: [
             { id: "Entity", label: "Entity",  type: "text" },
-            { id: "Query",  label: "Query",   type: "JSON", rows:1 },
+            { id: "Query",  label: "Query",   type: "text" },
           ]},
           { formFields: [
             { id: "Prop",   label: "Prop ",   type: "text" },

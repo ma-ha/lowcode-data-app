@@ -195,7 +195,8 @@ Available visualizations:
 - Pie360 (TODO)
 - Table
 - Items
-- ItemBars
+- ItemBars (TODO)
+- KezValue (TODO)
 - Graph (TODO)
 - Bars
 - BarGraph
