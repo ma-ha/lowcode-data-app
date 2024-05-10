@@ -189,6 +189,13 @@
    background-color:var(--menu-bg-hover-color);
  }
 
+input:invalid,
+textarea:invalid,
+select:invalid { 
+  border: none;
+  outline: 2px solid red;
+}
+
  /* ------END COLOR SCHEME ---------*/
  
  #header { 

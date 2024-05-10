@@ -16,12 +16,15 @@ describe( 'Data Ops', () => {
   let scopeId = null
   let dtaUrl = ''
   let testUuidUrl = ''
+  let testRegExpUrl = ''
+
 
   before( async () => { 
     scopeId = await helper.getRootScopeId()
     assert.notEqual( scopeId, null )
     dtaUrl = API_URL + scopeId + '/mocha-test-app/1.0.0/test'
     testUuidUrl = API_URL + scopeId + '/mocha-test-app/1.0.0/testUUID'
+    testRegExpUrl = API_URL + scopeId + '/mocha-test-app/1.0.0/testRegExp'
     // console.log( 'URL', dtaUrl )
   })
 
@@ -130,6 +133,28 @@ describe( 'Data Ops', () => {
     assert.notEqual( result.data, null )
     assert.notEqual( result.data[ uid ], null )
     // console.log( '8', result.data  )
+  })
+
+  // --------------------------------------------------------------------------
+  
+  it( 'RegExp Check with valid input', async () => {
+    let rec = { testStr : 'XYZ' }
+    let result = await axios.post( testRegExpUrl, rec, { headers: HEADERS } )
+    // console.log( result )
+    assert.equal( result.status, 200 )
+    assert.notEqual( result.data.id, null )
+  })
+
+  it( 'RegExp Check with invalid input', async () => {
+    let rec = { testStr : 'AA' }
+    let fail = false
+    try {
+      let result = await axios.post( testRegExpUrl, rec, { headers: HEADERS } )
+    } catch ( exc ) { 
+      fail = true
+    }
+    // console.log( result )
+    assert.equal(fail, true )
   })
 
 })

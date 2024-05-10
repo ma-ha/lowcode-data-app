@@ -687,6 +687,12 @@
               "CCC",
               "DDD"
             ]
+          },
+          "testRegxp": {
+            "type": "String",
+            "notNull": true,
+            "noDelete": true,
+            "regExp": "[A-Za-z]{3}"
           }
         },
         "noDelete": true
@@ -768,7 +774,7 @@
     "enabled": true,
     "id": "1000/city-light-mgr/1.0.0",
     "_cre": 1714413324675,
-    "_upd": 1714969626921,
+    "_upd": 1715357979357,
     "description": "",
     "img": "",
     "dashboard": true

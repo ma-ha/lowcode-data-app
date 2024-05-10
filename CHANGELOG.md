@@ -1,3 +1,7 @@
+# 0.28.6
+- Property type "String" support for RegExp 
+- Property type "Boolean" fix
+
 # 0.28.5
 - dashboard panel: S/M/L
 - dashboard panel: bar labels 

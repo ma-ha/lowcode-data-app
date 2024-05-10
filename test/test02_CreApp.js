@@ -85,7 +85,26 @@ const APP = {
         }
       },
       "stateModel": "TestState"
-    }
+    },
+    "testRegExp": {
+      "title": "testReGeXP",
+      "scope": "inherit",
+      "maintainer": [
+        "appUser"
+      ],
+      "properties": {
+        "id": {
+          "type": "UUID-Index"
+        },
+        "testStr": {
+          "type": "String",
+          "regExp": "[A-Za-z]{3}"
+        }
+      },
+      "noDelete": true,
+      "noEdit": true
+    },
+
   },
   "startPage": "test",
   "role": [

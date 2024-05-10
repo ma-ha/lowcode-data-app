@@ -329,6 +329,15 @@ async function init( ) {
     for ( let entityId in app.entity ) {
       refOptions.push({ value: entityId })
     }
+    let refDescr = 
+      'String: RegExp (optional)\n' +
+      'Text: Input field line count (integer number)\n' +
+      'Select: Options, comma separated\n' +
+      'SelectRef/MultiSelectRef: Full id of the entity, ScopeId/AppId/AppVer/EntityId\n' +
+      'DocMap: PropertyId of the child table, which stores the id of the parent\n'+
+      'API static string: String content to insert\n'+
+      'Link: The URL\n'+
+      'Event: EventID string to send'
 
     rows.push({ 
       id: 'AppEntityPropAdd', rowId: 'AppEntityPropAdd', title: 'Add / Update Property',  height: 'auto', 
@@ -343,7 +352,7 @@ async function init( ) {
                           { id: "label",   label: "Label", type: "text" } ]},
           { formFields: [{ id: "type",     label: "Type", type: "select",
                            options: addOptions( propHandler.getPropTypes(), 'x', [ 'Metric',  'Event', 'BLOB' ] ) },
-            { id: "ref", label: "Ref", type: "text", options: refOptions } ]},
+                         { id: "ref", label: "Spec", type: "text", options: refOptions , descr: refDescr } ]},
           { formFields: [ { id: "filter",  label: "Filter", type: "checkbox" },
                           { id: "apiManaged",  label: "API managed", type: "checkbox",
                             descr: "will not appear in the GUI form" } ]},

@@ -329,7 +329,7 @@ function chkPropValid( rec, properties, res ) {
       res.status( 400 ).send( )
       return false
     }
-    let paramOK = props.validateParam( p, properties[ propId ].type ) 
+    let paramOK = props.validateParam( p, properties[ propId ].type, properties[ propId ].regExp )
     if ( ! paramOK ) {
       sendErr( res, 'api-adapter: body not valid: '+propId )
       return false

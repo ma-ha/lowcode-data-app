@@ -109,7 +109,7 @@ Data types (and their Web GUI mapping)
 - `Event` (link to send an event. Ref can have a simple condition to render the link, e.g. "status == ready" or "status != in progress,done")
 
 So relations are
-- **1:n** = `DocMap`
+- **1:n** = `DocMap` ... the child entity must have a reference key to the parent
 - **n:1** = `SelectRef`
 - **n:m** = `MultiSelectRef`
 

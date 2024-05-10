@@ -238,7 +238,14 @@ async function addDoc( req, res )  {
   if ( dbRec ) {
     for ( let propId in dbRec ) {
       if ( ! rec[ propId ] || ( entity.properties[ propId ] && entity.properties[ propId ].apiManaged ) ) {
-        rec[ propId ] = dbRec[ propId ]
+        if ( entity.properties[ propId ] && entity.properties[ propId ].type == 'Boolean' ) {
+          if ( rec[ propId ] === false ) {
+          } else {
+            rec[ propId ] = dbRec[ propId ]
+          }
+        } else {
+          rec[ propId ] = dbRec[ propId ]
+        }
       }
     }
   } else {

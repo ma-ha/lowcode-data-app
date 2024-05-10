@@ -1,6 +1,6 @@
 {
   "name": "lowcode-data-app",
-  "version": "0.28.5",
+  "version": "0.28.6",
   "description": "LowCode App Environment",
   "main": "app.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "axios": "^1.6.7",
     "body-parser": "^1.19.0",
     "bunyan": "^1.8.15",
-    "easy-web-app": "^2.12.4",
+    "easy-web-app": "^2.12.6",
     "express-fileupload": "^1.4.3",
     "jsonwebtoken": "^9.0.2"
   },

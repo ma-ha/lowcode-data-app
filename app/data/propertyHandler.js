@@ -31,13 +31,16 @@ function getPropTypes() {
     'Select', 
     'DocMap', 'SelectRef', 'MultiSelectRef', /* 'RefArray',*/ 
     'Metric', 'Link', 'JSON', 'Event', 'BLOB',
-    'API static string' 
+    'API static string'
   ]
 }
 
 
 function setPropRef( prop, dbProp ) {
   switch ( dbProp.type ) {
+    case 'String':
+      prop.ref = dbProp.regExp
+      break 
     case 'Text':
       prop.ref = dbProp.lines
       break 
@@ -53,12 +56,12 @@ function setPropRef( prop, dbProp ) {
     case 'DocMap':
       prop.ref  = dbProp.docMap
       break 
-    case 'Ref':
-      prop.ref  = dbProp.ref
-      break 
-    case 'RefArray':
-      prop.ref  = dbProp.refArray
-      break 
+    // case 'Ref':
+    //   prop.ref  = dbProp.ref
+    //   break 
+    // case 'RefArray':
+    //   prop.ref  = dbProp.refArray
+    //   break 
     case 'Link':
       prop.ref  = dbProp.link
       break 
@@ -77,6 +80,7 @@ function getpropTypeDef( prop ) {
   switch ( pType ) {
     case 'String':
       if ( prop.qr ) { pType = 'String QR/Barcode' }
+      if ( prop.regExp ) { pType  = 'String RegExp' }
       break 
     case 'Text':
       pType = "Text ("+prop.lines+')'
@@ -119,6 +123,7 @@ async function addNewPropertyDef( prop, type, ref  ) {
   if ( type == 'String' ) {
 
       if ( prop.qr ) { delete prop.qr }
+      if ( ref ) { prop.regExp = ref }
 
   } else if ( type == 'String QR/Barcode' ) { // special String type
     
@@ -496,6 +501,8 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
 
     if ( fld ) {
       if ( prop.description ) { fld.descr = renderTooltip( prop.description ) }
+      if ( prop.notNull ) { fld.required = true }
+      if ( prop.regExp ) { fld.regExp = prop.regExp }
       fldCnt ++
       fldArr.push( fld )
     }
@@ -712,6 +719,7 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
 // ============================================================================
 
 function reformatDataReturn( entity, result  ) {
+  log.info( 'reformatDataReturn', entity, result  )
   for ( let propId in entity.properties )  {
     try {
       
@@ -913,18 +921,23 @@ function reformatDataUpdateInput( entity, rec ) {
   if ( ! rec[ indexKey ] || rec[ indexKey ] === '' ) {
     if ( entity.properties[ indexKey ]  &&  entity.properties[ indexKey ].type.startsWith( 'UUID' ) ) {
       rec[ indexKey ] = helper.uuidv4()
-      log.info( 'reformatDataUpdateInput', indexKey, rec[ indexKey ] )
     } else {
       rec[ indexKey ] = helper.uuidv4()
     }
   }
 
-
   for ( let propId in entity.properties ) try {
     if ( entity.properties[ propId ].jsonId ) { continue } // need to do JSON first
 
-    // JSOM input must be parsed to obj tree
-    if ( entity.properties[ propId ].type == 'JSON' ) { 
+    if ( entity.properties[ propId ].type == 'Boolean' ) { 
+      log.info( 'reformatDataUpdateInput',propId,  rec[ propId ] )
+      if (  rec[ propId ] && rec[ propId ] ===  propId ) {
+        rec[ propId ] = true 
+      } else  {
+        rec[ propId ] = false
+      }
+    } else if ( entity.properties[ propId ].type == 'JSON' ) { 
+      // JSON input must be parsed to obj tree
 
       try {
         log.debug( 'JSON', propId, rec[ propId ], rec )
@@ -978,14 +991,24 @@ function reformatDataUpdateInput( entity, rec ) {
     log.warn( 'reformatDataUpdateInput', exc ) 
     return { err: exc.message }
   }
+  log.debug( 'reformatDataUpdateInput', rec )
 
   return {}
 }
 
 // ============================================================================
-function validateParam( p, type) {
+function validateParam( p, type, pattern ) {
+  log.info( 'validateParam', p, type, pattern )
   switch ( type ) {
-    case 'String':  if ( typeof p === 'string' ) { return true }; break
+    case 'String':  
+      if ( typeof p === 'string' ) { 
+        if ( ! pattern ) { 
+          return true 
+        }
+        const check = new RegExp( pattern )
+        return check.test( p )
+      }
+      break
     case 'Text':    if ( typeof p === 'string' ) { return true }; break
     case 'Number':  if ( isNaN( p ) ) { return  true}; break
     case 'Boolean': if ( typeof p === 'boolean' ) { return  true}; break
