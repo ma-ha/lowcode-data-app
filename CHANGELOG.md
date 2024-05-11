@@ -1,3 +1,6 @@
+# 0.28.7
+- Customize CSS and theme colors
+
 # 0.28.6
 - Property type "String" support for RegExp 
 - Property type "Boolean" fix

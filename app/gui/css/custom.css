@@ -1,8 +1,8 @@
 /* LOWCODE-DATA-APP / copyright 2024 by ma-ha https://github.com/ma-ha  /  MIT License */
 
-:root {
+/* :root {
   --main-bg-color: #ffffff;
-  --main-color: #222222;
+  --main-color: #405466;
   --header-bg-color: #222222;
   --footer-bg-color: #222222;
   --footer-color: #d5d5d5;
@@ -14,7 +14,9 @@
   --link-color: #444444;
   --link-active-color: #000000;
   --content-h-bg-color: #81c3e8;
-}
+  --invalid-color: #2082ba;
+} */
+
 /* ------ BEGIN COLOR SCHEME --------*/
  html {
    background-color: var(--main-bg-color);
@@ -23,7 +25,6 @@
  body {
   background-color: var(--main-bg-color);
   color: var(--main-color);
-  color: rgb(66, 84, 102);
   font-family: "sohne-var", "Helvetica Neue", "Arial", sans-serif;
   font-weight: 300;
   letter-spacing: 0.2px;
@@ -43,7 +44,7 @@
  #WikiContent,
  #referencesContent ,
  #aboutContent{
-   color: #777;
+   color:  var(--main-color);
  }
  
  .header-logo h1,
@@ -139,7 +140,7 @@
  .PongLongout,
  .SecurityHeaderPullDownItem 
  {
-   color:#222;
+   color: var(--header-bg-color);
  }
  
  #WikiContent a:link, 
@@ -193,7 +194,7 @@ input:invalid,
 textarea:invalid,
 select:invalid { 
   border: none;
-  outline: 2px solid red;
+  outline: 2px solid var(--invalid-color);
 }
 
  /* ------END COLOR SCHEME ---------*/
@@ -799,7 +800,7 @@ select:invalid {
    width: 100%;
    font-size: 1.2em;
    text-transform: uppercase;
-   color: #CCC;
+   color: var(--footer-color)
    padding: 5px;
    font-stretch: ultra-expanded;
  }
@@ -808,8 +809,8 @@ select:invalid {
    font-weight: bold;    
  }
  .main-page-content a:hover {
-   color: #457e99;
-   font-weight: bold;    
+   color: var(--theme-color)
+   font-weight: bold;
  }
  .main-page-content b {
    font-weight: bold;
@@ -866,8 +867,8 @@ select:invalid {
    font-weight: bold;    
  }
  .teaserUseCaseCont a:hover {
-   color: #457e99;
-   font-weight: bold;    
+   color: var(--main-color)
+   font-weight: bold;
  }
  
  .teaserSmall {
@@ -1584,4 +1585,23 @@ code {
   float: left;
   padding: 10px;
   text-align: center;
+}
+
+/*  -------------------- CSS Editor ----------------*/
+
+#StyleColors label {
+  width: 240px;
+}
+
+#CssDesktopContent textarea,
+#CssTabletContent textarea,
+#CssMobileContent textarea {
+  width: 800px;
+  margin-left: 10px;
+}
+
+#CssDesktopContent button,
+#CssTabletContent button,
+#CssMobileContent button {
+  margin-left: 10px;
 }

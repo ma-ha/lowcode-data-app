@@ -18,6 +18,7 @@ dta/app-temp.json
 /package-lock.json
 example-db-template.js
 dta/2*
+dta/scopeCss.json
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

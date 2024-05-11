@@ -61,7 +61,7 @@ async function getAppLnk( req, res )  {
   log.info( 'GET erm' )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
-  res.send( '<a href="index.html?layout=ERM-nonav" class="erm-link">Show Data Model</a>')
+  res.send( '<a href="index.html?layout=ERM-nonav" class="erm-link">Show Data Model</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="index.html?layout=css-edit-nonav" class="erm-link">Customize CSS and Colors</a>')
 }
 
 // --------------------------------------------------------------------------

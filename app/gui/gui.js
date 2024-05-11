@@ -13,6 +13,7 @@ const marketplaceGUI = require( './gui-marketplace' )
 const appGUI         = require( './gui-app' ) 
 const docuGUI        = require( './gui-docu' ) 
 const userGUI        = require( './gui-user' ) 
+const userCSS        = require( './gui-css' ) 
 
 const dta     = require( '../persistence/app-dta' )
 const userDta = require( '../persistence/app-dta-user' )
@@ -31,12 +32,6 @@ function init( appConfig ) {
   log.info( 'Starting GUI...' )
 
   // api.initAPI( gui.getExpress() )
-
-  if ( cfg.CSS_PATH ) {
-    gui.getExpress().use( '/css-custom', express.static( cfg.CSS_PATH  ) )
-  } else {
-    gui.getExpress().use( '/css-custom', express.static( __dirname + '/css' ) )
-  }
   gui.getExpress().use( '/ext-module', express.static( __dirname + '/ext-module' ) )
 
   // gui.getExpress().use( '/content', express.static( __dirname + '/serve-html' ) )
@@ -69,6 +64,13 @@ async function initPages( ) {
   gui.dynamicHeader( genPageHeader )
   gui.dynamicNav( genDynNav )
    
+  if ( cfg.CSS_PATH ) {
+    gui.getExpress().use( '/css-custom', express.static( cfg.CSS_PATH  ) )
+  } else {
+   await userCSS.init( gui, cfg )
+    // gui.getExpress().use( '/css-custom', express.static( __dirname + '/css' ) )
+  }
+
   // ..........................................................................
   /** Add an empty view to the default page. */
   gui.addView({ 
