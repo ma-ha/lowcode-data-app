@@ -12,11 +12,12 @@ const appData   = require( './persistence/app-dta' )
 const appAPI    = require( './api/api-entity' )
 const appAdapter= require( './api/api-adapter' )
 const apiSec    = require( './api/api-sec' )
-const adminAPI  = require( './api/api-admin.js' )
+const adminAPI  = require( './api/api-admin' )
 const appMgrAPI = require( './api/api-appmgr' )
 const appMgrGUI = require( './gui/gui-appmgr' )
-const oidc      = require( './gui/oidc.js' )
-const eh        = require( './eh/even-hub.js' )
+const marketAPI = require( './api/api-market' )
+const oidc      = require( './gui/oidc' )
+const eh        = require( './eh/even-hub' )
 
 
 exports: module.exports = {
@@ -44,7 +45,8 @@ async function init( lowCodeConfig ) {
   await appAdapter.setupAPI( app, cfg )
   await appMgrAPI.setupAPI( app )
   await adminAPI.setupAPI( app, cfg )
-
+  await marketAPI.setupAPI( app, cfg )
+  
   return app
 }
 
@@ -65,7 +67,9 @@ function checkConfig( cfg ) {
   checkCfgParam( cfg, 'PORT', 8888 )
   checkCfgParam( cfg, 'HOST', 'localhost' )
   checkCfgParam( cfg, 'GUI_URL','http://'+ cfg.HOST +':' + cfg.PORT + cfg.PATH )
-
+  
+  checkCfgParam( cfg, 'MARKETPLACE_URL', 'http://localhost/mh/lowcode-app-market' )
+  
   checkOidcParams( cfg )
   log.debug( 'CONFIG', cfg )
   return cfg

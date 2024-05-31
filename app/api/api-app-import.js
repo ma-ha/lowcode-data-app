@@ -8,7 +8,8 @@ const helper     = require( '../helper/helper' )
 const fileupload = require( 'express-fileupload' )
 
 exports: module.exports = { 
-  setupAPI
+  setupAPI,
+  prepJsonUpload
 }
 
 // ============================================================================
@@ -44,6 +45,10 @@ async function getAppJSON( req, res )  { // export
   if ( ! app ) { return res.status(400).send( 'for found' ) }
 
   let appCopy = JSON.parse( JSON.stringify( app ) )
+  delete appCopy.id
+  delete appCopy.scopeId
+  delete appCopy.enabled
+
   appCopy.require = []
   for ( let entityId in appCopy.entity ) {
     let entity = appCopy.entity[ entityId ]
@@ -83,7 +88,7 @@ function addRefApp( requireArr, refId ) {
 }
 
 // ============================================================================
-let uploadResult = '... '
+let uploadResult = {}
 
 async function uploadAppJSON( req, res ) {
   let user = await userDta.getUserInfoFromReq( gui, req )
@@ -92,9 +97,74 @@ async function uploadAppJSON( req, res ) {
   if ( ! req.files || Object.keys( req.files ).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
+
   try {
     let newApps = JSON.parse( '' + req.files.file.data )
-    let dbApps = await  dta.getAppList( user.scopeId, [], 'admin' )
+    let result = await prepJsonUpload( user.rootScopeId, newApps )
+    uploadResult[ user.userId ] = result
+
+    // let dbApps = await  dta.getAppList( user.scopeId, [], 'admin' )
+
+    // let dbEntityMap = {}
+    // for ( let appId in dbApps ) {
+    //   for ( let entityId in dbApps[ appId ].entity ) {
+    //     dbEntityMap[ entityId ] = { appId: appId }
+    //   }
+    // }
+
+    // uploadResult = 'Parsed successfully'
+    // uploadOK     = true
+    // for ( let appId in newApps ) {
+    //   if ( dbApps[ user.rootScopeId +'/'+ appId ] ) {
+    //     uploadResult += '<p> ERROR, ALREADY EXISTS: App ID <b>' + appId + '</b>'
+    //     uploadOK = false
+    //     continue 
+    //   } 
+    //   let app = newApps[ appId ]
+    //   uploadResult += '<p> App ID: <b>' + appId  + '</b>'
+    //   for ( let requireAppId of app.require ) {
+    //     if ( dbApps[ user.rootScopeId +'/'+ requireAppId ] ) {
+    //       uploadResult += '<br> Dependency: ' +  user.rootScopeId +'/'+ requireAppId + ' ... already available'
+    //     } else  if ( newApps[ requireAppId ] ) {
+    //       uploadResult += '<br> Dependency uploaded: ' + requireAppId 
+    //     } else {
+    //       uploadResult += '<br> ERROR: Dependency: NOT FOUND'
+    //       uploadOK = false
+    //     }
+    //   }
+
+    //   for ( let entityId in app.entity ) {
+    //     if ( dbEntityMap[ entityId ] ) {
+    //       uploadResult += '<br> WARNING: Entity "'+entityId+'" already exists (in '+dbEntityMap[ entityId ].appId+')'
+    //     }
+    //   }
+    // }
+
+    // if ( uploadOK ) {
+    //   for ( let appId in newApps ) {
+    //     let importId = helper.uuidv4()
+    //     let appImp = {
+    //       apps    : newApps,
+    //       _expire : Date.now() + 1000*60*60*24
+    //     }
+    //     await dta.addDataObjNoEvent( 'app-temp', importId, appImp )
+    //     uploadResult += '<p> Click to <a href="app/import/'+importId+'">IMPORT</a>'
+    //   }
+    // } else {
+    //   uploadResult += '<p> <b> UPLOAD FAILED! </b>'
+    // }
+   
+  } catch ( exc ) {  
+    log.warn( 'uploadAppJSON', exc )
+    return res.status(400).send( 'Error' )
+  }
+  res.send( 'OK' )
+}
+
+async function prepJsonUpload( rootScopeId, newApps ) {
+  let result = ''
+  try {
+    let dbApps = await  dta.getAppList( rootScopeId, [], 'admin' )
 
     let dbEntityMap = {}
     for ( let appId in dbApps ) {
@@ -103,30 +173,30 @@ async function uploadAppJSON( req, res ) {
       }
     }
 
-    uploadResult = 'Parsed successfully'
+    result = 'Parsed successfully'
     uploadOK     = true
     for ( let appId in newApps ) {
-      if ( dbApps[ user.rootScopeId +'/'+ appId ] ) {
-        uploadResult += '<p> ERROR, ALREADY EXISTS: App ID <b>' + appId + '</b>'
+      if ( dbApps[ rootScopeId +'/'+ appId ] ) {
+        result += '<p> ERROR, ALREADY EXISTS: App ID <b>' + appId + '</b>'
         uploadOK = false
         continue 
       } 
       let app = newApps[ appId ]
-      uploadResult += '<p> App ID: <b>' + appId  + '</b>'
+      result += '<p> App ID: <b>' + appId  + '</b>'
       for ( let requireAppId of app.require ) {
-        if ( dbApps[ user.rootScopeId +'/'+ requireAppId ] ) {
-          uploadResult += '<br> Dependency: ' +  user.rootScopeId +'/'+ requireAppId + ' ... already available'
+        if ( dbApps[ rootScopeId +'/'+ requireAppId ] ) {
+          result += '<br> Dependency: ' +  rootScopeId +'/'+ requireAppId + ' ... already available'
         } else  if ( newApps[ requireAppId ] ) {
-          uploadResult += '<br> Dependency uploaded: ' + requireAppId 
+          result += '<br> Dependency uploaded: ' + requireAppId 
         } else {
-          uploadResult += '<br> ERROR: Dependency: NOT FOUND'
+          result += '<br> ERROR: Dependency: NOT FOUND'
           uploadOK = false
         }
       }
 
       for ( let entityId in app.entity ) {
         if ( dbEntityMap[ entityId ] ) {
-          uploadResult += '<br> WARNING: Entity "'+entityId+'" already exists (in '+dbEntityMap[ entityId ].appId+')'
+          result += '<br> WARNING: Entity "'+entityId+'" already exists (in '+dbEntityMap[ entityId ].appId+')'
         }
       }
     }
@@ -139,17 +209,18 @@ async function uploadAppJSON( req, res ) {
           _expire : Date.now() + 1000*60*60*24
         }
         await dta.addDataObjNoEvent( 'app-temp', importId, appImp )
-        uploadResult += '<p> Click to <a href="app/import/'+importId+'">IMPORT</a>'
+        result += '<p> Click to <a href="app/import/'+importId+'">IMPORT</a>'
       }
     } else {
-      uploadResult += '<p> <b> UPLOAD FAILED! </b>'
+      result += '<p> <b> UPLOAD FAILED! </b>'
     }
    
   } catch ( exc ) {  
     log.warn( 'uploadAppJSON', exc )
     return res.status(400).send( 'Error' )
   }
-  res.send( 'OK' )
+  log.info( 'result', result )
+  return result
 }
 
 
@@ -157,8 +228,8 @@ async function getUploadAppResult( req, res ) {
   log.info( 'GET /app/json/html'  ) // , req.files.file.data
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
-  res.send( uploadResult )
-  uploadResult = '... '
+  res.send( uploadResult[ user.userId ] )
+  delete uploadResult[ user.userId ]
 }
 
 

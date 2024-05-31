@@ -2,15 +2,22 @@
 
 const gui     = require( 'easy-web-app' )
 const log     = require( '../helper/log' ).logger
-const pjson   = require( '../package.json' )
-
-const dta     = require( '../persistence/app-dta' )
 
 exports: module.exports = {
   init
 }
 
-async function init( ) {
+let cfg = {}
+
+async function init( appCfg ) {
+  cfg = appCfg
+  initMarketPage()
+  initAppDetailsPage()
+  initAppImportPage()
+}
+
+
+function initMarketPage() {
   let marketPage = gui.addPage( 'Marketplace' ) 
   marketPage.title    = 'App Marketplace'
   marketPage.navLabel = 'Marketplace'
@@ -18,7 +25,73 @@ async function init( ) {
 
   marketPage.addView({ 
     id: 'AppMarketplace', title: 'App Marketplace',  height: '760px', 
-    resourceURL: 'svc/product/stat' 
+    type: 'pong-list', resourceURL: 'market',
+    moduleConfig : {
+      rowId: 'id',
+      divs: [
+        {
+          id: 'XApp',
+          cellType: 'div',
+          divs: [
+            {
+              id: 'img',
+              cellType: 'text',
+              nozoom: true 
+            },
+            {
+              id: 'id',
+              cellType: 'text'
+            },
+            {
+              id: 'title',
+              cellType: 'text'
+            },
+            {
+              id: 'XBy',
+              cellType: 'div',
+              divs: [
+                {
+                  id: 'XBy1',
+                  cellType: 'div',
+                  divs: [
+                    {
+                      id:'lBy',
+                      cellType: 'label',
+                      label: 'by:'
+                    },
+                    {
+                      id: 'author',
+                      cellType: 'text'
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      maxRows: 6
+    }
   })
+}
 
+function initAppDetailsPage() {
+  let marketPage = gui.addPage( 'MarketApp-nonav' ) 
+  marketPage.title    = 'App Marketplace'
+  marketPage.setPageWidth( '90%' )
+  marketPage.addView({ 
+    id: 'AppMarketplace', title: 'App Marketplace', height: '760px',
+    resourceURL: 'market'
+  })
+}
+
+
+function initAppImportPage() {
+  let importPage = gui.addPage( 'MarketImport-nonav' ) 
+  importPage.title    = 'LCA Import'
+  importPage.setPageWidth( '90%' )
+  importPage.addView({
+    rowId: "ImportLog", title: "Import Output", height: '760px',
+    resourceURL: "market/import",
+  })
 }

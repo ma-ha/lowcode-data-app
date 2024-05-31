@@ -228,13 +228,13 @@ async function saveCustomCss( req, res ) {
 
 //-----------------------------------------------------------------------------
 async function serveCss( req, res ) {
-  log.info( '>>>>>>>>>>>>', req.params )
+  log.debug( 'serveCss', req.params )
   let css = ''
   let user = await userDta.getUserInfoFromReq( gui, req )
   let { rootCol, tenantCss } = await geStyle( user )
   if ( req.params.css == 'custom.css' ) {
     css = rootCol +'\n'+ STATIC_CSS_D +'\n'+ tenantCss.desktop
-    log.info( '>>>>>>>>>>>>',rootCol)
+    log.debug( 'serveCss',rootCol)
 
   } else if ( req.params.css == 'custom-t.css' ) {
     css = STATIC_CSS_T + '\n' + tenantCss.tablet
@@ -250,12 +250,12 @@ let cssCache = {}
 
 async function geStyle( user ) {
   if ( ! user ) {
-    log.info( '>>>>>>>>>>>> default', cssRoot )
+    log.debug( 'geStyledefault', cssRoot )
     return { rootCol: cssRoot, tenantCss: { desktop: '', mobile: '', tablet: '' } }
   }
   if ( user ) {
     if ( cssCache[ user.rootScopeId ] ) {
-      log.info( '>>>>>>>>>>>> from cssCache' )
+      log.debug( 'geStyle from cssCache' )
       return  { rootCol: cssCache[ user.rootScopeId ].colors, tenantCss: cssCache[ user.rootScopeId ].css } 
     } else {
       let cssCfg = await dta.getDataById( 'scopeCss', user.rootScopeId )
@@ -269,10 +269,10 @@ async function geStyle( user ) {
           colors : tenantColors,
           css    : cssCfg.css
         }
-        log.info( '>>>>>>>>>>>> from DB' )
+        log.debug( 'geStyle from DB' )
         return { rootCol: tenantColors, tenantCss: cssCfg.css }
       } else {
-        log.info( '>>>>>>>>>>>> default 2', cssRoot )
+        log.debug( 'geStyle default 2', cssRoot )
         return { rootCol: cssRoot, tenantCss: { desktop: '', mobile: '', tablet: '' } }
       }
     }

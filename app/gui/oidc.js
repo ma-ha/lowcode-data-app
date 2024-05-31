@@ -143,7 +143,7 @@ async function loginForm ( req, res ) {
     id: 'oIdcLoginForm',
     fieldGroups: [ { columns: [
       { formFields: [
-        { id: 'app', type: 'text', label: 'App', readonly: true, defaultVal: '5d380c06abc348168ba62ec6' }, 
+        { id: 'app', type: 'text', label: 'App', readonly: true, defaultVal: 'LowCode Data App' }, 
         { id: 'client_id', type: 'text', hidden: true, value: req.query.client_id }, // refers subscription
         { id: 'scope', type: 'text', hidden: true, value: req.query.scope }, 
         { id: 'audience', type: 'text', hidden: true, value: req.query.audience }, 

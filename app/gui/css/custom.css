@@ -1113,11 +1113,11 @@ select:invalid {
   margin-bottom: 5px;
 }
 .htmldiv h2 {
-  font-size: 1.15em;
+  font-size: 1.6em;
   margin-bottom: 5px;
 }
 .htmldiv h3 {
-  font-size: 1.6em;
+  font-size: 1.4em;
 }
 #welcome1 h1 {
   margin-bottom: 20px;
@@ -1586,6 +1586,36 @@ code {
   padding: 10px;
   text-align: center;
 }
+/*  -------------------- Marketplace ---------------*/
+
+#AppMarketplace .pongListRow {
+  width: 230px;
+  height: 200px;
+  float: left;
+}
+#AppMarketplace .pongListCell {
+  width: 100%;
+  text-align: center;
+}
+#AppMarketplace .pongListCellid {
+  font-size: 0.8em;
+}
+#AppMarketplace .pongListCelltitle {
+  font-size: 1.1em;
+}
+#AppMarketplace .pongListCelllBy,
+#AppMarketplace .pongListCellauthor,
+#AppMarketplace .pongListCellXBy1 {
+  width: auto;
+}
+#AppMarketplace .pongListCellXBy{
+  display: flex;
+  justify-content: center;
+}
+#AppMarketplace .celllBy {
+  padding-right: 5px;
+}
+
 
 /*  -------------------- CSS Editor ----------------*/
 
