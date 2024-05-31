@@ -1604,6 +1604,7 @@ code {
 }
 #AppMarketplace .pongListCellid {
   font-size: 0.8em;
+  color: #BBB;
 }
 #AppMarketplace .pongListCelltitle {
   font-size: 1.1em;
@@ -1616,6 +1617,7 @@ code {
 #AppMarketplace .pongListCellXBy{
   display: flex;
   justify-content: center;
+  color: #BBB;
 }
 #AppMarketplace .celllBy {
   padding-right: 5px;

@@ -57,7 +57,7 @@ function initMarketPage() {
                     {
                       id:'lBy',
                       cellType: 'label',
-                      label: 'by:'
+                      label: 'by'
                     },
                     {
                       id: 'author',
