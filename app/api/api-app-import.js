@@ -161,6 +161,7 @@ async function uploadAppJSON( req, res ) {
   res.send( 'OK' )
 }
 
+
 async function prepJsonUpload( rootScopeId, newApps ) {
   let result = ''
   try {
@@ -219,7 +220,7 @@ async function prepJsonUpload( rootScopeId, newApps ) {
     log.warn( 'uploadAppJSON', exc )
     return res.status(400).send( 'Error' )
   }
-  log.info( 'result', result )
+  // log.info( 'result', result )
   return result
 }
 

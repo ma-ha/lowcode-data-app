@@ -710,6 +710,11 @@ select:invalid {
    color: #A42;
    font-size: 0.8em;
  }
+
+ .error {
+  color: #A42;
+  font-weight: bold;
+}
  
  .pongFormField label { 
    /* vertical-align: top; */

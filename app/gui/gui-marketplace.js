@@ -76,7 +76,7 @@ function initMarketPage() {
 }
 
 function initAppDetailsPage() {
-  let marketPage = gui.addPage( 'MarketApp-nonav' ) 
+  let marketPage = gui.addPage( 'MarketPrepImport-nonav' ) 
   marketPage.title    = 'App Marketplace'
   marketPage.setPageWidth( '90%' )
   marketPage.addView({ 

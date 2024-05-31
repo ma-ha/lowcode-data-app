@@ -9,7 +9,8 @@ const fileupload = require( 'express-fileupload' )
 const helper     = require( '../helper/helper' )
 
 exports: module.exports = { 
-  setupAPI
+  setupAPI,
+  prepJsonStateUpload
 }
 
 // ============================================================================
@@ -49,6 +50,8 @@ async function setupAPI( app ) {
 
   svc.get( '/state-model/diagram', guiAuthz, getStateModel )
   
+  svc.get( '/state-model/import/:id', guiAuthz, importStateModel )
+
 }
 // ============================================================================
 
@@ -238,6 +241,8 @@ async function getStateJSON( req, res )  {
     let exportModel = JSON.parse( JSON.stringify( stateModel ) )
     let name = req.query.id.split('/')
     delete exportModel.id
+    let idS = req.query.id.split('/')
+    exportModel.id = idS.pop()
     delete exportModel.scopeId
     delete exportModel._cre
     delete exportModel._upd
@@ -809,8 +814,6 @@ async function checkUserApp( req, res ) {
 
 // ============================================================================
 
-
-
 function getInt( defaultVal, strVal ) {
   let val = Number.parseInt( strVal, 10 )
   if ( ! Number.isNaN( val ) ) {
@@ -818,4 +821,44 @@ function getInt( defaultVal, strVal ) {
     return val
   }
   return defaultVal
+}
+
+// ============================================================================
+
+async function prepJsonStateUpload( rootScopeId, id, newSM ) {
+  let result = ''
+  try {
+    let sm = await dta.getStateModelById( id )
+    if ( sm ) { return '<span class="error"> Error: State model ='+id+' exists!</span>' }
+    
+    let importId = helper.uuidv4()
+    let appImp = {
+      stateModel : newSM,
+      _expire    : Date.now() + 1000*60*60*24
+    }
+    await dta.addDataObjNoEvent( 'app-temp', importId, appImp )
+    result += '<p> Click to <a href="state-model/import/'+importId+'">IMPORT</a>'
+
+  } catch ( exc ) {  
+    log.warn( 'uploadAppJSON', exc )
+    return res.status(400).send( 'Error' )
+  }
+  log.info( 'result', result )
+  return result
+}
+
+async function importStateModel( req, res ) {
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  log.info( 'GET /state-model/import', req.params.uid )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.params.uid ) { return res.status(400).send( 'id required' ) }
+
+  let impDta = await dta.getDataById( 'app-temp', req.params.uid ) 
+  if ( ! impDta || ! impDta.stateModel ) { return res.status(400).send( 'not found' ) }
+  impDta.stateModel.scopeId = user.rootScopeId
+  await dta.saveStateModel( user.rootScopeId +'/'+ impDta.stateModel.id, impDta.stateModel )
+  await dta.delDataObjNoEvent( 'app-temp', req.params.uid )
+
+  res.redirect( '../../index.html?layout=StateAdmin-nonav' ) 
+
 }
