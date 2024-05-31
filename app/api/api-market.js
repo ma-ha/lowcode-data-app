@@ -93,6 +93,15 @@ async function getMarketApp( req, res )  { // export
           let entity = app.entity[ entityId ]
           log.debug( 'entity', entity )
           html += '<h3>Entity: '+ ( entity.title ? entity.title+' ('+entityId+')' : entityId ) +'</h3>'
+          if ( entity.stateModel ) {
+            html += 'State Model: '+ entity.stateModel
+            let sm = await dta.getStateModelById( entity.stateModel )
+            if ( ! sm ) {
+              html += '<span class="warning"> Warning: Not present! Import or create model first!</span>'
+            }
+            html += '<br>'
+          }
+
           html += '<ul>'
           for ( let propId in entity.properties ) {
             let prp = entity.properties[ propId ]
