@@ -1,5 +1,7 @@
 # 0.29.1
 - pkg update / OIDC fix
+- Marketplace export
+- Marketplace server
 
 # 0.29.0
 - Marketplace import

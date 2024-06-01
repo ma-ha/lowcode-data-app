@@ -228,7 +228,9 @@ async function getAppList( scopeId, scopeTags, mode ) {
     let app = appMap[ appId ]
     let appInScope = false
     log.debug( 'getAppList >', app.scope,  app.scopeId )
-    if ( mode == 'admin'  &&  appId.startsWith( rootScope ) ) {
+    if ( mode == 'marketplace' ) {
+      appInScope = app.marketplace
+    } else if ( mode == 'admin'  &&  appId.startsWith( rootScope ) ) {
       appInScope = true
     } else if ( app.scope[ scopeId ] || app.scopeId == scopeId ) {
       appInScope = true

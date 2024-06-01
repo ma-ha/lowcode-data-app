@@ -18,10 +18,12 @@ exports: module.exports = {
 // now we need to implement the ReST service for /products 
 // this should also only be available for authenticated users
 let gui = null
+let cfg = {}
 
-async function setupAPI( app ) {
+async function setupAPI( app, appCfg ) {
   let svc = app.getExpress()
   gui = app
+  cfg = appCfg
 
   const guiAuthz = apiSec.customizeAuthz( gui )
 
@@ -61,7 +63,13 @@ async function getAppLnk( req, res )  {
   log.info( 'GET erm' )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
-  res.send( '<a href="index.html?layout=ERM-nonav" class="erm-link">Show Data Model</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="index.html?layout=css-edit-nonav" class="erm-link">Customize CSS and Colors</a>')
+  res.send( 
+    '<a href="index.html?layout=ERM-nonav" class="erm-link">Show Data Model</a>'+
+    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+    '<a href="index.html?layout=StateAdmin-nonav" class="erm-link">Manage State Models</a>'+
+    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+    '<a href="index.html?layout=css-edit-nonav" class="erm-link">Customize CSS and Colors</a>'
+  )
 }
 
 // --------------------------------------------------------------------------
@@ -120,6 +128,10 @@ async function getAppForCustomize( req, res )  {
     enabled     : ( app.enabled ? true : false ),
     description : ( app.description ?  app.description : '' )
   }
+  if ( cfg.MARKETPLACE_SERVER ) {
+    cApp.marketplace = ( app.marketplace ? true : false )
+    cApp.by = app.by
+  }
 
   res.send( cApp )
 }
@@ -170,6 +182,9 @@ async function addApp( req, res ) {
   app.title   = ( req.body.name ? req.body.name : req.body.id )
   app.enabled = ( req.body.enabled ? true : false )
   app.dashboard = ( req.body.dashboard ? true : false )
+  if ( cfg.MARKETPLACE_SERVER ) {
+    app.marketplace = ( req.body.marketplace ? true : false )
+  }
   if ( app.dashboard ) {
    if ( ! app.startPage[0] || ! app.startPage[0].startsWith( 'dashboard/' ) ) {
     app.startPage.unshift( 'dashboard/' + app.title )

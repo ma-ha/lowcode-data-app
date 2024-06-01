@@ -41,6 +41,15 @@ async function getMarketAppList( req, res )  {
   let user = await userDta.getUserInfoFromReq( gui, req )
   // log.info( 'user', user )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
+
+  if ( cfg.MARKETPLACE_SERVER ) {
+    res.json( await getMarketAppLisFrmDB( req, res ) )
+  } else {
+    res.json( await getMarketAppListFrmURL( req, res ) )
+  }
+}
+
+async function getMarketAppListFrmURL( req, res )  {
   let marketListURL = cfg.MARKETPLACE_URL +'/market.json'
   let offers = []
 
@@ -64,19 +73,62 @@ async function getMarketAppList( req, res )  {
     }
   } catch ( exc ) {
     log.error( 'getAppMarketList', marketListURL, exc.message )
-    
   }
-  res.json( offers )
+  return offers
+}
+
+async function getMarketAppLisFrmDB( req, res )  { 
+  let offers = []
+
+  let dbApps = await dta.getAppList( cfg.MARKETPLACE_SCOPE, [], 'marketplace' )
+  for ( let appId in dbApps ) {
+    let app = dbApps[ appId ]
+    let id = appId.split('/')[1]
+    offers.push({
+      id     : 'App/'+id,
+      title  : app.title,
+      author : app.by,
+      type   : 'App',
+      img    : '<a href="index.html?layout=MarketPrepImport-nonav&id=App/'+appId+'">'+
+               '<img src="img/k8s-ww-conn.png"></a>'
+    })
+  }
+
+  let dbSM = await dta.getStateModelMap( cfg.MARKETPLACE_SCOPE )
+  for ( let smId in dbSM ) {
+    let stateModel = dbSM[ dbSM ]
+    let id = smId.split('/')[1]
+    offers.push({
+      id     : 'StateModel/'+smId,
+      title  : id,
+      author : 'NN',
+      type   : 'StateModel',
+      img    : '<a href="index.html?layout=MarketPrepImport-nonav&id=StateModel/'+smId+'">'+
+               '<img src="img/state-model.png"></a>'
+    })
+  }
+
+  return offers
 }
 
 
+// ============================================================================
+
 async function getMarketItemDetails( req, res )  { 
-  log.info( 'GET market/html', req.params.id )
+  log.info( 'GET market/html', req.query.id )
   let user = await userDta.getUserInfoFromReq( gui, req )
   // log.info( 'user', user )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( cfg.MARKETPLACE_SERVER ) {
+    res.json( await getMarketItemDetailsFromDB( req.query.id ) )
+  } else {
+    res.send( await getMarketItemDetailsFromURL( req.query.id ) )
+  }
+}
 
-  let importUrl = cfg.MARKETPLACE_URL +'/'+req.query.id+'.json'
+
+async function getMarketItemDetailsFromURL( id )  {
+  let importUrl = cfg.MARKETPLACE_URL +'/'+id+'.json'
 
   let html =  ''
   try {
@@ -85,18 +137,34 @@ async function getMarketItemDetails( req, res )  {
     log.info( 'axios', result.data )
     if ( result.status == 200 ) {
       if ( result.data.state ) {
-        html = await preStateImport( req.query.id, result.data )
+        html = await preStateImport( id, result.data )
       } else {
-        html = await prepAppImport( req.query.id, result.data )
+        html = await prepAppImport( id, result.data )
       }  
     }
   } catch ( exc ) {
     log.error( 'getMarketApp', importUrl, exc.message )
     
   }
-  res.send( html )
+  return html
 }
 
+async function getMarketItemDetailsFromDB( id )  {
+  let html =  ''
+  if ( id.startsWith( 'App' ) ) {
+    let appId = id.substring( 4 )
+    let app = await dta.getAppById( appId )
+    html = await prepAppImport( id, { appId: app } )
+  } else if ( id.startsWith( 'StateModel' ) ) {
+    let smId = id.substring( 11 )
+    let sm = await dta.getStateModelById( smId )
+    html = await preStateImport( id, sm )
+  }
+
+  return html
+}
+
+// ============================================================================
 
 async function prepAppImport( id, apps ) {
   let html = ''

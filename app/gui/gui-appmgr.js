@@ -12,9 +12,11 @@ exports: module.exports = {
   init
 }
 
+let cfg = {}
 
-async function init( ) {
+async function init( appCfg ) {
   log.info( 'Starting app manager' )
+  cfg = appCfg
 
   // --------------------------------------------------------------------------
   let scopePg = gui.addPage( 'Scope' ) 
@@ -60,19 +62,28 @@ async function init( ) {
   cstmizePage.title    = 'Customize'
   cstmizePage.navLabel = 'Customize'
   cstmizePage.setPageWidth( '90%' )
-  cstmizePage.addView( cstmizePageLnk() )
-  cstmizePage.addView( cstmizePageAppTable() )
-  cstmizePage.addView( cstmizePageAddAppFrom() )
+
+  cstmizePage.dynamicRow( async ( staticRows, req, pageName ) => {
+    let user = await userDta.getUserInfoFromReq( gui, req )
+    if ( ! user ) { return [] }
+
+    let rows = []
+    rows.push(  cstmizePageLnk() )
+    rows.push(  cstmizePageAppTable( user.scopeId ) )
+    rows.push(  cstmizePageAddAppFrom() )
+
+    return rows
+  })
 
   function cstmizePageLnk() {
     return { id: 'CustomizeLnk', rowId: 'CustomizeLnk', title: '',
-       height: '40px', resourceURL: 'app-lnk', decor: 'none' }
+       height: '60px', resourceURL: 'app-lnk', decor: 'decor' }
   }
 
-  function cstmizePageAppTable() {
-    return {
+  function cstmizePageAppTable( scopeId ) {
+    let tbl = {
       id: 'CustomizeAppsTbl', rowId: 'CustomizeAppsTbl', title: 'Apps',  height: '565px', 
-      type : 'pong-table', resourceURL: 'app',
+      type : 'pong-table', resourceURL: 'app', decor: 'decor',
       moduleConfig : {
         dataURL: "",
         rowId: "id",
@@ -94,12 +105,30 @@ async function init( ) {
         ]
       }
     }
+    if ( cfg.MARKETPLACE_SERVER  && scopeId == cfg.MARKETPLACE_SCOPE ) {
+      tbl.title = 'Marketplace Apps'
+      tbl.moduleConfig.cols =  [
+        { id: 'Edit', label: "", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
+        method: "GET", URL: 'app/customize', setData: [ { resId : 'CustomizeAddApp' } ] } ,
+        { id: "marketplace", label: "Market",   width: "5%",  cellType: "checkbox" },
+        { id: "id",          label: "Id",        width: "20%", cellType: "text" },
+        { id: "title",       label: "Title",     width: "15%", cellType: "text" },
+        { id: "dashboardLnk",label: "Dashboard", width: "7%",  cellType: "text" },
+        { id: "entitiesLnk", label: "Entities",  width: "10%", cellType: "text" },
+        // { id: "pagesLnk",    label: "App Pages", width: "20%", cellType: "text" },
+        { id: "appLnk",      label: "Test&nbsp;it",  width: "10%", cellType: "text" },
+        { id: "expLnk",      label: "Export",    width: "10%", cellType: "text" },
+        { id: "swaggerLnk",  label: "Adapter&nbsp;API",   width: "10%", cellType: "text" }
+      ]
+    }
+    // TODO show marketplace col
+    return tbl
   }
 
-  function cstmizePageAddAppFrom() {
-    return { 
+  function cstmizePageAddAppFrom( ) {
+      let form = { 
       id: 'CustomizeAddApp', rowId: 'CustomizeAddApp', title: 'Add / Edit App',  height: 'auto', 
-      type : 'pong-form', resourceURL: 'app', 
+      type : 'pong-form', resourceURL: 'app', decor: 'decor',
       moduleConfig : {
         description: "Add",
         id: 'CustomizeAddAppForm',
@@ -132,6 +161,15 @@ async function init( ) {
         ]
       }
     }
+    if ( cfg.MARKETPLACE_SERVER ) {
+      form.moduleConfig.fieldGroups[0].columns[3].formFields.push(
+        { id: "marketplace", label: "Marketplace", type: "checkbox" }
+      )
+      form.moduleConfig.fieldGroups[0].columns[0].formFields.push(
+        { id: "by", label: "By", type: "text" }
+      )
+    }
+    return form
   }
 
   // --------------------------------------------------------------------------

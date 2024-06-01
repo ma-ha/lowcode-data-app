@@ -34,7 +34,7 @@ async function init( lowCodeConfig ) {
 
   await appGUI.initPages()
 
-  await appMgrGUI.init()
+  await appMgrGUI.init( cfg )
   appSec.init( app, cfg )
 
   if ( cfg.OIDC_SERVER )  {
@@ -43,7 +43,7 @@ async function init( lowCodeConfig ) {
 
   await appAPI.setupAPI( app, cfg)
   await appAdapter.setupAPI( app, cfg )
-  await appMgrAPI.setupAPI( app )
+  await appMgrAPI.setupAPI( app, cfg )
   await adminAPI.setupAPI( app, cfg )
   await marketAPI.setupAPI( app, cfg )
   
@@ -69,6 +69,8 @@ function checkConfig( cfg ) {
   checkCfgParam( cfg, 'GUI_URL','http://'+ cfg.HOST +':' + cfg.PORT + cfg.PATH )
   
   checkCfgParam( cfg, 'MARKETPLACE_URL', 'http://localhost/mh/lowcode-app-market' )
+  checkCfgParam( cfg, 'MARKETPLACE_SERVER', false )
+  checkCfgParam( cfg, 'MARKETPLACE_SCOPE', '-' )
   
   checkOidcParams( cfg )
   log.debug( 'CONFIG', cfg )

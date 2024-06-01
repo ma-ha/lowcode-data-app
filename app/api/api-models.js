@@ -830,7 +830,7 @@ async function prepJsonStateUpload( rootScopeId, id, newSM ) {
   try {
     let sm = await dta.getStateModelById( id )
     if ( sm ) { return '<span class="error"> Error: State model ='+id+' exists!</span>' }
-    
+    newSM.id = id
     let importId = helper.uuidv4()
     let appImp = {
       stateModel : newSM,
