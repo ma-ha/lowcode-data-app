@@ -117,7 +117,7 @@ Entity Ids must be alphanumeric, min length is 2.
 
 Property features:
 - you can select a property for the data table filter
-- you can define a property as "API managed", means zou will see it only in the table, 
+- you can define a property as "API managed", means zo u will see it only in the table, 
   but there is no input available in the add/change GUI form
 
 *Important:* The entity id scope is globally within a top level scope between apps. 
@@ -127,6 +127,8 @@ But: Please choose your entity ids wisely, if you don't want this behavior.
 For JSON properties sub-elements can be defined with a dot-notation (e.g. "MyJsonProp.MySubField"). Allowed types: 'String', 'Text','Boolean','Date','Select'.
 
 You can "inherit" a new child entity in your app from an existing entity in any app of your root scope. This is initially a 1:1 copy and it can be modified to your needs.
+
+You can also create app versions, including all their entities. Simply click "Edit" and change the app id and click the "Add / Change" button to create a new (initially disabled) copy.
 
 # Add New Root Scope (aka "Tenant")
 
@@ -176,7 +178,7 @@ A CSV upload for the "create" action is available.
 
 # Metric Dashboard (WIP)
 
-Dashboards can visualize data in simple way.
+Dashboards can visualize data of an entity collection in simple way.
 
 ![dashboard example](doc/dashboard-example.jpg)
 

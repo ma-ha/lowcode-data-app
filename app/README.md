@@ -1,5 +1,7 @@
 # Prototype of a "Low Code Data App".
 
+Build your multi tenant data driven apps quickly with the npm package: https://www.npmjs.com/package/lowcode-data-app
+
 ## General Idea
 
 It starts with a generic, secure **web gui**.
@@ -26,22 +28,9 @@ All **operations are exposed as API**, e.g. for the adapters.
 
 ![sceenshot](doc/locode-erm.png)
 
-# Run it
+# Sample Server 
 
-    git clone https://github.com/ma-ha/lowcode-data-app.git
-    cd lowcode-data-app/app
-    npm i
-    node example-standalone | node_modules/bunyan/bin/bunyan 
-
-Open http://localhost:8888/app/index.html
-
-Login with user `demo` and password `demo`. 
-
-A sample "database" is initialized already, so you should see already some apps, entities and data.
-
-# Sample code 
-
-Standalone mode using it as npm package: https://www.npmjs.com/package/lowcode-data-app
+Standalone mode:
 
     let lowCodeApp = require( 'lowcode-data-app' )
 
@@ -51,6 +40,12 @@ Standalone mode using it as npm package: https://www.npmjs.com/package/lowcode-d
       URL_PATH : '/app',
       OIDC_SERVER : true
     })
+
+Open http://localhost:8888/app/index.html
+
+Login with user `demo` and password `demo`. 
+
+A sample "database" is initialized already, so you should see already some apps, entities and data.
 
 The `init(...)` returns the `easy-web-app`, so the whole [API](https://github.com/ma-ha/easy-web-app/blob/master/API-Reference.md) is open for customizing,
 e.g. `app.getExpress()` to add API routes or ` gui.pages['main'].addFooterLink(...)` to modify the footer.
@@ -105,7 +100,7 @@ Data types (and their Web GUI mapping)
 - `Event` (link to send an event. Ref can have a simple condition to render the link, e.g. "status == ready" or "status != in progress,done")
 
 So relations are
-- **1:n** = `DocMap`
+- **1:n** = `DocMap` ... the child entity must have a reference key to the parent
 - **n:1** = `SelectRef`
 - **n:m** = `MultiSelectRef`
 
@@ -113,7 +108,7 @@ Entity Ids must be alphanumeric, min length is 2.
 
 Property features:
 - you can select a property for the data table filter
-- you can define a property as "API managed", means zou will see it only in the table, 
+- you can define a property as "API managed", means zo u will see it only in the table, 
   but there is no input available in the add/change GUI form
 
 *Important:* The entity id scope is globally within a top level scope between apps. 
@@ -123,6 +118,8 @@ But: Please choose your entity ids wisely, if you don't want this behavior.
 For JSON properties sub-elements can be defined with a dot-notation (e.g. "MyJsonProp.MySubField"). Allowed types: 'String', 'Text','Boolean','Date','Select'.
 
 You can "inherit" a new child entity in your app from an existing entity in any app of your root scope. This is initially a 1:1 copy and it can be modified to your needs.
+
+You can also create app versions, including all their entities. Simply click "Edit" and change the app id and click the "Add / Change" button to create a new (initially disabled) copy.
 
 # Add New Root Scope (aka "Tenant")
 
@@ -172,7 +169,7 @@ A CSV upload for the "create" action is available.
 
 # Metric Dashboard (WIP)
 
-Dashboards can visualize data in simple way.
+Dashboards can visualize data of an entity collection in simple way.
 
 ![dashboard example](doc/dashboard-example.jpg)
 
@@ -198,7 +195,6 @@ Available visualizations:
 In general the raw data is mostly not prepared to show easily on a dashboard. 
 The approach is to aggregate metrics via cron-jobs: read data via API and write metric in dedicated table. 
 An universal metric table may have properties: Id, metric-key, value, text, description, timestamp.
-
 
 # Integration 
 

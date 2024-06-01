@@ -98,13 +98,14 @@ async function init( ) {
 
   function cstmizePageAddAppFrom() {
     return { 
-      id: 'CustomizeAddApp', rowId: 'CustomizeAddApp', title: 'Add App',  height: 'auto', 
+      id: 'CustomizeAddApp', rowId: 'CustomizeAddApp', title: 'Add / Edit App',  height: 'auto', 
       type : 'pong-form', resourceURL: 'app', 
       moduleConfig : {
         description: "Add",
         id: 'CustomizeAddAppForm',
         fieldGroups:[{ columns: [
           { formFields: [ { id: "appId", label: "Id", type: "text" },
+                          { id: "appIdOrig", type: "text", hidden: true },
                           { id: "name",  label: "App Title", type: "text" }
            ]},
           { formFields: [

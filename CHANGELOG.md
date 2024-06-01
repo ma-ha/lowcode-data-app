@@ -1,3 +1,7 @@
+# 0.29.0
+- Marketplace import
+- App versioning (copy)
+
 # 0.28.7
 - Customize CSS and theme colors
 

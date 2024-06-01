@@ -110,13 +110,14 @@ async function getAppForCustomize( req, res )  {
   if ( ! allOK ) { return }
 
   let cApp = {
-    appId : appId,  // appId.substring( appId.indexOf('/') + 1 ),
-    name  : app.title,
-    scope : ( app.scopeId ? app.scopeId : '-' ),
-    tags  : getTagsCSV( app.scope ),
-    role  : ( app.role.length > 0 ? app.role[0] : '-' ),
-    img   : ( app.img ? app.img : '' ),
-    enabled  : ( app.enabled ? true : false ),
+    appIdOrig   : appId,  
+    appId       : appId,  // appId.substring( appId.indexOf('/') + 1 ),
+    name        : app.title,
+    scope       : ( app.scopeId ? app.scopeId : '-' ),
+    tags        : getTagsCSV( app.scope ),
+    role        : ( app.role.length > 0 ? app.role[0] : '-' ),
+    img         : ( app.img ? app.img : '' ),
+    enabled     : ( app.enabled ? true : false ),
     description : ( app.description ?  app.description : '' )
   }
 
@@ -147,7 +148,15 @@ async function addApp( req, res ) {
     return res.status(401).send( 'ID must be scope/name/version or name/version' )
   }
   log.info( 'POST /app', req.body )
-  let app = await dta.getAppById( appId )
+  let app = await dta.getAppById( req.body.appIdOrig )
+  if ( req.body.appIdOrig != req.body.appId ) { // copy mode
+    let appN = await dta.getAppById( req.body.appId )
+    if ( appN ){
+      return res.status(401).send( 'ID or version already exists' )
+    }
+    app = JSON.parse( JSON.stringify( app ) )
+    req.body.enabled = false
+  }
   if ( ! app ) {
     app = {
       require   : {},
