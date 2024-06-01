@@ -70,7 +70,7 @@ async function init( appCfg ) {
     let rows = []
     rows.push(  cstmizePageLnk() )
     rows.push(  cstmizePageAppTable( user.scopeId ) )
-    rows.push(  cstmizePageAddAppFrom() )
+    rows.push(  cstmizePageAddAppFrom( user.scopeId ) )
 
     return rows
   })
@@ -125,7 +125,7 @@ async function init( appCfg ) {
     return tbl
   }
 
-  function cstmizePageAddAppFrom( ) {
+  function cstmizePageAddAppFrom( scopeId ) {
       let form = { 
       id: 'CustomizeAddApp', rowId: 'CustomizeAddApp', title: 'Add / Edit App',  height: 'auto', 
       type : 'pong-form', resourceURL: 'app', decor: 'decor',
@@ -161,7 +161,7 @@ async function init( appCfg ) {
         ]
       }
     }
-    if ( cfg.MARKETPLACE_SERVER ) {
+    if ( cfg.MARKETPLACE_SERVER  && scopeId == cfg.MARKETPLACE_SCOPE ) {
       form.moduleConfig.fieldGroups[0].columns[3].formFields.push(
         { id: "marketplace", label: "Marketplace", type: "checkbox" }
       )

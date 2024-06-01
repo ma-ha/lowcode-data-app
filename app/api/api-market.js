@@ -251,26 +251,50 @@ async function getMarketPrepImport( req, res ) {
   // log.info( 'user', user )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
 
-  let appUrl = cfg.MARKETPLACE_URL +'/'+req.query.id+'.json'
 
-  let html =  ''
-  try {
-    log.info( 'axios', appUrl )
-    let result = await axios.get( appUrl )
-    // log.info( 'axios', result.data )
-    if ( result.status == 200 ) {
-      if ( result.data.state ) {
-        let prepOut = await stateImport.prepJsonStateUpload( user.rootScopeId, req.query.id, result.data )
-        impResult[ user.userId ] = prepOut
-      } else {
-        let prepOut = await appImport.prepJsonUpload( user.rootScopeId, result.data )
-        impResult[ user.userId ] = prepOut
-      }
+  if ( cfg.MARKETPLACE_SERVER ) {
+
+    let id = req.query.id
+    if ( id.startsWith( 'App' ) ) {
+
+      let appId = id.substring( 4 )
+      let app = await dta.getAppById( appId )
+      let apps = {}
+      let idp = appId.split('/')
+      apps[ idp[1]+'/'+idp[2] ] = app
+      let prepOut = await appImport.prepJsonUpload( user.rootScopeId, apps )
+      impResult[ user.userId ] = prepOut
+
+    } else if ( id.startsWith( 'StateModel' ) ) {
+
+      let smId = id.substring( 11 )
+      let sm = await dta.getStateModelById( smId )
+      let prepOut = await stateImport.prepJsonStateUpload( user.rootScopeId, smId, sm )
+      impResult[ user.userId ] = prepOut
 
     }
-  } catch ( exc ) {
-    log.error( 'getMarketApp', appUrl, exc.message )
+
+  } else {
+
+    let appUrl = cfg.MARKETPLACE_URL +'/'+req.query.id+'.json'
+    try {
+      log.info( 'axios', appUrl )
+      let result = await axios.get( appUrl )
+      // log.info( 'axios', result.data )
+      if ( result.status == 200 ) {
+        if ( result.data.state ) {
+          let prepOut = await stateImport.prepJsonStateUpload( user.rootScopeId, req.query.id, result.data )
+          impResult[ user.userId ] = prepOut
+        } else {
+          let prepOut = await appImport.prepJsonUpload( user.rootScopeId, result.data )
+          impResult[ user.userId ] = prepOut
+        }
+      }
+    } catch ( exc ) {
+      log.error( 'getMarketApp', appUrl, exc.message )
+    }
   }
+
   res.redirect( '../index.html?layout=MarketImport-nonav&id='+req.params.appId )
 }
 
