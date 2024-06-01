@@ -1,3 +1,6 @@
+# 0.29.1
+- pkg update / OIDC fix
+
 # 0.29.0
 - Marketplace import
 - App versioning (copy)

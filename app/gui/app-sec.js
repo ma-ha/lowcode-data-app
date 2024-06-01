@@ -66,6 +66,7 @@ function init( gui, allCfg ) {
       return false
     }
     let u = await userDta.getUserInfo( user )
+    // log.info( 'user', user, u )
     if ( u.role.dev.length == 0  &&  DEV_PAGES.includes(page) ) {
       log.warn( 'User tries to access Dev Page:', user, '->', page )
       return false

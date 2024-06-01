@@ -103,7 +103,7 @@ async function authorize( req, res ) {
       // console.log( "ctx", ctx )
       let redirectURL = req.query.redirect_uri 
       let user = await userDta.getUserInfo( ctx.userId )
-      // console.log( "user", user  )
+      log.debug( "user", user  )
       let idToken =  await oidcGetIdToken( req, user.userId, req.query.client_id )
       let accessToken = await gui.createToken( user.userId )
 
@@ -335,7 +335,7 @@ async function oidcGetIdToken( req, email, cltId ) {
         iss   : 'EkoSys',
         aud   : clt,
         email : uid,
-        name  : user.name,
+        name  : userID, // user.name,
         sub   : userID,
         exp   : Math.round( Date.now() / 1000 +  cfg.userSessionExpireMin * 60 )
         //TODO?
