@@ -1593,6 +1593,16 @@ code {
 }
 /*  -------------------- Marketplace ---------------*/
 
+#AppMarketplaceContentSrchFrm label {
+  margin: 0;
+}
+#AppMarketplaceContentSrchFrm label {
+  width: auto;
+  margin: 3px 6px 0 10px;
+}
+#AppMarketplaceContentSrchFrm input {
+  float: left;
+}
 #AppMarketplace .pongListRow {
   width: 230px;
   height: 200px;

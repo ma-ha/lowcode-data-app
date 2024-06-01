@@ -79,35 +79,50 @@ async function getMarketAppListFrmURL( req, res )  {
 
 async function getMarketAppLisFrmDB( req, res )  { 
   let offers = []
+  
+  let showApp = true
+  let showSM  = true
+  let name    = false
+  if ( req.query.dataFilter ) {
+    if ( req.query.dataFilter.type == 'App' ) { showSM = false }
+    if ( req.query.dataFilter.type == 'StateModel' ) { showApp = false }
+    if ( req.query.dataFilter.name != '' ) { name = req.query.dataFilter.name }
+  }
 
-  let dbApps = await dta.getAppList( cfg.MARKETPLACE_SCOPE, [], 'marketplace' )
-  for ( let appId in dbApps ) {
-    let app = dbApps[ appId ]
-    let id = appId.split('/')[1]
-    offers.push({
-      id     : 'App/'+id,
-      title  : app.title,
-      author : app.by,
-      type   : 'App',
-      img    : '<a href="index.html?layout=MarketPrepImport-nonav&id=App/'+appId+'">'+
-               '<img src="img/k8s-ww-conn.png"></a>'
+  if ( showApp ) {
+    let dbApps = await dta.getAppList( cfg.MARKETPLACE_SCOPE, [], 'marketplace' )
+    for ( let appId in dbApps ) {
+      let app = dbApps[ appId ]
+      let id = appId.split('/')[1]
+      if ( name &&  app.title.indexOf( name ) == -1 ) { continue }
+      offers.push({
+        id     : id,
+        title  : app.title,
+        author : app.by,
+        type   : 'App',
+        img    : '<a href="index.html?layout=MarketPrepImport-nonav&id=App/'+appId+'">'+ 
+                 '<img src="img/k8s-ww-conn.png"></a>'
+      })
+    }
+  }
+
+  if ( showSM ) {
+    let dbSM = await dta.getStateModelMap( cfg.MARKETPLACE_SCOPE )
+    for ( let smId in dbSM ) {
+      let stateModel = dbSM[ dbSM ]
+      let id = smId.split('/')[1]
+      if ( name && id.indexOf( name ) == -1 ) { continue }
+      offers.push({
+        id     : id,
+        title  : id,
+        author : 'NN',
+        type   : 'StateModel',
+        img    : '<a href="index.html?layout=MarketPrepImport-nonav&id=StateModel/'+smId+'">'+
+                 '<img src="img/state-model.png"></a>'
     })
   }
 
-  let dbSM = await dta.getStateModelMap( cfg.MARKETPLACE_SCOPE )
-  for ( let smId in dbSM ) {
-    let stateModel = dbSM[ dbSM ]
-    let id = smId.split('/')[1]
-    offers.push({
-      id     : 'StateModel/'+smId,
-      title  : id,
-      author : 'NN',
-      type   : 'StateModel',
-      img    : '<a href="index.html?layout=MarketPrepImport-nonav&id=StateModel/'+smId+'">'+
-               '<img src="img/state-model.png"></a>'
-    })
   }
-
   return offers
 }
 

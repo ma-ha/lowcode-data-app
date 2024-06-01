@@ -28,6 +28,14 @@ function initMarketPage() {
     type: 'pong-list', resourceURL: 'market',
     moduleConfig : {
       rowId: 'id',
+      filter: {
+        dataReqParams : [
+          { id: 'name', label: 'Name' },
+          { id: 'type', label: 'Type', type: 'select',
+            options: [ { option: '*', value: '*' }, { option: 'App', value: 'App' }, { option: 'State Model', value: 'StateModel' } ] },
+        ],
+        dataReqParamsSrc : 'Form'
+      },
       divs: [
         {
           id: 'XApp',
@@ -38,10 +46,10 @@ function initMarketPage() {
               cellType: 'text',
               nozoom: true 
             },
-            {
-              id: 'id',
-              cellType: 'text'
-            },
+            // {
+            //   id: 'id',
+            //   cellType: 'text'
+            // },
             {
               id: 'title',
               cellType: 'text'
