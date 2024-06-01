@@ -27,6 +27,8 @@
     "Engine",
     "ERM",
     "Event Hub",
+    "OpenAPI",
+    "Swagger",
     "data",
     "GUI",
     "lowcode",
