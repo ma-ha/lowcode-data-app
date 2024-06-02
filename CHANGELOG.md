@@ -1,3 +1,6 @@
+# 0.29.2
+- Marketplace filter case insensitive
+
 # 0.29.1
 - pkg update / OIDC fix
 - Marketplace export

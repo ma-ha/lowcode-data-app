@@ -32,6 +32,7 @@ async function setupAPI( app, appCfg ) {
   svc.get( '/market/html', guiAuthz, getMarketItemDetails )
   svc.get( '/market/prep-import', guiAuthz, getMarketPrepImport )
   svc.get( '/market/import/html', guiAuthz, getMarketImport )
+  svc.post( '/market', guiAuthz, getMarketAppList )
 }
 
 // ============================================================================
@@ -52,23 +53,29 @@ async function getMarketAppList( req, res )  {
 async function getMarketAppListFrmURL( req, res )  {
   let marketListURL = cfg.MARKETPLACE_URL +'/market.json'
   let offers = []
+  let { showApp, showSM, name } = getFilter( req ) 
 
   try {
     log.info( 'axios', marketListURL )
     let result = await axios.get( marketListURL )
     log.info( 'axios', result.status )
     if ( result.status == 200 ) {
-      offers = result.data
-      for ( let offer of offers ) {
+      offers = []
+      for ( let offer of result.data ) {
         let img = offer.img 
         if ( ! img ) {
           img = 'img/k8s-ww-conn.png'
           if ( offer.type =='StateModel' ) {
+            if ( ! showSM ) { continue }
             img = 'img/state-model.png' // TODO
+          } else {
+            if ( ! showApp ) { continue }
           }
         }
+        if ( name &&  offer.title?.toLowerCase().indexOf( name ) == -1 ) { continue }
         offer.img = '<a href="index.html?layout=MarketPrepImport-nonav&id='+offer.id+'">'+
           '<img src="'+encodeURI(img)+'"></a>'
+        offers.push( offer )
       }
     }
   } catch ( exc ) {
@@ -78,23 +85,15 @@ async function getMarketAppListFrmURL( req, res )  {
 }
 
 async function getMarketAppLisFrmDB( req, res )  { 
-  let offers = []
-  
-  let showApp = true
-  let showSM  = true
-  let name    = false
-  if ( req.query.dataFilter ) {
-    if ( req.query.dataFilter.type == 'App' ) { showSM = false }
-    if ( req.query.dataFilter.type == 'StateModel' ) { showApp = false }
-    if ( req.query.dataFilter.name != '' ) { name = req.query.dataFilter.name }
-  }
+  let offers = []  
+  let { showApp, showSM, name } = getFilter( req ) 
 
   if ( showApp ) {
     let dbApps = await dta.getAppList( cfg.MARKETPLACE_SCOPE, [], 'marketplace' )
     for ( let appId in dbApps ) {
       let app = dbApps[ appId ]
       let id = appId.split('/')[1]
-      if ( name &&  app.title.indexOf( name ) == -1 ) { continue }
+      if ( name &&  app.title?.toLowerCase().indexOf( name ) == -1 ) { continue }
       offers.push({
         id     : id,
         title  : app.title,
@@ -126,6 +125,17 @@ async function getMarketAppLisFrmDB( req, res )  {
   return offers
 }
 
+function getFilter( req ) {
+  let showApp = true
+  let showSM  = true
+  let name    = false
+  if ( req.query.dataFilter ) {
+    if ( req.query.dataFilter.type == 'App' ) { showSM = false }
+    if ( req.query.dataFilter.type == 'StateModel' ) { showApp = false }
+    if ( req.query.dataFilter.name != '' ) { name = req.query.dataFilter.name.toLowerCase() }
+  }
+  return { showApp: showApp, showSM: showSM, name: name }
+}
 
 // ============================================================================
 
