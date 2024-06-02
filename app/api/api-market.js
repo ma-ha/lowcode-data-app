@@ -28,11 +28,12 @@ async function setupAPI( app, appCfg ) {
 
   const guiAuthz = apiSec.userTenantAuthz( gui )
 
-  svc.get( '/market', guiAuthz, getMarketAppList )
-  svc.get( '/market/html', guiAuthz, getMarketItemDetails )
-  svc.get( '/market/prep-import', guiAuthz, getMarketPrepImport )
-  svc.get( '/market/import/html', guiAuthz, getMarketImport )
-  svc.post( '/market', guiAuthz, getMarketAppList )
+  svc.get( '/market', getMarketAppList )
+  svc.get( '/market/html', getMarketItemDetails )
+  svc.get( '/market/prep-import', getMarketPrepImport )
+  svc.get( '/market/import/html', getMarketImport )
+  svc.get( '/market/howto/html', getMarketHowTo )
+  svc.get( 'market/state-model/diagram', getMarketStateModel )
 }
 
 // ============================================================================
@@ -99,7 +100,7 @@ async function getMarketAppLisFrmDB( req, res )  {
         title  : app.title,
         author : app.by,
         type   : 'App',
-        img    : '<a href="index.html?layout=MarketPrepImport-nonav&id=App/'+appId+'">'+ 
+        img    : '<a href="index.html?layout=MarketAppDetails-nonav&id=App/'+appId+'">'+ 
                  '<img src="img/k8s-ww-conn.png"></a>'
       })
     }
@@ -108,20 +109,22 @@ async function getMarketAppLisFrmDB( req, res )  {
   if ( showSM ) {
     let dbSM = await dta.getStateModelMap( cfg.MARKETPLACE_SCOPE )
     for ( let smId in dbSM ) {
-      let stateModel = dbSM[ dbSM ]
+      let stateModel = dbSM[ smId ]
       let id = smId.split('/')[1]
       if ( name && id.indexOf( name ) == -1 ) { continue }
       offers.push({
         id     : id,
-        title  : id,
+        title  : ( stateModel.title ? stateModel.title : id ),
         author : 'NN',
         type   : 'StateModel',
-        img    : '<a href="index.html?layout=MarketPrepImport-nonav&id=StateModel/'+smId+'">'+
+        img    : '<a href="index.html?layout=MarketStateModelDetails-nonav&id=StateModel/'+smId+'">'+
                  '<img src="img/state-model.png"></a>'
-    })
+      })
+    }
   }
 
-  }
+  offers.sort( (a,b) => { if ( a.title < b.title ) { return 1 } else { return -1 }} )
+
   return offers
 }
 
@@ -189,6 +192,10 @@ async function getMarketItemDetailsFromDB( id )  {
   return html
 }
 
+async function getMarketStateModel( req, res )  {
+  res.send({})
+}
+
 // ============================================================================
 
 async function prepAppImport( id, apps ) {
@@ -245,6 +252,12 @@ async function preStateImport( id, state ) {
       html += '<span class="error"> Error: State model ='+id+' exists!</span>'
     } else {
       html += '<b>'+ id +'</b>: <a href="market/prep-import?id='+id+'">Check import state models</a>'
+      if (  state.description ) {
+        html += '<h2>'+ ( state.title ? state.title : id ) +'</h2>'
+        html += state.description
+      }
+     
+
     }
   } catch (exc) {
     html = exc.message
@@ -315,4 +328,12 @@ async function getMarketImport( req, res ) {
   let html = impResult[ user.userId ]
   delete impResult[ user.userId ]
   res.send( html )
+}
+
+async function getMarketHowTo( req, res ) {
+  if ( cfg.MARKETPLACE_HOWTO_CONTRIBUTE ) {
+    res.send( cfg.MARKETPLACE_HOWTO_CONTRIBUTE )
+  } else {
+    res.send( 'No contributions!' )
+  }
 }

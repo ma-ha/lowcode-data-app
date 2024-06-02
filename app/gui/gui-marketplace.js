@@ -12,7 +12,7 @@ let cfg = {}
 async function init( appCfg ) {
   cfg = appCfg
   initMarketPage()
-  initAppDetailsPage()
+  initDetailsPages()
   initAppImportPage()
 }
 
@@ -81,16 +81,39 @@ function initMarketPage() {
       maxRows: 6
     }
   })
+
+  log.info( ' cfg.MARKETPLACE_HOWTO_CONTRIBUTE' , cfg.MARKETPLACE_HOWTO_CONTRIBUTE )
+  if ( cfg.MARKETPLACE_HOWTO_CONTRIBUTE ) {
+    marketPage.addView({ 
+      id: 'AppMarketHowToPublish', title: 'How can I contribute?',  height: '56px', 
+      resourceURL: 'market/howto'
+    })
+  }
+
 }
 
-function initAppDetailsPage() {
-  let marketPage = gui.addPage( 'MarketPrepImport-nonav' ) 
-  marketPage.title    = 'App Marketplace'
-  marketPage.setPageWidth( '90%' )
-  marketPage.addView({ 
-    id: 'AppMarketplace', title: 'App Marketplace', height: '760px',
+
+function initDetailsPages() {
+  let marketAppPage = gui.addPage( 'MarketAppDetails-nonav' ) 
+  marketAppPage.title    = 'App Marketplace'
+  marketAppPage.setPageWidth( '90%' )
+  marketAppPage.addView({ 
+    id: 'MarketplaceApp', title: 'App Marketplace', height: '760px',
     resourceURL: 'market'
   })
+
+  let marketSmPage = gui.addPage( 'MarketStateModelDetails-nonav' ) 
+  marketSmPage.title    = 'App Marketplace'
+  marketSmPage.setPageWidth( '90%' )
+  marketSmPage.addView({ 
+    id: 'MarketplaceSm', title: 'App Marketplace', height: '150px',
+    resourceURL: 'market'
+  })
+  marketSmPage.addView({ 
+    id: 'MarketplaceSmDiagram', title: 'State Model', height: '650px',
+    type : 'statemodel', resourceURL: 'market/state-model/diagram',
+  })
+
 }
 
 

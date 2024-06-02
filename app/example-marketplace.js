@@ -13,5 +13,6 @@ lowCodeApp.init({
   OIDC_SERVER : true,
   SUPER_TENANT_ADMIN: 'demo', // comma separated user ids
   MARKETPLACE_SERVER: true,
-  MARKETPLACE_SCOPE: '2110'
+  MARKETPLACE_SCOPE: '2110',
+  MARKETPLACE_HOWTO_CONTRIBUTE: 'Please email me your app exports to xzy@test.de'
 })

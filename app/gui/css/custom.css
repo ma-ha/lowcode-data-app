@@ -602,6 +602,13 @@ select:invalid {
   width: 150px;
 }
 
+#StateModelTitle .pongFormInputGrpClose {
+  display: none;
+}
+
+#StateModelTitle .pongFormInputGrp0 {
+  width: auto;
+}
 /* ==================================================== */
 
  .decor-tm-title,

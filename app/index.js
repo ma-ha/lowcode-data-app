@@ -71,6 +71,7 @@ function checkConfig( cfg ) {
   checkCfgParam( cfg, 'MARKETPLACE_URL', 'http://localhost/mh/lowcode-app-market' )
   checkCfgParam( cfg, 'MARKETPLACE_SERVER', false )
   checkCfgParam( cfg, 'MARKETPLACE_SCOPE', '-' )
+  checkCfgParam( cfg, 'MARKETPLACE_HOWTO_CONTRIBUTE', false )
   
   checkOidcParams( cfg )
   log.debug( 'CONFIG', cfg )

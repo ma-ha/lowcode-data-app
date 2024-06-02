@@ -1,5 +1,6 @@
 # 0.29.2
-- Marketplace filter case insensitive
+- Marketplace: improvements
+- State model fixes
 
 # 0.29.1
 - pkg update / OIDC fix

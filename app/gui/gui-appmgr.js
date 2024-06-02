@@ -627,6 +627,24 @@ async function init( appCfg ) {
   editStatePage.setPageWidth( '90%' )
 
   editStatePage.addView({ 
+    id: 'StateModelTitle', rowId: 'StateModelTitle', title: 'State Model',
+    height: '90px', decor: 'decor',
+    type : 'pong-form', resourceURL: 'state-model',
+    moduleConfig : {
+      id: 'StateModelTitleForm',
+      fieldGroups:[{ columns: [
+        { formFields: [{ id: "id", label: "State Model Id", type: "text", readonly: true } ]},
+        { formFields: [{ id: "title", label: "Title", type: "text" } ]},
+        { formFields: [{ id: "description", label: "Description", type: "text", rows:2 } ]}
+      ] }],
+      actions : [ 
+        { id: "Upd", actionName: "Save", actionURL: 'state-model', target: "modal" },
+        { id: 'Init', onInit: 'GET', actionURL: 'state-model' },
+      ]
+    }
+  })
+
+  editStatePage.addView({ 
     id: 'StateModel', rowId: 'StateModel', 
     title: 'State Model',
     height: '350px', decor: 'decor',
