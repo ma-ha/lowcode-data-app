@@ -177,6 +177,14 @@ async function getStateModels( req, res )  {
     return res.status(401).send( 'login required' ) 
   }
 
+  if ( req.query.id ) { // by id
+    let stateModel = await dta.getStateModelById( req.query.id  )
+    if ( ! stateModel.title ) {
+      stateModel.title = stateModel.id?.split('/')[1]
+    }
+    return res.send( stateModel )
+  }
+
   let stateArr = []
   let stateModeMap = await dta.getStateModelMap(user.rootScopeId )
 
@@ -204,6 +212,16 @@ async function addStateModel( req, res )  {
     log.warn( 'addState no user')
     return res.status(401).send( 'login required' ) 
   }
+
+  if ( req.body.id &&  req.body.title && req.body.description ) {
+    let stateModel = await dta.getStateModelById( req.body.id )
+    if ( ! stateModel ) {  return res.status(400).send( 'Not found!' ) }
+    stateModel.title =  req.body.title
+    stateModel.description =  req.body.description
+    await dta.saveStateModel( req.body.id, stateModel )
+    return res.send( 'ok' ) 
+  }
+
   if ( ! req.body.scopeId || ! req.body.stateModelId ) {
     return res.status(400).send( ) 
   }
@@ -224,7 +242,7 @@ async function addStateModel( req, res )  {
   }
   await dta.saveStateModel( req.body.scopeId +'/'+id, newState )
 
-  res.send(( result ? 'OK' : 'FAILED!!' ))
+  res.send( 'OK' )
 }
 
 
@@ -665,7 +683,7 @@ async function delStateTransitions( req, res )  {
       return res.status(400).send( 'ActionId not found' )
     }
     delete stateFrom.actions[ req.body.actionId ]
-    await dta.saveStateModel( stateModelId, stateModel )
+    await dta.saveStateModel( req.body.stateModelId, stateModel )
     return res.send( 'OK' )
   }
   res.status(400).send( ) 
@@ -704,7 +722,7 @@ async function getStateModel( req, res )  {
     let state = stateModel.state[ stateId ]
     let name = ( state.label ? state.label : stateId )
     if ( stateId == 'null' ) {
-      name = '<span class="fontPlus1">'+modelId+'</span>'
+      name = '<span class="fontPlus1">'+ ( stateModel.title ? stateModel.title : modelId ) +'</span>'
     }
     stm.state[ stateId ] = {
       id    : stateId,
