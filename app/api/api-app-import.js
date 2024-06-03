@@ -28,6 +28,9 @@ async function setupAPI( app ) {
   svc.post( '/app/json', fileupload(),guiAuthz, uploadAppJSON )
   svc.get(  '/app/json/html', guiAuthz, getUploadAppResult )
   svc.get(  '/app/import/:uid', guiAuthz, importApp )
+
+  svc.post( '/app/swagger', fileupload(),guiAuthz, uploadAppSwagger )
+  svc.get(  '/app/swagger/html', guiAuthz, getUploadSwaggerResult )
 }
 
 // ============================================================================
@@ -243,11 +246,168 @@ async function importApp( req, res ) {
   let impDta = await dta.getDataById( 'app-temp', req.params.uid ) 
   if ( ! impDta ) { return res.status(400).send( 'not found' ) }
 
-  for ( let appId in impDta.apps ) {
-    log.info( 'GET /app/import IMPORT >>', appId  ) 
-    await dta.addApp( user.rootScopeId +'/'+ appId, impDta.apps[ appId] )
+  if ( impDta.appId && impDta.entity ) { // swagger
+
+    let app = await dta.getAppById( impDta.appId )
+    for ( let entityId in impDta.entity ) {
+      app.entity[ entityId ] = impDta.entity[ entityId ]
+    }
+    await dta.addApp( impDta.appId, app )
+
+
+  } else {
+
+    for ( let appId in impDta.apps ) {
+      log.info( 'GET /app/import IMPORT >>', appId  ) 
+      await dta.addApp( user.rootScopeId +'/'+ appId, impDta.apps[ appId] )
+    }
+
   }
+
   await dta.delDataObjNoEvent( 'app-temp', req.params.uid )
 
   res.redirect( '../../index.html?layout=Customize' ) 
+}
+
+// ----------------------------------------------------------------------------
+
+async function uploadAppSwagger( req, res ) {
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  log.info( 'POST /app/swagger', req.body  ) // , req.files.file.data
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  if ( ! req.files || Object.keys( req.files ).length === 0) {
+    return res.status(400).send( 'No files were uploaded.' )
+  }
+  if ( ! req.body.appId.startsWith( user.rootScopeId )) { 
+    return res.status(400).send( 'App Id Not allowed' )
+  }
+  let app = await dta.getAppById( req.body.appId )
+  if ( ! app ) { return res.status(400).send( 'App Id not valid' ) }
+
+  try {
+    let result = await prepSwaggerUpload( req.body.appId, req.body.prefix, '' + req.files.file.data )
+    uploadResult[ user.userId + 'swagger' ] = result
+
+  } catch ( exc ) {  
+    log.warn( 'uploadAppSwagger', exc )
+    return res.status(400).send( 'Error' )
+  }
+  res.send( 'OK' )
+}
+
+
+async function prepSwaggerUpload( appId, prefix, swaggerFile ) {
+  let htmlOut = '<h2>'+appId+'</h2>'
+  try {
+    let swagger = JSON.parse( swaggerFile )
+    let app = await dta.getAppById( appId )
+    // log.info( 'swagger',swagger )
+    htmlOut += '<h3>Entities</h3>'
+    let d = swagger.definitions
+    let entity = {}
+    for ( let defId in d ) {
+      let sE = d[ defId ]
+      if ( sE.type != 'object' ) {
+        htmlOut += '<b>skipping</b>'  + sE.type + ': ' 
+        continue
+      }
+      htmlOut += prefix + defId
+      if ( app.entity[  prefix + defId ] ) {
+        htmlOut += ' <b>WARNING: Overwriting existing!!</b>' 
+      }
+      htmlOut += '<br>'
+      let nE = {
+        title : defId,
+        scope : 'inherit',
+        maintainer: [ "appUser" ],
+        properties: { },
+        description : sE.description,
+        colWidth: "M"
+      }
+      entity[ prefix + defId ] = nE
+      for ( let pId in sE.properties ) {
+        let sP = sE.properties[ pId ]
+        let prp = {
+          type : 'String',
+          description : sP.description
+        }
+        if ( sE.required?.includes( pId ) ) {
+          prp.notNull = true
+        }
+        if ( pId.startsWith('@') ) {
+          prp.type = 'API static string'
+          prp.apiString = ''
+          prp.noTable = true
+
+        } else if ( sP.type == 'string' && sP.enum ) {
+          prp.type = 'Select'
+          prp.options = sP.enum
+        } else if ( sP.type == 'boolean' ) {
+          prp.type = 'Boolean'
+        } else if ( sP.type == 'array' ) {
+          prp.type = 'MultiSelectRef'
+          let refX =  sP.items[ '$ref' ].split('/')
+          let ref = refX[ refX.length -1 ]
+          prp.multiSelectRef = appId + '/' +prefix + ref
+          prp.noTable = true
+        } else if ( sP[ '$ref' ] ) {
+          let refX =  sP[ '$ref' ].split('/')
+          let ref = refX[ refX.length -1 ]
+          if ( d[ ref ]?.type == 'string' ) {
+            if ( d[ ref ].enum ) {
+              prp.type = 'Select'
+              prp.options =  d[ ref ].enum
+            }
+          } else {
+            prp.type = 'SelectRef'
+            prp.selectRef = appId + '/' +prefix + ref  
+          }
+        }
+        if ( pId == 'name' ) {
+          prp.refLbl = true
+        }
+        nE.properties[ pId ] = prp
+      }
+      if ( ! nE.properties.id ) {
+        nE.properties.id = {
+          type     : "UUID",
+          noDelete : true,
+          noEdit   : true,
+          noTable  : true
+        }
+      } else {
+        nE.properties.id.type = "UUID"
+        nE.properties.id.noEdit = true
+        nE.properties.id.description = 'TODO type changed\n' +  nE.properties.id.description
+      }
+    }
+    // htmlOut += '<h3>App JSON</h3>'
+    // let appE = JSON.stringify( entity, null, '  ' )
+    // htmlOut += appE.replaceAll( '  ', '&nbsp;&nbsp' ).replaceAll( '\n', '<br>' )
+    
+    log.info( 'swagger', entity )
+    
+    let importId = helper.uuidv4()
+    let appImp = {
+      appId   : appId,
+      entity  : entity,
+      _expire : Date.now() + 1000*60*60*24
+    }
+    await dta.addDataObjNoEvent( 'app-temp', importId, appImp )
+    htmlOut += '<p> Click to <a href="app/import/'+importId+'">IMPORT</a>'
+
+  } catch ( exc ) {
+    log.warn( 'prepSwaggerUpload', exc )
+    htmlOut += '<span class="error">'+exc.message+'</span>'
+  }
+  return htmlOut
+}
+
+
+async function getUploadSwaggerResult( req, res ) {
+  log.info( 'GET /app/swagger/html'  ) // , req.files.file.data
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  res.send( uploadResult[ user.userId + 'swagger' ] )
+  delete uploadResult[ user.userId + 'swagger']
 }

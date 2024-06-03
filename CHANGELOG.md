@@ -1,6 +1,7 @@
 # 0.29.2
 - Marketplace: improvements
 - State model fixes
+- Swagger upload
 
 # 0.29.1
 - pkg update / OIDC fix

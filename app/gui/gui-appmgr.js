@@ -454,14 +454,21 @@ async function init( appCfg ) {
   uploadAppPage.navLabel = 'LCA Upload App'
   uploadAppPage.setPageWidth( '90%' )
   uploadAppPage.addView( uploadAppForm() )
-  uploadAppPage.addView(  uploadOut( 'app' ) )
+  uploadAppPage.addView(  uploadOut( 'app/json' ) )
 
   let uploadStatePage = gui.addPage( 'UploadStateModel-nonav' ) 
   uploadStatePage.title    = 'LCA Upload State Model'
   uploadStatePage.navLabel = 'LCA Upload State Model'
   uploadStatePage.setPageWidth( '90%' )
   uploadStatePage.addView( uploadStateModelForm() )
-  uploadStatePage.addView( uploadOut( 'state-model' ) )
+  uploadStatePage.addView( uploadOut( 'state-model/json' ) )
+
+  let uploadSwaggerPage = gui.addPage( 'UploadSwagger-nonav' ) 
+  uploadSwaggerPage.title    = 'LCA Upload Swagger'
+  uploadSwaggerPage.navLabel = 'LCA Upload Swagger'
+  uploadSwaggerPage.setPageWidth( '90%' )
+  uploadSwaggerPage.addView( uploadAppSwaggerForm() )
+  uploadSwaggerPage.addView( uploadOut( 'app/swagger' ) )
 
   // --------------------------------------------------------------------------
   let entityStatusPage = gui.addPage( 'AppEntityStatus-nonav' ) 
@@ -830,8 +837,26 @@ function uploadStateModelForm() {
 
 function uploadOut( uploadType ) {
   return {
-    rowId: "ImportLog", title: "Import Output", resourceURL: uploadType+"/json",
+    rowId: "ImportLog", title: "Import Output", resourceURL: uploadType,
     height: '500px'
+  }
+}
+
+// ============================================================================
+
+function uploadAppSwaggerForm() {
+  return {
+    rowId: "ApSwaggerUpload", title: "Upload App JSON",
+    type : "pong-upload", resourceURL: "app/swagger",
+    height: '150px', 
+    moduleConfig: {
+      update : [ "ImportLog" ],
+      input: [
+        { id: "appId", label: "App Id" },
+        { id: "prefix", label: "Entity Prefix" },
+      ],
+      accept: ".json,.yaml,yml"
+    }
   }
 }
 
