@@ -10,7 +10,8 @@ const helper     = require( '../helper/helper' )
 
 exports: module.exports = { 
   setupAPI,
-  prepJsonStateUpload
+  prepJsonStateUpload,
+  getStateModel
 }
 
 // ============================================================================
@@ -694,7 +695,7 @@ async function delStateTransitions( req, res )  {
 
 // ============================================================================
 
-async function getStateModel( req, res )  {
+async function getStateModel( req, res, dta  )  {
   log.info( 'GET STM', req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
 
@@ -711,11 +712,16 @@ async function getStateModel( req, res )  {
   }
   log.info( 'GET STM ', modelId )
 
-  let stateModel = await dta.getStateModelById( user.rootScopeId+'/'+modelId )
+  let stateModel = null
+  if ( ! dta ) {
+    await dta.getStateModelById( user.rootScopeId+'/'+modelId )
+  } else {
+    stateModel = dta
+  }
   if ( ! stateModel ) { 
     log.warn( 'stateModel no found', stateModel, modelId )
     return res.send(  { state: {} } )
-    return res.status(400).send( 'not found required' ) 
+    // return res.status(400).send( 'not found required' ) 
   }
   
   let stm = { state: {} }

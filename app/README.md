@@ -78,6 +78,12 @@ Open your new app in the "App" tab (the app is only visible in the defined scope
 
 The web GUI supports CSV data upload, if this is enabled for the entity (checkbox).
 
+### Import Apps, Entity Models and State Models from Marketplace
+
+Just select your scope, open "Marketplace" and click the App or State Model to inspect the
+details. Click the "Check import" link to check all dependencies and if everything is OK, 
+click the "Import" link to add the models to your scope.
+
 # Entity / Document Model
 
 ![sceenshot](doc/locode.png)

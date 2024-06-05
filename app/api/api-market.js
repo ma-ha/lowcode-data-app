@@ -33,7 +33,7 @@ async function setupAPI( app, appCfg ) {
   svc.get( '/market/prep-import', getMarketPrepImport )
   svc.get( '/market/import/html', getMarketImport )
   svc.get( '/market/howto/html', getMarketHowTo )
-  svc.get( 'market/state-model/diagram', getMarketStateModel )
+  svc.get( '/market/state-model/diagram', getMarketStateModel )
 
   setInterval( clearMarketListCache, 60*60*1000 )
 }
@@ -258,10 +258,23 @@ async function getMarketItemDetailsFromDB( id )  {
 }
 
 async function getMarketStateModel( req, res )  {
+  log.info( 'getMarketStateModel', req.query.id )
   if ( ! cfg.MARKETPLACE_SERVER ) {
-    res.send(  { state: {} } )
+    try {
+      log.debug( 'axios', cfg.MARKETPLACE_URL +'/'+req.query.id+'.json' )
+      let result = await axios.get( cfg.MARKETPLACE_URL +'/'+req.query.id+'.json' )
+      log.info( 'axios', result.data )
+      if ( result.status == 200 ) {
+        // if ( result.data.state ) {
+          return await stateImport.getStateModel( req, res, result.data )
+        // }
+      }
+    } catch ( exc ) {
+      log.warn( 'getMarketStateModel', cfg.MARKETPLACE_URL +'/'+req.query.id+'.json', exc.message ) 
+    }
+    res.send({})
   } else {
-    await stateImport. getStateModel( req, res )
+    await stateImport.getStateModel( req, res )
   }
 }
 
