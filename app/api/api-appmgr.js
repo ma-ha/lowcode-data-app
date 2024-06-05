@@ -99,6 +99,11 @@ async function getApp( req, res )  {
         tags  : getTagsCSV( app.scope ),
         role  : ( app.role ? app.role.join() : '' ),
         enabled  : ( app.enabled ? true : false ),
+        marketplace  : ( app.marketplace ? true : false ),
+        by           : app.by,
+        standard     : app.standard,
+        license      : app.license,
+        marketplace  : ( app.marketplace ? true : false ),
         dashboardLnk : dashboardLnk, 
         entitiesLnk : '<a href="index.html?layout=AppEntities-nonav&id='+appId+'">Manage&nbsp;Entities</a>',
         pagesLnk :'<a href="index.html?layout=AppPages-nonav&id='+appId+'">Manage&nbsp;Pages</a>',
@@ -131,6 +136,8 @@ async function getAppForCustomize( req, res )  {
   if ( cfg.MARKETPLACE_SERVER ) {
     cApp.marketplace = ( app.marketplace ? true : false )
     cApp.by = app.by
+    cApp.standard = app.standard
+    cApp.license  = app.license
   }
 
   res.send( cApp )
@@ -178,12 +185,16 @@ async function addApp( req, res ) {
       enabled   : false
     }
   }
-  app.scopeId = ( req.body.scope == '' ? null : req.body.scope )
+  app.scopeId = ( req.body.scope == '' ? null : ( req.body.scope == '-' ? null : req.body.scope ) )
+  
   app.title   = ( req.body.name ? req.body.name : req.body.id )
   app.enabled = ( req.body.enabled ? true : false )
   app.dashboard = ( req.body.dashboard ? true : false )
   if ( cfg.MARKETPLACE_SERVER ) {
     app.marketplace = ( req.body.marketplace ? true : false )
+    app.by = req.body.by
+    app.standard = req.body.standard
+    app.license = req.body.license
   }
   if ( app.dashboard ) {
    if ( ! app.startPage[0] || ! app.startPage[0].startsWith( 'dashboard/' ) ) {
@@ -270,7 +281,7 @@ async function getEntity( req, res )  {
         csvUpload  : ( entity.csvUpload === true ? true : false ),
         stateModel : stateModel,
         maintainer : entity.maintainer,
-        propLnk :'<a href="index.html?layout=AppEntityProperties-nonav&id='+appId+','+entityId+'">Manage Properties</a>'
+        propLnk :'<a href="index.html?layout=AppEntityProperties-nonav&id='+appId+','+entityId+'">Properties</a>'
       })
     }
     res.send( entityArr )

@@ -213,11 +213,14 @@ async function addStateModel( req, res )  {
     return res.status(401).send( 'login required' ) 
   }
 
-  if ( req.body.id &&  req.body.title && req.body.description ) {
+  if ( req.body.id  ) {
     let stateModel = await dta.getStateModelById( req.body.id )
     if ( ! stateModel ) {  return res.status(400).send( 'Not found!' ) }
-    stateModel.title =  req.body.title
-    stateModel.description =  req.body.description
+    stateModel.title = req.body.title
+    stateModel.by    = req.body.by
+    stateModel.description = req.body.description
+    stateModel.standard = req.body.standard
+    stateModel.license = req.body.license
     await dta.saveStateModel( req.body.id, stateModel )
     return res.send( 'ok' ) 
   }
@@ -711,6 +714,7 @@ async function getStateModel( req, res )  {
   let stateModel = await dta.getStateModelById( user.rootScopeId+'/'+modelId )
   if ( ! stateModel ) { 
     log.warn( 'stateModel no found', stateModel, modelId )
+    return res.send(  { state: {} } )
     return res.status(400).send( 'not found required' ) 
   }
   

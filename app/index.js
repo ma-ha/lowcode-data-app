@@ -68,7 +68,7 @@ function checkConfig( cfg ) {
   checkCfgParam( cfg, 'HOST', 'localhost' )
   checkCfgParam( cfg, 'GUI_URL','http://'+ cfg.HOST +':' + cfg.PORT + cfg.PATH )
   
-  checkCfgParam( cfg, 'MARKETPLACE_URL', 'http://localhost/mh/lowcode-app-market' )
+  checkCfgParam( cfg, 'MARKETPLACE_URL', 'https://raw.githubusercontent.com/ma-ha/lowcode-data-app-market/master' )
   checkCfgParam( cfg, 'MARKETPLACE_SERVER', false )
   checkCfgParam( cfg, 'MARKETPLACE_SCOPE', '-' )
   checkCfgParam( cfg, 'MARKETPLACE_HOWTO_CONTRIBUTE', false )

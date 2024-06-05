@@ -168,6 +168,12 @@ async function init( appCfg ) {
       form.moduleConfig.fieldGroups[0].columns[0].formFields.push(
         { id: "by", label: "By", type: "text" }
       )
+      form.moduleConfig.fieldGroups[0].columns[1].formFields.push(
+        { id: "standard", label: "Standard", type: "text" }
+      )
+      form.moduleConfig.fieldGroups[0].columns[1].formFields.push(
+        { id: "license", label: "License", type: "text" }
+      )
     }
     return form
   }
@@ -211,6 +217,7 @@ async function init( appCfg ) {
           { id: 'Edit', label: "", cellType: "button", width :'5%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AppEntitiesAdd' } ] } ,
           { id: "entityId",   label: "Id",         width: "10%", cellType: "text" },
+          { id: "propLnk",    label: "Properties", width: "10%", cellType: "text" },
           { id: "title",      label: "Title",      width: "10%", cellType: "text" },
           { id: "scope",      label: "Scope",      width: "10%", cellType: "text" },
           { id: "startPage",  label: "Start Page", width: "10%", cellType: "checkbox" },
@@ -218,7 +225,6 @@ async function init( appCfg ) {
           { id: "userDelete", label: "Deletable",  width: "10%", cellType: "checkbox" },
           { id: "csvUpload",  label: "CSV Upload", width: "10%", cellType: "checkbox" },
           { id: "stateModel", label: "State Model",width: "10%", cellType: "text" },
-          { id: "propLnk",    label: "Properties", width: "10%", cellType: "text" },
           { id: "maintainer", label: "Maintainer", width: "10%", cellType: "text" },
           { id: 'Del', label: "", cellType: "button", width :'7%', icon: 'ui-icon-trash', 
             method: "DELETE", update: [ { resId : 'AppEntitiesTbl' } ], target: "modal" }
@@ -602,10 +608,10 @@ async function init( appCfg ) {
       dataURL: "",
       rowId: "stateModelId",
       cols: [
-        { id: "stateModelId",label: "Model ID",  width: "10%",  cellType: "text" },
-        { id: "scope",       label: "Scope",     width: "10%", cellType: "text" },
-        { id: "editLnk",     label: "Edit",      width: "10%", cellType: "text" },
-        { id: "expLnk",      label: "Export",    width: "10%", cellType: "text" },
+        { id: "stateModelId",label: "Model ID",  width: "16%",  cellType: "text" },
+        { id: "scope",       label: "Scope",     width: "8%", cellType: "text" },
+        { id: "editLnk",     label: "Edit",      width: "8%", cellType: "text" },
+        { id: "expLnk",      label: "Export",    width: "8", cellType: "text" },
         { id: "states",      label: "States",    width: "60%", cellType: "text" }
       ]
     } 
@@ -633,28 +639,60 @@ async function init( appCfg ) {
   editStatePage.title = 'Edit State'
   editStatePage.setPageWidth( '90%' )
 
-  editStatePage.addView({ 
-    id: 'StateModelTitle', rowId: 'StateModelTitle', title: 'State Model',
-    height: '90px', decor: 'decor',
-    type : 'pong-form', resourceURL: 'state-model',
-    moduleConfig : {
-      id: 'StateModelTitleForm',
-      fieldGroups:[{ columns: [
-        { formFields: [{ id: "id", label: "State Model Id", type: "text", readonly: true } ]},
-        { formFields: [{ id: "title", label: "Title", type: "text" } ]},
-        { formFields: [{ id: "description", label: "Description", type: "text", rows:2 } ]}
-      ] }],
-      actions : [ 
-        { id: "Upd", actionName: "Save", actionURL: 'state-model', target: "modal" },
-        { id: 'Init', onInit: 'GET', actionURL: 'state-model' },
-      ]
-    }
-  })
+
+  if ( ! cfg.MARKETPLACE_SERVER ) {
+    editStatePage.addView({ 
+      id: 'StateModelTitle', rowId: 'StateModelTitle', title: 'State Model',
+      height: '90px', decor: 'decor',
+      type : 'pong-form', resourceURL: 'state-model',
+      moduleConfig : {
+        id: 'StateModelTitleForm',
+        fieldGroups:[{ columns: [
+          { formFields: [{ id: "id", label: "State Model Id", type: "text", readonly: true } ]},
+          { formFields: [{ id: "title", label: "Title", type: "text" } ]},
+          { formFields: [{ id: "by", label: "Author", type: "text" } ]},
+          { formFields: [{ id: "description", label: "Description", type: "text", rows:2 } ]}
+        ] }],
+        actions : [ 
+          { id: "Upd", actionName: "Save", actionURL: 'state-model', target: "modal" },
+          { id: 'Init', onInit: 'GET', actionURL: 'state-model' },
+        ]
+      }
+    })
+  } else {
+    editStatePage.addView({ 
+      id: 'StateModelTitle', rowId: 'StateModelTitle', title: 'State Model',
+      height: '110px', decor: 'decor',
+      type : 'pong-form', resourceURL: 'state-model',
+      moduleConfig : {
+        id: 'StateModelTitleForm',
+        fieldGroups:[{ columns: [
+          { formFields: [{ id: "id", label: "State Model Id", type: "text", readonly: true } ]},
+          { formFields: [
+            { id: "title", label: "Title", type: "text" } ,
+            { id: "standard", label: "Standard", type: "text" } 
+          ]},
+          { formFields: [
+            { id: "by", label: "Author", type: "text" },
+            { id: "license", label: "License", type: "text" } 
+          ]},
+          { formFields: [{ id: "description", label: "Description", type: "text", rows:2 } ]}
+        ] }],
+        actions : [ 
+          { id: "Upd", actionName: "Save", actionURL: 'state-model', target: "modal" },
+          { id: 'Init', onInit: 'GET', actionURL: 'state-model' },
+        ]
+      }
+    })
+  }
+
+  
+
 
   editStatePage.addView({ 
     id: 'StateModel', rowId: 'StateModel', 
     title: 'State Model',
-    height: '350px', decor: 'decor',
+    height: '400px', decor: 'decor',
     type : 'statemodel', 
     resourceURL: 'state-model/diagram',
     moduleConfig : {}

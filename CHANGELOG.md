@@ -1,3 +1,7 @@
+# 0.29.3
+- Marketplace: improvements
+- Marketplace default from GitHub
+
 # 0.29.2
 - Marketplace: improvements
 - State model fixes

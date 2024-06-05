@@ -260,7 +260,8 @@ async function getUserInfo( userId ) {
     scopeId     : scopeId,
     rootScopeId : rootScope,
     scopeTags   : scopeTbl[ scopeId ].tag,
-    role        : idnty.role
+    role        : idnty.role,
+    lastLogin   : idnty.lastLogin
   }
   if ( scopeTbl[ rootScope ].noCustomizing ) {
     userInfo.role.dev = []  // dev not allowed

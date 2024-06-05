@@ -78,7 +78,7 @@ e.g. `app.getExpress()` to add API routes or ` gui.pages['main'].addFooterLink(.
 
 1. In the newly created app click "Manage Entities" 
 2. In the "Add / Update Entity" form define an ID (e.g. "Customer") and a title (Optional, but can contain spaces and special characters) and push the "Add" button.
-3. Click "Manage Properties"
+3. Click "Properties"
 4. Add some property fields, e.g. id="name", Label="Name", Type="String", Filter=checked
 
 ### Test the App
@@ -86,6 +86,12 @@ e.g. `app.getExpress()` to add API routes or ` gui.pages['main'].addFooterLink(.
 Open your new app in the "App" tab (the app is only visible in the defined scope).
 
 The web GUI supports CSV data upload, if this is enabled for the entity (checkbox).
+
+### Import Apps, Entity Models and State Models from Marketplace
+
+Just select your scope, open "Marketplace" and click the App or State Model to inspect the
+details. Click the "Check import" link to check all dependencies and if everything is OK, 
+click the "Import" link to add the models to your scope.
 
 # Entity / Document Model
 

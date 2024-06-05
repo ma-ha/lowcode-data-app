@@ -2,6 +2,7 @@
 
 const gui     = require( 'easy-web-app' )
 const log     = require( '../helper/log' ).logger
+const dta     = require( '../persistence/app-dta' )
 
 exports: module.exports = {
   init
@@ -11,17 +12,52 @@ let cfg = {}
 
 async function init( appCfg ) {
   cfg = appCfg
-  initMarketPage()
+  await initMarketPage()
   initDetailsPages()
   initAppImportPage()
+  setInterval( loadMarketStandards, 600000 )
 }
 
 
-function initMarketPage() {
+let stdOpts = [ { option: '*', value: '*' } ] 
+
+async function loadMarketStandards() {
+  if ( cfg.MARKETPLACE_SERVER ){
+    log.info( 'loadMarketStandards... ' )
+    let standards = {}
+      let dbSM = await dta.getStateModelMap( cfg.MARKETPLACE_SCOPE )
+    for ( let sm in dbSM ) {
+      if ( dbSM[ sm ] && dbSM[ sm ].standard && dbSM[ sm ].standard != '' ) {
+        standards[ dbSM[ sm ].standard.trim() ] = ''
+      }
+    }
+    let dbApps = await dta.getAppList( cfg.MARKETPLACE_SCOPE, [], 'marketplace' )
+    for ( let app in dbApps ) {
+      if ( dbApps[ app ] && dbApps[ app ].standard && dbApps[ app ].standard != '' ) {
+        standards[ dbApps[ app ].standard.trim() ] = ''
+      }
+    }
+  
+    stdOpts = [ { option: '*', value: '*' } ] 
+    for ( let std in standards ) {
+      stdOpts.push({ option: std, value: std })
+    }  
+  } else {
+    stdOpts = [ 
+      { option: '*', value: '*' },
+      { option: 'TM Forum', value: 'TM Forum' } 
+    ] 
+  }
+  log.info( 'loadMarketStandards',stdOpts )
+}
+
+async function initMarketPage() {
   let marketPage = gui.addPage( 'Marketplace' ) 
   marketPage.title    = 'App Marketplace'
   marketPage.navLabel = 'Marketplace'
   marketPage.setPageWidth( '90%' )
+
+  await loadMarketStandards()
 
   marketPage.addView({ 
     id: 'AppMarketplace', title: 'App Marketplace',  height: '760px', 
@@ -31,6 +67,7 @@ function initMarketPage() {
       filter: {
         dataReqParams : [
           { id: 'name', label: 'Name' },
+          { id: 'standard', label: 'Standard', type: 'select', options: stdOpts },
           { id: 'type', label: 'Type', type: 'select',
             options: [ { option: '*', value: '*' }, { option: 'App', value: 'App' }, { option: 'State Model', value: 'StateModel' } ] },
         ],
@@ -50,6 +87,10 @@ function initMarketPage() {
             //   id: 'id',
             //   cellType: 'text'
             // },
+            {
+              id: 'standard',
+              cellType: 'text'
+            },
             {
               id: 'title',
               cellType: 'text'
@@ -77,8 +118,7 @@ function initMarketPage() {
             }
           ]
         }
-      ],
-      maxRows: 6
+      ]
     }
   })
 

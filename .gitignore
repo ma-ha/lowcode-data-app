@@ -17,6 +17,7 @@ dta/app-temp.json
 /package.json
 /package-lock.json
 example-db-template.js
+example-marketplace-mh.js
 dta/2*
 dta/scopeCss.json
 

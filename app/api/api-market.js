@@ -34,6 +34,8 @@ async function setupAPI( app, appCfg ) {
   svc.get( '/market/import/html', getMarketImport )
   svc.get( '/market/howto/html', getMarketHowTo )
   svc.get( 'market/state-model/diagram', getMarketStateModel )
+
+  setInterval( clearMarketListCache, 60*60*1000 )
 }
 
 // ============================================================================
@@ -51,34 +53,70 @@ async function getMarketAppList( req, res )  {
   }
 }
 
+
+let marketList = null
+
+function clearMarketListCache(){
+  marketList = null
+}
+
 async function getMarketAppListFrmURL( req, res )  {
+  log.info( 'getMarketAppListFrmURL', req.query )
   let marketListURL = cfg.MARKETPLACE_URL +'/market.json'
   let offers = []
-  let { showApp, showSM, name } = getFilter( req ) 
+  let { showApp, showSM, name, standard } = getFilter( req ) 
 
   try {
-    log.info( 'axios', marketListURL )
-    let result = await axios.get( marketListURL )
-    log.info( 'axios', result.status )
-    if ( result.status == 200 ) {
-      offers = []
-      for ( let offer of result.data ) {
-        let img = offer.img 
-        if ( ! img ) {
-          img = 'img/k8s-ww-conn.png'
-          if ( offer.type =='StateModel' ) {
-            if ( ! showSM ) { continue }
-            img = 'img/state-model.png' // TODO
-          } else {
-            if ( ! showApp ) { continue }
-          }
-        }
-        if ( name &&  offer.title?.toLowerCase().indexOf( name ) == -1 ) { continue }
-        offer.img = '<a href="index.html?layout=MarketPrepImport-nonav&id='+offer.id+'">'+
-          '<img src="'+encodeURI(img)+'"></a>'
-        offers.push( offer )
+    log.debug( 'axios', marketListURL )
+    if ( ! marketList ) {
+      let result = await axios.get( marketListURL )
+      log.info( 'axios', result.status )
+      if ( result.status != 200 ) { 
+        log.error( 'axios.get', marketListURL, result.status )
+        return offers 
       }
+       marketList = result.data
     }
+    
+    offers = []
+    for ( let offer of marketList ) {
+      
+      if ( name &&  offer.title?.toLowerCase().indexOf( name ) == -1 ) { continue }
+      if ( standard ) {
+        if ( offer.standard ) {
+          if ( offer.standard.toLowerCase().indexOf( standard ) == -1 ) { continue }
+        } else {
+          continue 
+        }
+      }
+      let img = 'img/k8s-ww-conn.png'
+      if ( offer.type =='StateModel' ) {
+          if ( ! showSM ) { continue }
+          img = 'img/state-model.png'
+        } else {
+          if ( ! showApp ) { continue }
+        }
+      // if ( ! offer.img ) {
+      //   img = 'img/k8s-ww-conn.png'
+      //   if ( offer.type =='StateModel' ) {
+      //     if ( ! showSM ) { continue }
+      //     img = 'img/state-model.png' // TODO
+      //   } else {
+      //     if ( ! showApp ) { continue }
+      //   }
+      // } else {
+      //   img = encodeURI( offer.img )
+      // }
+      if ( offer.type =='StateModel' ) { 
+        offer.img = '<a href="index.html?layout=MarketStateModelDetails-nonav&id='+offer.id+'">'+
+        '<img src="'+img+'"></a>'
+      } else {
+        offer.img = '<a href="index.html?layout=MarketAppDetails-nonav&id='+offer.id+'">'+
+        '<img src="'+img+'"></a>'
+      }
+      offers.push( offer )
+    }
+  
   } catch ( exc ) {
     log.error( 'getAppMarketList', marketListURL, exc.message )
   }
@@ -87,7 +125,7 @@ async function getMarketAppListFrmURL( req, res )  {
 
 async function getMarketAppLisFrmDB( req, res )  { 
   let offers = []  
-  let { showApp, showSM, name } = getFilter( req ) 
+  let { showApp, showSM, name, standard } = getFilter( req ) 
 
   if ( showApp ) {
     let dbApps = await dta.getAppList( cfg.MARKETPLACE_SCOPE, [], 'marketplace' )
@@ -95,10 +133,19 @@ async function getMarketAppLisFrmDB( req, res )  {
       let app = dbApps[ appId ]
       let id = appId.split('/')[1]
       if ( name &&  app.title?.toLowerCase().indexOf( name ) == -1 ) { continue }
+      if ( standard ) {
+        if ( app.standard ) {
+          if ( app.standard.toLowerCase().indexOf( standard ) == -1 ) { continue }
+        } else {
+          continue 
+        }
+      }
       offers.push({
         id     : id,
         title  : app.title,
-        author : app.by,
+        standard  : app.standard,
+        license  : app.license,
+        author : ( app.by ? app.by : 'NN' ),
         type   : 'App',
         img    : '<a href="index.html?layout=MarketAppDetails-nonav&id=App/'+appId+'">'+ 
                  '<img src="img/k8s-ww-conn.png"></a>'
@@ -111,11 +158,22 @@ async function getMarketAppLisFrmDB( req, res )  {
     for ( let smId in dbSM ) {
       let stateModel = dbSM[ smId ]
       let id = smId.split('/')[1]
-      if ( name && id.indexOf( name ) == -1 ) { continue }
+      if ( name ) { 
+        if ( stateModel.title ) {
+          if ( stateModel.title.toLowerCase().indexOf( name ) == -1 ) { continue }
+        } else if ( id.indexOf( name ) == -1 ) { continue }
+      }
+      if ( standard ) {
+        if ( stateModel.standard ) {
+          if ( stateModel.standard.toLowerCase().indexOf( standard ) == -1 ) { continue }
+        } else {
+          continue 
+        }
+      }
       offers.push({
         id     : id,
         title  : ( stateModel.title ? stateModel.title : id ),
-        author : 'NN',
+        author : ( stateModel.by ? stateModel.by : 'NN'),
         type   : 'StateModel',
         img    : '<a href="index.html?layout=MarketStateModelDetails-nonav&id=StateModel/'+smId+'">'+
                  '<img src="img/state-model.png"></a>'
@@ -129,15 +187,22 @@ async function getMarketAppLisFrmDB( req, res )  {
 }
 
 function getFilter( req ) {
+  log.info( 'getFilter', req.query.dataFilter )
   let showApp = true
   let showSM  = true
   let name    = false
+  let standard = false
   if ( req.query.dataFilter ) {
     if ( req.query.dataFilter.type == 'App' ) { showSM = false }
     if ( req.query.dataFilter.type == 'StateModel' ) { showApp = false }
-    if ( req.query.dataFilter.name != '' ) { name = req.query.dataFilter.name.toLowerCase() }
+    if ( req.query.dataFilter.name != '' ) {
+      name = req.query.dataFilter.name.toLowerCase()
+    }
+    if ( req.query.dataFilter.standard != '*' ) { 
+      standard = req.query.dataFilter.standard.toLowerCase()
+    }
   }
-  return { showApp: showApp, showSM: showSM, name: name }
+  return { showApp: showApp, showSM: showSM, name: name, standard:standard }
 }
 
 // ============================================================================
@@ -160,9 +225,9 @@ async function getMarketItemDetailsFromURL( id )  {
 
   let html =  ''
   try {
-    log.info( 'axios', importUrl )
+    log.debug( 'axios', importUrl )
     let result = await axios.get( importUrl )
-    log.info( 'axios', result.data )
+    log.debug( 'axios', result.data )
     if ( result.status == 200 ) {
       if ( result.data.state ) {
         html = await preStateImport( id, result.data )
@@ -193,7 +258,11 @@ async function getMarketItemDetailsFromDB( id )  {
 }
 
 async function getMarketStateModel( req, res )  {
-  res.send({})
+  if ( ! cfg.MARKETPLACE_SERVER ) {
+    res.send(  { state: {} } )
+  } else {
+    await stateImport. getStateModel( req, res )
+  }
 }
 
 // ============================================================================
@@ -201,11 +270,12 @@ async function getMarketStateModel( req, res )  {
 async function prepAppImport( id, apps ) {
   let html = ''
   try {
-    html += '<b>'+ id +'</b>: <a href="market/prep-import?id='+id+'">Check import apps and entity models</a>'
     for ( let appId in apps ) {
       let app = apps[ appId ]
-      html += '<h2>App: '+ app.title +'</h2>'
+      html += '<h2>App: '+ ( app.standard ? app.standard + ' ' : '' ) + app.title +'</h2>'
+      html += 'License: '+ ( app.license ? app.license : 'unknown' ) + '<br>'
       html +=  app.description.replaceAll('\n','<p>')
+      html += '<p><b>'+ id +'</b>: <a href="market/prep-import?id='+id+'">Check import apps and entity models</a>'
       for ( let entityId in app.entity ) {
         let entity = app.entity[ entityId ]
         log.debug( 'entity', entity )
@@ -301,7 +371,7 @@ async function getMarketPrepImport( req, res ) {
 
     let appUrl = cfg.MARKETPLACE_URL +'/'+req.query.id+'.json'
     try {
-      log.info( 'axios', appUrl )
+      log.debug( 'axios', appUrl )
       let result = await axios.get( appUrl )
       // log.info( 'axios', result.data )
       if ( result.status == 200 ) {
@@ -324,7 +394,6 @@ async function getMarketPrepImport( req, res ) {
 async function getMarketImport( req, res ) {
   log.info( 'GET market/prep-import', req.query.id )
   let user = await userDta.getUserInfoFromReq( gui, req )
-  log.info( 'user', user )
   let html = impResult[ user.userId ]
   delete impResult[ user.userId ]
   res.send( html )

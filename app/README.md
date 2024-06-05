@@ -69,7 +69,7 @@ e.g. `app.getExpress()` to add API routes or ` gui.pages['main'].addFooterLink(.
 
 1. In the newly created app click "Manage Entities" 
 2. In the "Add / Update Entity" form define an ID (e.g. "Customer") and a title (Optional, but can contain spaces and special characters) and push the "Add" button.
-3. Click "Manage Properties"
+3. Click "Properties"
 4. Add some property fields, e.g. id="name", Label="Name", Type="String", Filter=checked
 
 ### Test the App

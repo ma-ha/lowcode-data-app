@@ -66,6 +66,10 @@ function init( gui, allCfg ) {
       return false
     }
     let u = await userDta.getUserInfo( user )
+    // if ( Date.now() - u.lastLogin  > 60000 ) {
+    //   log.info( 'lastlogin', page, Date.now() - u.lastLogin,  Date.now() , u.lastLogin )
+    //   return false
+    // }
     // log.info( 'user', user, u )
     if ( u.role.dev.length == 0  &&  DEV_PAGES.includes(page) ) {
       log.warn( 'User tries to access Dev Page:', user, '->', page )

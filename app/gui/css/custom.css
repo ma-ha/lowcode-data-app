@@ -1607,12 +1607,13 @@ code {
   width: auto;
   margin: 3px 6px 0 10px;
 }
-#AppMarketplaceContentSrchFrm input {
-  float: left;
+#AppMarketplaceContentSrchFrm input,
+#AppMarketplaceContentSrchFrm select {
+    float: left;
 }
 #AppMarketplace .pongListRow {
   width: 230px;
-  height: 200px;
+  height: 180px;
   float: left;
 }
 #AppMarketplace .pongListCell {

@@ -422,7 +422,11 @@ async function genGuiFormFieldsDef( entity, filter, user, stateTransition, rende
         // index.html?layout=AppEntity-nonav&id=2103/TmfServiceInventory/0.1.0,TmfIntent
         try {
           let ent = prop.selectRef.split('/')
-          let lnk = '<a href="index.html?layout=AppEntity-nonav&id='+ent[0]+'/'+ent[1]+'/'+ent[2]+','+ent[3]+'">'+ lbl +'</a>'
+          let lnk = '<a href="index.html?layout=AppEntity-nonav&id='+ent[0]+'/'+ent[1]+'/'+ent[2]+'">'+ lbl +'</a>'
+          if ( ent[3] ) {
+            lnk = '<a href="index.html?layout=AppEntity-nonav&id='+ent[0]+'/'+ent[1]+'/'+ent[2]+','+ent[3]+'">'+ lbl +'</a>'
+          }
+      
           fld = { id: fldId, label: lnk, type: 'select', options: [] }
           let opdTbl = await dta.getData( ent[0] + ent[3], user.scopeId )
           let refEntity = await getEntity( prop.selectRef, propId )
@@ -719,7 +723,7 @@ async function genGuiFormStateChangeDef( entity, filter, user, stateTransition, 
 // ============================================================================
 
 function reformatDataReturn( entity, result  ) {
-  log.info( 'reformatDataReturn', entity, result  )
+  log.debug( 'reformatDataReturn', entity, result  )
   for ( let propId in entity.properties )  {
     try {
       

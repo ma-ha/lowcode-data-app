@@ -202,6 +202,21 @@ async function prepJsonUpload( rootScopeId, newApps ) {
         if ( dbEntityMap[ entityId ] ) {
           result += '<br> WARNING: Entity "'+entityId+'" already exists (in '+dbEntityMap[ entityId ].appId+')'
         }
+        for ( let propId in app.entity[ entityId ].properties ) {
+          let prop = app.entity[ entityId ].properties[ propId ]
+          switch ( prop.type ) {
+            case 'DocMap':
+              prop.docMap = rootScopeId +'/'+ prop.docMap
+              break
+            case 'SelectRef':
+              prop.selectRef = rootScopeId +'/'+ prop.selectRef
+              break
+            case 'MultiSelectRef':
+              prop.multiSelectRef = rootScopeId +'/'+ prop.multiSelectRef
+              break
+            default: break
+          }
+        }
       }
     }
 
@@ -316,8 +331,10 @@ async function prepSwaggerUpload( appId, prefix, swaggerFile ) {
         htmlOut += ' <b>WARNING: Overwriting existing!!</b>' 
       }
       htmlOut += '<br>'
+      let title = defId.replace( /([A-Z])/g, ' $1' )
+      title = title.charAt(0).toUpperCase() + title.slice( 1 )
       let nE = {
-        title : defId,
+        title : title,
         scope : 'inherit',
         maintainer: [ "appUser" ],
         properties: { },
@@ -327,8 +344,11 @@ async function prepSwaggerUpload( appId, prefix, swaggerFile ) {
       entity[ prefix + defId ] = nE
       for ( let pId in sE.properties ) {
         let sP = sE.properties[ pId ]
+        let label = pId.replace( /([A-Z])/g, ' $1' )
+        label = label.charAt(0).toUpperCase() + label.slice( 1 )
         let prp = {
           type : 'String',
+          label : label,
           description : sP.description
         }
         if ( sE.required?.includes( pId ) ) {

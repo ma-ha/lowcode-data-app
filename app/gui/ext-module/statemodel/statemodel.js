@@ -4,12 +4,9 @@ log( "statemodel", "load module");
 let statemodelFn_divId  = '';
 let statemodelFn_id = null;
 let statemodelFn_MSvc = {};
-let statemodelFn_k8s  = {};
+let statemodelFn_ResUrl = {};
 let statemodelFn_lastSeen = null;
-let statemodelFn_k8s_node  = {};
 
-let statemodelFn_k8sName  = ''
-let statemodelFn_k8sNameS = ''
 let statemodelFn_divW = 0;
 let statemodelFn_changed = false;
 
@@ -25,6 +22,7 @@ function statemodel_loadResourcesHtml( divId, resUrl, fparam ) {
     alert('ID missing'); 
     return
   }
+  statemodelFn_ResUrl[ divId ] = resUrl
   $( '#'+divId ).html( `<DIV id="${divId}Pane" class="lc-statemodel-main-div"></DIV>` );
   statemodelFn_reDraw( divId );
 
@@ -44,7 +42,7 @@ function statemodel_loadResourcesHtml( divId, resUrl, fparam ) {
 statemodelDta = {}
 function statemodelFn_reDraw( divId ) {
   console.log( "statemodelFn_reDraw",  "divId="+divId );
-  $.getJSON( "state-model/diagram", { id: statemodelFn_id } ).done( ( statemodel )  => {
+  $.getJSON( statemodelFn_ResUrl[ divId ], { id: statemodelFn_id } ).done( ( statemodel )  => {
     statemodelDta = statemodel
     let html = [];
 
@@ -62,7 +60,7 @@ function statemodelFn_reDraw( divId ) {
   }).fail( ( err ) => {
     // Simulate a mouse click:
     console.log( "error", err );
-    window.location.href = "index.html?layout=main";
+    // window.location.href = "index.html?layout=main";
   });
 }
 
@@ -205,20 +203,6 @@ function statemodelFn_drawConnX( divId, e1, e2, relId, lbl, mFrm, mTo ) { try {
 
 
 function statemodelFn_setTitle() {
-  let title = 'Kubernetes Landscape <i>'+statemodelFn_k8sName+'</i> ... '
-  $( '.header-logo' ).html( '<h1>Kubernetes Monitor: '+statemodelFn_k8sNameS+'</h1>' );
-  if ( ! statemodelFn_lastSeen ) {
-    $( `#CluststatemodelonitoringTitle` ).html( title +'  <span style="color:gray">waiting for data</span> ');
-    return
-  }
-  let dtStr = ( new Date( statemodelFn_lastSeen ) ).toLocaleString()
-  if ( Date.now() - statemodelFn_lastSeen < 80000 ) {
-    $( `#CluststatemodelonitoringTitle` ).html( title +' updated '+ dtStr );
-  } else  if ( Date.now() - statemodelFn_lastSeen < 300000 ) {
-    $( `#CluststatemodelonitoringTitle` ).html( title +' <span style="color:orange"> last update '+ dtStr +"</span>" ); 
-  } else {
-    $( `#CluststatemodelonitoringTitle` ).html( title +' <span style="color:red">got last update '+ dtStr +"</span>" ); 
-  }
 }
 
 
