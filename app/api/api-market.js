@@ -259,6 +259,8 @@ async function getMarketItemDetailsFromDB( id )  {
 
 async function getMarketStateModel( req, res )  {
   log.info( 'getMarketStateModel', req.query.id )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'Login required!' )}
   if ( ! cfg.MARKETPLACE_SERVER ) {
     try {
       log.debug( 'axios', cfg.MARKETPLACE_URL +'/'+req.query.id+'.json' )
@@ -266,7 +268,7 @@ async function getMarketStateModel( req, res )  {
       log.debug( 'axios', result.data )
       if ( result.status == 200 ) {
         // if ( result.data.state ) {
-          return await stateImport.getStateModel( req, res, result.data )
+          return await stateImport.getStateModelDta( res, req.query.id, result.data )
         // }
       }
     } catch ( exc ) {

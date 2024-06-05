@@ -301,6 +301,7 @@ async function getStateModelById( stateModelId ) {
   let rootScopeId = stateModelId.split('/')[0]
   log.debug( 'getStateModelById', rootScopeId, stateModelId  )
   let stateModel = await loadDataById( rootScopeId+'_state', stateModelId )
+  log.debug( 'getStateModelById', stateModel  )
   return stateModel
 }
 

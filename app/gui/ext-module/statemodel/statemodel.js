@@ -59,7 +59,7 @@ function statemodelFn_reDraw( divId ) {
 
   }).fail( ( err ) => {
     // Simulate a mouse click:
-    console.log( "error", err );
+    console.log( "statemodelFn_reDraw ERROR", err );
     // window.location.href = "index.html?layout=main";
   });
 }

@@ -1,3 +1,6 @@
+# 0.29.4
+- fix state model editor
+
 # 0.29.3
 - Marketplace: improvements
 - Marketplace default from GitHub

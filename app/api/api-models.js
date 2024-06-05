@@ -11,7 +11,7 @@ const helper     = require( '../helper/helper' )
 exports: module.exports = { 
   setupAPI,
   prepJsonStateUpload,
-  getStateModel
+  getStateModelDta
 }
 
 // ============================================================================
@@ -695,10 +695,8 @@ async function delStateTransitions( req, res )  {
 
 // ============================================================================
 
-async function getStateModel( req, res, dta  )  {
-  log.debug( 'GET STM', req.query )
-  let user = await userDta.getUserInfoFromReq( gui, req )
-
+async function getStateModel( req, res  )  {
+  log.info( 'GET STM', req.query )
   let modelId = null
   if ( req.query.id.indexOf(',') > 0 ) {
     let { allOK, user, app, appId, entity, entityId } = await checkUserAppEntity( req, res )
@@ -710,22 +708,22 @@ async function getStateModel( req, res, dta  )  {
   } else {
     return res.send({})
   }
-  log.info( 'GET STM ', modelId )
-
-  let stateModel = null
-  if ( ! dta ) {
-    await dta.getStateModelById( user.rootScopeId+'/'+modelId )
-  } else {
-    stateModel = dta
-  }
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  log.info( 'getStateModel', user.rootScopeId+'/'+modelId )
+  let stateModel =  await dta.getStateModelById( user.rootScopeId+'/'+modelId )
+  
   if ( ! stateModel ) { 
     log.warn( 'stateModel no found', stateModel, modelId )
     return res.send(  { state: {} } )
     // return res.status(400).send( 'not found required' ) 
   }
-  
+  await getStateModelDta( res, modelId, stateModel )
+}
+
+
+async function getStateModelDta( res, modelId, stateModel ) {
+  log.debug( 'getStateModelDta',  modelId, stateModel )
   let stm = { state: {} }
-  
   let x = 100
 
   for ( let stateId in stateModel.state ) {
