@@ -696,7 +696,7 @@ async function delStateTransitions( req, res )  {
 // ============================================================================
 
 async function getStateModel( req, res, dta  )  {
-  log.info( 'GET STM', req.query )
+  log.debug( 'GET STM', req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
 
   let modelId = null
