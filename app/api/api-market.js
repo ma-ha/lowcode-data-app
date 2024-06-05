@@ -263,7 +263,7 @@ async function getMarketStateModel( req, res )  {
     try {
       log.debug( 'axios', cfg.MARKETPLACE_URL +'/'+req.query.id+'.json' )
       let result = await axios.get( cfg.MARKETPLACE_URL +'/'+req.query.id+'.json' )
-      log.info( 'axios', result.data )
+      log.debug( 'axios', result.data )
       if ( result.status == 200 ) {
         // if ( result.data.state ) {
           return await stateImport.getStateModel( req, res, result.data )
