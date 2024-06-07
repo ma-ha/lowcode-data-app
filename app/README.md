@@ -2,6 +2,8 @@
 
 Build your multi tenant data driven apps quickly with the npm package: https://www.npmjs.com/package/lowcode-data-app
 
+IMPORTANT: This is in experimental state!
+
 ## General Idea
 
 It starts with a generic, secure **web gui**.

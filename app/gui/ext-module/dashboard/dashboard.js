@@ -5,7 +5,7 @@ let dashboardPanels = {}
 
 function dashboard_loadResourcesHtml( divId, resUrl, fparam ) {
   // console.log( "dashboard", "divId="+divId, " resourceURL="+resUrl, fparam );
-  if ( ! moduleConfig[ divId ] || ! moduleConfig[ divId ].id ) {
+  if ( ! moduleConfig[ divId ] || ! moduleConfig[ divId ].id || ! moduleConfig[ divId ].appId  ) {
     alert('ID missing'); 
     return
   }
@@ -17,7 +17,11 @@ function dashboardFn_reDraw( divId ) {
   // console.log( "dashboardFn_reDraw",  "divId="+divId );
   dashboardPanels[ divId ] = {}
   let panelSize = ( moduleConfig[ divId ].panelSize ? moduleConfig[ divId ].panelSize : 200 )
-  $.getJSON( "dashboard/panel", { id:  moduleConfig[ divId ].id } ).done( ( panels )  => {
+  let qry = {
+    id    :  moduleConfig[ divId ].id,
+    appId :  moduleConfig[ divId ].appId 
+  }
+  $.getJSON( "dashboard/panel", qry ).done( ( panels )  => {
     dashboardPanels[ divId ] = panels
     let html = [];
     for ( let panelId in panels ) {

@@ -75,7 +75,7 @@ async function getAppLnk( req, res )  {
 // --------------------------------------------------------------------------
 
 async function getApp( req, res )  {
-  log.debug( 'GET app' )
+  log.info( 'GET app', req.query )
   let user = await userDta.getUserInfoFromReq( gui, req )
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   let appId = req.query.id
@@ -89,7 +89,7 @@ async function getApp( req, res )  {
       let app = appMap[ appId ]
       let dashboardLnk = ''
       if ( app.dashboard ) {
-        dashboardLnk = '<a href="index.html?layout=AppDashboardPanels-nonav&id='+app.title.replaceAll(' ','_')+'">Configure</a>'
+        dashboardLnk = '<a href="index.html?layout=AppDashboardPanels-nonav&id='+appId+'">Configure</a>'
       }
       apps.push({
         active : ( app.role.length > 0),
@@ -121,6 +121,13 @@ async function getAppForCustomize( req, res )  {
   log.debug( 'GET app/customize' )
   let { allOK, user, app, appId } = await checkUserApp( req, res )
   if ( ! allOK ) { return }
+  log.info( 'app', app)
+  let boardCSV = ''
+  if ( typeof app.startPage === 'string' || app.startPage instanceof String ) {
+    boardCSV = startPage
+  } else {
+    boardCSV = app.startPage.join(',')
+  }
 
   let cApp = {
     appIdOrig   : appId,  
@@ -131,7 +138,9 @@ async function getAppForCustomize( req, res )  {
     role        : ( app.role.length > 0 ? app.role[0] : '-' ),
     img         : ( app.img ? app.img : '' ),
     enabled     : ( app.enabled ? true : false ),
-    description : ( app.description ?  app.description : '' )
+    enabled     : ( app.enabled ? true : false ),
+    dashboard   : ( app.dashboard ?  app.dashboard : '' ),
+    boardCSV    : boardCSV
   }
   if ( cfg.MARKETPLACE_SERVER ) {
     cApp.marketplace = ( app.marketplace ? true : false )
@@ -167,6 +176,14 @@ async function addApp( req, res ) {
     return res.status(401).send( 'ID must be scope/name/version or name/version' )
   }
   log.info( 'POST /app', req.body )
+
+  if ( req.body.boardCSV ) { // modify startPage only
+    let app = await dta.getAppById( req.body.appId )
+    app.startPage = req.body.boardCSV.split(',')
+    await dta.addApp( appId, app )
+    return res.send( 'Start Pages Updated' )
+  }
+
   let app = await dta.getAppById( req.body.appIdOrig )
   if ( req.body.appIdOrig != req.body.appId ) { // copy mode
     let appN = await dta.getAppById( req.body.appId )
@@ -229,7 +246,7 @@ async function addApp( req, res ) {
     app.img =  req.body.img
   }
 
-  await dta.addApp( appId, app)
+  await dta.addApp( appId, app )
   res.send( 'OK' )
 }
 
@@ -750,13 +767,14 @@ async function getDashboardPanel( req, res ) {
   if ( req.query._recId == '_empty' ) {
     return res.send({
       panelId : '',
-      boardId : req.query.bId,
+      appId : req.query.appId,
+      boardId : 'Dashboard',
       scopeId : user.rootScopeId,
       Type    : 'Number',
       Title   : '',
       SubText : '',
-      PosX    : '1',
-      PosY    : '1',
+      PosX    : '0',
+      PosY    : '0',
       Size    : '1x1',
       Entity  : '',
       Query   : '{}',
@@ -766,12 +784,12 @@ async function getDashboardPanel( req, res ) {
       CSS     : 'L',
       Img     : ''
     })
-  } else if ( req.query.id  &&  req.query.layout ) { // board id
+  } else if ( req.query.id  &&  req.query.layout ) { // id => appId
     let panels = await dta.getData( 
       user.rootScopeId + '_dashboard', 
       user.rootScopeId,
       false,
-      { "Board": req.query.id } 
+      { "appId": req.query.id } 
     )
     for ( let panelId in panels ) {
       let panel = panels[ panelId ]
@@ -779,7 +797,8 @@ async function getDashboardPanel( req, res ) {
       panelArr.push({
         panelId : panel.id,
         scopeId : panel.scopeId,
-        Board   : panel.Board,
+        appId   : panel.appId,
+        boardId : ( panel.boardId ? panel.boardId : 'Dashboard' ),
         Title   : panel.Title,
         CSS     : ( panel.CSS ? panel.CSS : 'L' ),
         Type    : panel.Type,
@@ -797,8 +816,9 @@ async function getDashboardPanel( req, res ) {
     let e = p.Metric.Entity.split('/')
     let panel = {
       panelId : p.id,
-      boardId : p.Board,
+      appId   : p.appId,
       scopeId : p.scopeId,
+      boardId : ( p.boardId ? p.boardId : 'Dashboard' ),
       Type    : p.Type,
       Title   : p.Title,
       SubText : p.SubText,
@@ -826,11 +846,13 @@ async function addDashboardPanel( req, res ) {
   let s = req.body.Size.split('x')
   let size = [ Number.parseInt( s[0] ),  Number.parseInt( s[1] ) ]
   let e = req.body.Entity.split('/')
+  let boardId =  ( req.body.boardId == '' ? 'Dashboard' : req.body.boardId )
   log.info(' >>>', e )
   if ( ! e || e.length != 4 ) { return res.send('ERROR: Entity must have format: "scope/app-name/ver/entity-name"') }
   let panel = {
     scopeId : user.rootScopeId,
-    Board   : req.body.boardId,
+    appId   : req.body.appId,
+    boardId : boardId,
     Type    : req.body.Type,
     Title   : req.body.Title,
     SubText : req.body.SubText,
@@ -852,6 +874,13 @@ async function addDashboardPanel( req, res ) {
     panel.id = helper.uuidv4()
   }
   await dta.addDataObjNoEvent( user.rootScopeId + '_dashboard', panel.id, panel )
+  let app = await dta.getAppById(  req.body.appId )
+  if ( app ) {
+    if ( ! app.startPage.includes( 'dashboard/'+boardId ) ) {
+      app.startPage.push( 'dashboard/'+boardId )
+      await dta.saveApp( req.body.appId, app )
+    }
+  }
   res.send( 'OK' )
 }
 

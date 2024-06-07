@@ -1598,6 +1598,16 @@ code {
   padding: 10px;
   text-align: center;
 }
+
+#AppDashboardInfoContentboardCSV {
+  width: 800px;
+}
+#AppDashboardInfoContentPongFormFrm .pongFormInputGrpClose {
+  display: none;
+}
+#AppDashboardInfoContentPongFormFrm pongFormInputGrp0 {
+  width: auto;
+}
 /*  -------------------- Marketplace ---------------*/
 
 #AppMarketplaceContentSrchFrm label {

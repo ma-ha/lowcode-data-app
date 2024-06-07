@@ -882,7 +882,7 @@
     },
     "page": {},
     "startPage": [
-      "dashboard/Task List",
+      "dashboard/Dashboard",
       "Ticket"
     ],
     "scopeId": null,
@@ -907,7 +907,7 @@
     "img": "img/k8s-fire.png",
     "id": "1000/ticket-mgr/1.0.0",
     "_cre": 1711692745036,
-    "_upd": 1714413925341,
+    "_upd": 1717760977083,
     "description": "Task management"
   }
 }

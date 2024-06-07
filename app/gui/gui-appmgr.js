@@ -754,18 +754,29 @@ async function init( appCfg ) {
   dashboardPg.setPageWidth( '90%' )
 
   dashboardPg.dynamicRow( async ( staticRows, req, pageName ) => {
-    let boardId = req.query.id
+    let appId = req.query.id
 
     let rows =  [{ 
-      id: 'AppDashboarInfo', rowId: 'AppDashboarInfo', title: 'Entity',  height: '80px', 
-      type : 'pong-form', resourceURL: 'app', decor: 'decor',
+      id: 'AppDashboardInfo', rowId: 'AppDashboardInfo', title: 'Dashboard Configuration',
+      type : 'pong-form', resourceURL: 'app/customize', decor: 'decor', height: '90px',
       moduleConfig : {
-        description: "AppDashboarInfo",
-        id: 'AppDashboarInfoForm',
-        fieldGroups:[{ columns: [
-          { formFields: [
-            { id: "boardId", label: "Noard Id", type: "text", defaultVal: boardId.replaceAll('_',' '), readonly: true } ]}
-        ] }]
+        description: "AppDashboardInfo",
+        id: 'AppDashboardInfoForm',
+        fieldGroups:[{ 
+          columns: [
+            { formFields: [
+              { id: "appId", label: "App", type: "text", defaultVal: appId.replaceAll('_',' '), readonly: true }
+            ]},
+            { formFields: [
+              { id: "boardCSV", label: "Boards", type: "text" }
+            ]}
+          ]
+        }],
+        actions: [
+          { id: "UpdStartPage", actionName: " Update", actionURL: 'app', target: "modal" },
+          { id: 'Init', onInit: 'GET', actionURL: 'app' }
+        ]
+
       }
     }]
 
@@ -779,12 +790,13 @@ async function init( appCfg ) {
         cols: [
           { id: 'Edit', label: "", cellType: "button", width :'4%', icon: 'ui-icon-pencil', 
             method: "GET", setData: [ { resId : 'AddDashboardPanel' } ] },
+          { id: "boardId",  label: "Dashboard", width: "15%", cellType: "text" },
           { id: "Title",  label: "Title", width: "15%", cellType: "text" },
           { id: "Type",   label: "Type",  width: "10%", cellType: "text" },
           { id: "CSS",    label: "CSS",   width: "6%", cellType: "text" },
           { id: "Pos",    label: "Pos",   width: "6%", cellType: "text" },
           { id: "Size",   label: "Size",  width: "6%", cellType: "text" },
-          { id: "Entity", label: "Entity",width: "20%", cellType: "text" },
+          { id: "Entity", label: "Collection",width: "20%", cellType: "text" },
           { id: "Query",  label: "Query", width: "15%", cellType: "text" },
           { id: "Prop",   label: "Property",width: "15%", cellType: "text" }
         ]
@@ -793,7 +805,7 @@ async function init( appCfg ) {
 
     rows.push({  id: 'AddDashboardPanel', rowId: 'AddDashboardPanel',
       title: 'Add / Edit Dashboard Panel',  
-      height: '200px',  decor: 'decor',
+      height: 'auto',  decor: 'decor',
       type : 'pong-form', resourceURL: 'app/dashboard/panel',
       moduleConfig : {
   //      label:'Add Scope',
@@ -802,7 +814,8 @@ async function init( appCfg ) {
         fieldGroups:[{ columns: [
           { formFields: [
             { id: "panelId",  type: "text", readonly: true },
-            { id: "boardId",  type: "text", hidden: true, value: boardId },
+            { id: "appId",  type: "text", hidden: true, value: appId },
+            { id: "boardId", label: "Dashboard Name", type: "text", defaultVal: 'Dashboard' },
             { id: "Type",   label: "Type",    type: "select",  
               options: addOptions(['Number','Text','ProgressBar','Distribution','Pie180',
                 'Pie360','Table','Items','KeyValue','ItemBars','Graph','Bars','BarGraph'], 
@@ -820,7 +833,7 @@ async function init( appCfg ) {
           ]},  
           { formFields: [
             { id: "Entity", label: "Entity",  type: "text" },
-            { id: "Query",  label: "Query",   type: "text" },
+            { id: "Query",  label: "Query",   type: "text", defaultVal: '{}' },
           ]},
           { formFields: [
             { id: "Prop",   label: "Prop ",   type: "text" },
@@ -834,10 +847,11 @@ async function init( appCfg ) {
 
         ] }],
         actions : [ 
-          { id: "AddDashboardPanelBtn", actionName: "Add / Update", update: [{ resId:'DashboardPanels' }], 
+          { id: "AddDashboardPanelBtn", actionName: "Add / Update", 
+            update: [{ resId:'DashboardPanels' }, { resId: 'AppDashboardInfo'}],
             actionURL: 'app/dashboard/panel', target: "modal" },
           { id: "AddDashboardPanelReset", actionName: "Reset", method: 'GET',
-            actionURL: 'app/dashboard/panel?_recId=_empty&bId='+boardId,
+            actionURL: 'app/dashboard/panel?_recId=_empty',
             setData: [{ resId : 'AddDashboardPanel' }] }
         ]
       }

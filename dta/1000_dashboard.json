@@ -26,11 +26,14 @@
     },
     "id": "111",
     "_cre": 1707026935716,
-    "_upd": 1714983555514
+    "_upd": 1714983555514,
+    "boardId": "Dashboard",
+    "appId": "1000/ticket-mgr/1.0.0"
   },
   "112": {
     "scopeId": "1000",
-    "Board": "Task_List",
+    "appId": "1000/ticket-mgr/1.0.0",
+    "boardId": "Dashboard",
     "Type": "ProgressBar",
     "Title": "Ticket Done",
     "SubText": "... of non-closed",
@@ -59,7 +62,8 @@
   },
   "113": {
     "scopeId": "1000",
-    "Board": "Task_List",
+    "appId": "1000/ticket-mgr/1.0.0",
+    "boardId": "Dashboard",
     "Type": "Distribution",
     "Title": "Ticket by Status",
     "SubText": "... as mixed bar",
@@ -88,7 +92,8 @@
   },
   "114": {
     "scopeId": "1000",
-    "Board": "Task_List",
+    "appId": "1000/ticket-mgr/1.0.0",
+    "boardId": "Dashboard",
     "Type": "Bars",
     "Title": "Tickets in Progress",
     "SubText": "... also this",
@@ -117,7 +122,8 @@
   },
   "115": {
     "scopeId": "1000",
-    "Board": "Task_List",
+    "appId": "1000/ticket-mgr/1.0.0",
+    "boardId": "Dashboard",
     "Type": "Items",
     "Title": "Top Prio",
     "SubText": "... tickets",
@@ -147,7 +153,8 @@
   "116": {
     "id": "116",
     "scopeId": "1000",
-    "Board": "Task_List",
+    "appId": "1000/ticket-mgr/1.0.0",
+    "boardId": "Dashboard",
     "Title": "Top Prio",
     "SubText": "... tickets",
     "Type": "Table",
@@ -172,7 +179,8 @@
   "117": {
     "id": "117",
     "scopeId": "1000",
-    "Board": "Task_List",
+    "appId": "1000/ticket-mgr/1.0.0",
+    "boardId": "Dashboard",
     "Title": "Ticket Count",
     "SubText": "... tickets",
     "Type": "BarGraph",
@@ -199,7 +207,8 @@
   "123": {
     "id": "123",
     "scopeId": "1000",
-    "Board": "Task_List",
+    "appId": "1000/ticket-mgr/1.0.0",
+    "boardId": "Dashboard",
     "Title": "Ticket by Status",
     "SubText": "... as pie 180",
     "Type": "Pie180",
@@ -226,7 +235,8 @@
   "123a": {
     "id": "123a",
     "scopeId": "1000",
-    "Board": "Task_List",
+    "appId": "1000/ticket-mgr/1.0.0",
+    "boardId": "Dashboard",
     "Title": "Ticket by Status",
     "SubText": "... as pie 180",
     "Type": "Pie180",
@@ -252,7 +262,8 @@
   },
   "5d331940-2dac-4597-a182-da30171a89a6": {
     "scopeId": "1000",
-    "Board": "City_Light_Manager",
+    "appId": "City_Light_Manager",
+    "boardId": "Dashboard",
     "Type": "Number",
     "Title": "xxx",
     "SubText": "",
@@ -281,7 +292,8 @@
   },
   "128ba5f9-d5db-44fd-abfa-29586e709c70": {
     "scopeId": "1000",
-    "Board": "City_Light_Manager",
+    "appId": "City_Light_Manager",
+    "boardId": "Dashboard",
     "Type": "Number",
     "Title": "Test",
     "SubText": "",

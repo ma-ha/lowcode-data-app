@@ -575,12 +575,13 @@ async function getDashboardPanels( req, res ) {
   log.info( 'GET /dashboard/panels', req.query.id  ) 
   if ( ! user ) { return res.status(401).send( 'login required' ) }
   if ( ! req.query.id ) { return res.status(400).send( 'id required' ) }
+  if ( ! req.query.appId ) { return res.status(400).send( 'appId required' ) }
 
-   let panels = await dta.getData( 
+  let panels = await dta.getData( 
     user.rootScopeId + '_dashboard', 
     user.rootScopeId,
     false,
-    { "Board": req.query.id } 
+    { appId: req.query.appId, boardId: req.query.id } 
   )
   log.debug( 'panels', panels )
   res.send( panels )

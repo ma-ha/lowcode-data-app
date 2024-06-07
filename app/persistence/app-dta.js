@@ -198,6 +198,34 @@ async function prepDB() {
       }
     }, null, ' ' ))
   }
+
+  // migrate dashboards for v0.30.0
+  for ( let scopeId in scopeMap ) try {
+    if ( fs.existsSync( fileName( scopeId + '_dashboard' ) ) ) {
+      let dashboard = await syncTbl( scopeId + '_dashboard', SYNC_ALWAYS )
+      let needSave = false
+      for ( let panelId in dashboard ) {
+        let panel = dashboard[ panelId ] 
+        if ( ! panel.appId ) {
+          panel.boardId = 'Dashboard'
+          let appMap = await getAppList( scopeId, null, 'admin' )
+          for ( let appId in appMap ) {
+            let app =  appMap[ appId ]
+            if ( app.title.replaceAll(' ','') == panel.Board.replaceAll('_','') ) {
+              log.warn( 'MIGRATE ',  scopeId + '_dashboard', panelId )
+              panel.appId = appId
+              needSave = true
+              continue
+            }
+          }
+        }
+      }
+      if ( needSave ) {
+        await writeFile( fileName( scopeId + '_dashboard' ), JSON.stringify( dashboard, null, '  ' ) )
+      }
+
+    }
+  } catch ( exc ) { log.error('Dashboard migration failed:', exc ) }
 }
 
 function appTblName( scopeId ) {

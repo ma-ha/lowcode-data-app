@@ -80,19 +80,18 @@ async function renderDynEntityRows( staticRows, req, pageName )  {
         if ( entityId.startsWith( 'dashboard/' ) ) {
 
           let parts = entityId.split('/')
-          let boardName = parts[1]
+          let dashboard = parts[1]
           
-          let boardId   = boardName.replaceAll( ' ', '_' )
           let moduleConfig = {
-            id: boardId
+            appId : appId,
+            id: dashboard
           }
-          if ( parts[2] ) {
-            moduleConfig.entity = parts[2]
-          }
+
+          let boardId   = dashboard.replaceAll( ' ', '_' )
 
           let tabSpec = {
             tabId  : 'Tab' + boardId, 
-            title  : boardName,
+            title  : dashboard,
             rows:  [{ 
               id     : 'AppDashboard'+boardId, 
               rowId  : 'AppDashboard'+boardId, 

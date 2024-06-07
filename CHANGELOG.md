@@ -1,3 +1,6 @@
+# 0.30.0
+- Support multiple dashboards
+
 # 0.29.4
 - fix state model editor
 
