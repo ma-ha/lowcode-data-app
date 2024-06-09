@@ -42,7 +42,7 @@ let DB = null
 
 async function init( cfg ) {
   if ( cfg.PERSISTENCE ) { // EXTERNAL IMPLEMENTATION
-    let replaceOK = true
+    let extPersistenceOK = true
 
     const dbMethods = ['info','prepDB',
       'loadData','loadDataById','savedDataObj','delData'
@@ -50,7 +50,7 @@ async function init( cfg ) {
     for ( let dbMethod of dbMethods ) {
       if ( ! cfg.PERSISTENCE[ dbMethod ] ) {
         log.error( "REQUIRED METHOD NOT FOUND:", dbMethod )
-        replaceOK = false
+        extPersistenceOK = false
       }
     }
     const userMethods = ['getNextScopeId','loadScopes','saveScope','delScope',
@@ -60,12 +60,15 @@ async function init( cfg ) {
     for ( let dbMethod of userMethods ) {
       if ( ! cfg.PERSISTENCE.USER[ dbMethod ] ) {
         log.error( "REQUIRED METHOD NOT FOUND:", dbMethod )
-        replaceOK = false
+        extPersistenceOK = false
       }
     }
-    if ( replaceOK ) { 
+    if ( extPersistenceOK ) { 
       DB = cfg.PERSISTENCE
       log.info( 'USE:', DB.info() )
+
+      DB.prepDB()
+
       userDB.init( cfg )
       return 
     } else {
@@ -185,6 +188,7 @@ async function prepDB() {
 
     await writeFile( fileName( 'user-auth' ), JSON.stringify({
       demo: {
+        userId : 'demo',
         name: "Demo",
         role: {
           dev     : [ "1000" ],

@@ -1,3 +1,6 @@
+# 0.30.1
+- fix package.json
+
 # 0.30.0
 - Support multiple dashboards
 
