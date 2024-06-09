@@ -152,7 +152,8 @@ async function getSelScope( userId ) {
   let userScope = await loadUserScope( userId )
   if (  userScope ) {
     return userScope
-  } 
+  }
+  await saveUserScope( userId, idnty.role.appUser[0] )
   return idnty.role.appUser[0]
 }
 
@@ -162,7 +163,8 @@ async function getSelScopeName( userId ) {
   let userScope =await loadUserScope( userId )
   if (  userScope ) {
     return await getScopeName( userScope )
-  } 
+  }
+  await saveUserScope( userId, idnty.role.appUser[0] )
   return await getScopeName( idnty.role.appUser[0] )
 }
 
@@ -248,6 +250,10 @@ async function getUserInfo( userId ) {
   let scopeTbl = await loadScopes() 
   let idnty = await loadUserById( userId )
 
+  // log.info( 'getUserInfo userId', userId )
+  // log.info( 'getUserInfo scopeId', scopeId )
+  // log.info( 'getUserInfo idnty', idnty )
+  // log.info( 'getUserInfo scopeTbl', scopeTbl )
 
   if ( ! scopeId ) { return null }
   let rootScope = scopeId

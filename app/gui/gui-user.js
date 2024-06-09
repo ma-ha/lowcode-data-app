@@ -77,7 +77,7 @@ async function init( ) {
     moduleConfig : {
       id: 'AddPrincipalForm',
       fieldGroups:[{ columns: [
-        { formFields: [{ id: "sp_name",label: "App Name", type: "text" } ]},
+        { formFields: [{ id: "sp_name",label: "App Name", type: "select",   optionsResource: { resourceURL: 'app/options', optionValue: 'id',optionField:'id' }} ]},
         { formFields: [{ id: "sp_expire",  label: "Expires", type: "select", 
             options:  addOptions([ '6m', '1y', '2y' ]) } ]},
         { formFields: [{ id: "sp_id",  type: "text", hidden: true, defaultVal: 'add' } ]},

@@ -1,3 +1,6 @@
+# 0.30.2
+- slight improvements + fixes
+
 # 0.30.1
 - fix package.json
 

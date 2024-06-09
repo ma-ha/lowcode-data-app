@@ -41,6 +41,7 @@ const SYNC_ALWAYS = true
 let DB = null 
 
 async function init( cfg ) {
+  log.info( 'Init Persistence...')
   if ( cfg.PERSISTENCE ) { // EXTERNAL IMPLEMENTATION
     let extPersistenceOK = true
 
@@ -55,11 +56,11 @@ async function init( cfg ) {
     }
     const userMethods = ['getNextScopeId','loadScopes','saveScope','delScope',
       'loadUserArr','loadUserById','saveUser','delUser','loadUserScope','saveUserScope',
-      'writeUserScope','loadOidcSessions','saveOidcSessions'
+      'loadOidcSessions','saveOidcSessions'
     ]
     for ( let dbMethod of userMethods ) {
       if ( ! cfg.PERSISTENCE.USER[ dbMethod ] ) {
-        log.error( "REQUIRED METHOD NOT FOUND:", dbMethod )
+        log.error( "EXTERNAL PERSISTENCE: REQUIRED METHOD NOT FOUND:", dbMethod )
         extPersistenceOK = false
       }
     }
@@ -621,7 +622,7 @@ async function loadDataById( tbl, id ) {
 
 async function saveData( tbl, id, obj ) {
   log.debug( 'addDataObjNoEvent', tbl, id )
-  if ( DB ) { return await DB.saveData( tbl, id, obj ) }
+  if ( DB ) { return await DB.savedDataObj( tbl, id, obj ) }
   // --- JSON file DB ---
   await syncTbl( tbl )
   let cre = null

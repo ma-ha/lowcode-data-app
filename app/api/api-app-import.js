@@ -105,57 +105,6 @@ async function uploadAppJSON( req, res ) {
     let newApps = JSON.parse( '' + req.files.file.data )
     let result = await prepJsonUpload( user.rootScopeId, newApps )
     uploadResult[ user.userId ] = result
-
-    // let dbApps = await  dta.getAppList( user.scopeId, [], 'admin' )
-
-    // let dbEntityMap = {}
-    // for ( let appId in dbApps ) {
-    //   for ( let entityId in dbApps[ appId ].entity ) {
-    //     dbEntityMap[ entityId ] = { appId: appId }
-    //   }
-    // }
-
-    // uploadResult = 'Parsed successfully'
-    // uploadOK     = true
-    // for ( let appId in newApps ) {
-    //   if ( dbApps[ user.rootScopeId +'/'+ appId ] ) {
-    //     uploadResult += '<p> ERROR, ALREADY EXISTS: App ID <b>' + appId + '</b>'
-    //     uploadOK = false
-    //     continue 
-    //   } 
-    //   let app = newApps[ appId ]
-    //   uploadResult += '<p> App ID: <b>' + appId  + '</b>'
-    //   for ( let requireAppId of app.require ) {
-    //     if ( dbApps[ user.rootScopeId +'/'+ requireAppId ] ) {
-    //       uploadResult += '<br> Dependency: ' +  user.rootScopeId +'/'+ requireAppId + ' ... already available'
-    //     } else  if ( newApps[ requireAppId ] ) {
-    //       uploadResult += '<br> Dependency uploaded: ' + requireAppId 
-    //     } else {
-    //       uploadResult += '<br> ERROR: Dependency: NOT FOUND'
-    //       uploadOK = false
-    //     }
-    //   }
-
-    //   for ( let entityId in app.entity ) {
-    //     if ( dbEntityMap[ entityId ] ) {
-    //       uploadResult += '<br> WARNING: Entity "'+entityId+'" already exists (in '+dbEntityMap[ entityId ].appId+')'
-    //     }
-    //   }
-    // }
-
-    // if ( uploadOK ) {
-    //   for ( let appId in newApps ) {
-    //     let importId = helper.uuidv4()
-    //     let appImp = {
-    //       apps    : newApps,
-    //       _expire : Date.now() + 1000*60*60*24
-    //     }
-    //     await dta.addDataObjNoEvent( 'app-temp', importId, appImp )
-    //     uploadResult += '<p> Click to <a href="app/import/'+importId+'">IMPORT</a>'
-    //   }
-    // } else {
-    //   uploadResult += '<p> <b> UPLOAD FAILED! </b>'
-    // }
    
   } catch ( exc ) {  
     log.warn( 'uploadAppJSON', exc )
@@ -224,7 +173,8 @@ async function prepJsonUpload( rootScopeId, newApps ) {
       for ( let appId in newApps ) {
         let importId = helper.uuidv4()
         let appImp = {
-          apps    : newApps,
+          appId   : appId,
+          app    : newApps[ appId ],
           _expire : Date.now() + 1000*60*60*24
         }
         await dta.addDataObjNoEvent( 'app-temp', importId, appImp )
@@ -269,6 +219,11 @@ async function importApp( req, res ) {
     }
     await dta.addApp( impDta.appId, app )
 
+
+  } else if ( impDta.appId && impDta.app ) { // swagger
+
+    log.info( 'GET /app/import IMPORT 1 >>', impDta.appId  ) 
+    await dta.addApp( user.rootScopeId +'/'+ impDta.appId, impDta.app )
 
   } else {
 

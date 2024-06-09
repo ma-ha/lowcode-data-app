@@ -31,6 +31,7 @@ async function setupAPI( app, appCfg ) {
 
   svc.get(  '/app-lnk/html', guiAuthz, getAppLnk ) // for HTML view above the app list
   svc.get(  '/app', guiAuthz, getApp )
+  svc.get(  '/app/options', guiAuthz, getAppOptions )
   svc.post( '/app', guiAuthz, addApp )
   svc.get(  '/app/customize', guiAuthz, getAppForCustomize )
   
@@ -114,6 +115,19 @@ async function getApp( req, res )  {
     }
     res.send( apps )
   }
+}
+
+
+async function getAppOptions( req, res ) {
+  log.info( 'GET app', req.query )
+  let user = await userDta.getUserInfoFromReq( gui, req )
+  if ( ! user ) { return res.status(401).send( 'login required' ) }
+  let appMap = await dta.getAppList( user.scopeId, [], 'admin' )
+  let apps = []
+  for ( let appId in appMap ) {
+    apps.push({ id : appId })
+  }
+  res.send( apps )
 }
 
 
