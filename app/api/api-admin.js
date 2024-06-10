@@ -195,6 +195,28 @@ async function addUser( req, res ) {
       return res.status(401).send( 'Email not valid' )
     }
 
+    // adding an existing user to a scope w/o knowing he is a user
+    if ( req.body.mode != 'update' ) {
+      let userExists = await userDta.loadUserById( req.body.email )
+      if ( userExists ) {
+        if ( ! userExists.role.appUser.includes( user.scopeId ) ) {
+          userExists.role.appUser.push( user.scopeIdr )
+        }
+        if ( req.body.dev ) { 
+          if ( ! userExists.role.dev.includes( user.scopeId ) ) {
+            userExists.role.dev.push( user.scopeId )
+          }
+        }
+        if ( req.body.admin ) { 
+          if ( ! userExists.role.admin.includes( user.scopeId ) ) {
+            userExists.role.admin.push( user.scopeId )
+          } 
+        }
+        await userDta.saveUser( req.body.email, userExists )
+        return res.send( 'User invited to scope!' ) 
+      }
+    }
+
     let userRec = {
       name : req.body.name,
       role : {

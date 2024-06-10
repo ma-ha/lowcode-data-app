@@ -16,6 +16,8 @@ exports: module.exports = {
   getSelScope,
   getSelScopeName,
   getUser,
+  loadUserById,
+  saveUser,
   getUserInfo,
   getUserInfoFromReq,
   geScopeArr,

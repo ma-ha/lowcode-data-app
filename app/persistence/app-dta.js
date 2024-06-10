@@ -350,7 +350,7 @@ async function saveStateModel( stateModelId, stateModel ) {
 // ============================================================================
 
 // tbl param can be like "1000city" or "1000/region-mgr/1.0.0/city"
-async function getData( tbl, scopeId, admin, qry ) {  
+async function getData( tbl, scopeId, admin, qry ) {
   log.debug( 'getData',  tbl, scopeId )
   let table = tbl
   await syncTbl( tbl )
@@ -371,7 +371,7 @@ async function getData( tbl, scopeId, admin, qry ) {
   let result = {}
   for ( let recId in dtaMap ) {
     let rec = dtaMap[ recId ]
-    if ( !  isQueried( rec, qry ) ) { continue }
+    if ( ! isQueried( rec, qry ) ) { continue }
     log.debug( 'getData dta:', inheritData, recId, scopeId, rec.scopeId  )
     if ( admin ) {
       result[ recId ] = rec
@@ -435,7 +435,7 @@ async function getDataObjX( rootScopeId, appId, appVersion, entityId, userScopeI
   } else {
     // array of data fo scope
     result = []
-    let dtaMap = await loadData( tbl )
+    let dtaMap = await loadData( tbl, filterParams )
     for ( let recId in dtaMap ) {
       let rec = dtaMap[ recId ]
       if ( scopeOK( userScopeId, rec.scopeId, inherit ) ) {

@@ -95,8 +95,14 @@ function userTenantAuthz( theGUI ) {
   let check = async (req, res, next) => {
     let user = await userDta.getUserInfoFromReq( gui, req )
     if ( user ) { 
-      // TODO check scopeId
-
+      if ( req.params.tenantId && user.rootScopeId != req.params.tenantId) { // TODO test intensive
+        log.warn( 'user scope', user.rootScopeId, req.params.tenantId )
+        log.info( 'call is not authorized', req.headers )
+        return next( new UnauthorizedError(
+          'Not authorized', 
+          { message: 'Not authorized' }
+        ))
+      }
       req.user = user
     } else {
       log.info( 'call is not authorized', req.headers )
