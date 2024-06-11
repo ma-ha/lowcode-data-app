@@ -1,3 +1,6 @@
+# 0.30.4
+- Add user to scope fix
+
 # 0.30.3
 - Entity API with scope authz
 - Add user to scope

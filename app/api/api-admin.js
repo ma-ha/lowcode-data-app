@@ -200,7 +200,7 @@ async function addUser( req, res ) {
       let userExists = await userDta.loadUserById( req.body.email )
       if ( userExists ) {
         if ( ! userExists.role.appUser.includes( user.scopeId ) ) {
-          userExists.role.appUser.push( user.scopeIdr )
+          userExists.role.appUser.push( user.scopeId )
         }
         if ( req.body.dev ) { 
           if ( ! userExists.role.dev.includes( user.scopeId ) ) {
